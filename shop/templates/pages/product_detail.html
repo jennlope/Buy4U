@@ -1,0 +1,29 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="h1">{{ title }}</h1>
+            <h2 class="h2">{{ subtitle }}</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Mostrar la imagen del producto -->
+            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+        </div>
+        <div class="col-md-6">
+            <!-- Mostrar los detalles del producto -->
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Name:</strong> {{ product.name }}</li>
+                <li class="list-group-item"><strong>Price:</strong> ${{ product.price }}</li>
+                <li class="list-group-item"><strong>Brand:</strong> {{ product.brand }}</li>
+                <li class="list-group-item"><strong>Warranty:</strong> {{ product.warranty }}</li>
+                <li class="list-group-item"><strong>Description:</strong> {{ product.description }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

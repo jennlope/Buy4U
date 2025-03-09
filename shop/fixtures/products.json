@@ -1,0 +1,26 @@
+[
+    {
+        "model": "shop.product",
+        "pk": 1,
+        "fields": {
+            "name": "Smartphone",
+            "price": 599.99,
+            "brand": "Samsung",
+            "warranty": "2 years",
+            "description": "A high-end smartphone with great features.",
+            "image": "products/smartphone.jpg"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 2,
+        "fields": {
+            "name": "Laptop",
+            "price": 1299.99,
+            "brand": "Dell",
+            "warranty": "3 years",
+            "description": "A powerful laptop for professionals.",
+            "image": "products/laptop.jpg"
+        }
+    }
+]
