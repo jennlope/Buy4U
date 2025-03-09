@@ -13,15 +13,39 @@ class HomePageView(TemplateView):
 class ShopPageView(TemplateView):
     template_name = 'pages/shop.html'
 
+class ProductFilterForm(forms.Form):
+    name = forms.CharField(required=False, label='Name', widget=forms.TextInput(attrs={'placeholder': 'Buscar producto...'}))
+    min_price = forms.DecimalField(required=False, label='Minimum price', min_value=0)
+    max_price = forms.DecimalField(required=False, label='Maximum price', min_value=0)
+    brand = forms.CharField(required=False, label='Brand')
+
 class ShopView(View):
     template_name = 'pages/shop.html'
 
     def get(self, request):
+        form = ProductFilterForm(request.GET)
         products = Product.objects.all()
+        
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            min_price = form.cleaned_data.get('min_price')
+            max_price = form.cleaned_data.get('max_price')
+            brand = form.cleaned_data.get('brand')
+
+            if name:
+                products = products.filter(name__icontains=name)
+            if min_price is not None:
+                products = products.filter(price__gte=min_price)
+            if max_price is not None:
+                products = products.filter(price__lte=max_price)
+            if brand:
+                products = products.filter(brand__icontains=brand)
+
         view_data = {
             "title": "Shop - Buy4U",
             "subtitle": "List of products",
-            "products": products
+            "products": products,
+            "form": form
         }
         return render(request, self.template_name, view_data)
 
