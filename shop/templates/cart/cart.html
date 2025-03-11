@@ -1,0 +1,30 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <div class="row">
+        {% for key, product in cart_products.items %}
+    <div class="col-md-4 col-lg-3 mb-2">
+        <div class="card">
+            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+            <div class="card-body text-center">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">${{ product.price }}</p>
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-success">View Details</a>
+
+                <!-- Formulario para quitar del carrito -->
+                <form method="post" action="{% url 'remove_cart' product.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <p>No products added to the cart.</p>  <!-- ← Esto mostrará en caso de no haber agregado nada al carro -->
+{% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -67,3 +67,47 @@ class ProductDetailView(View):
             "product": product
         }
         return render(request, self.template_name, view_data)
+
+class CartView(View):
+    template_name = 'cart/cart.html'
+
+    def get(self, request):
+        # Extracting from the database the products available
+        products = Product.objects.all()
+
+        # Get cart items from session
+        cart_products = {}
+        cart_products_data = request.session.get('cart_product_data', {})
+
+        for product in products:
+            if str(product.id) in cart_products_data:
+                cart_products[product.id] = product
+
+        # Data for the view
+        view_data = {
+            "title": "Cart - Buy4U",
+            "subtitle": "Shopping cart",
+            "products": products,
+            "cart_products": cart_products,
+        }
+        return render(request, self.template_name, view_data)
+    
+    def post(self, request, product_id):
+        cart_product_data = request.session.get('cart_product_data', {})
+        if product_id:
+            cart_product_data[str(product_id)] = str(product_id)
+            request.session['cart_product_data'] = cart_product_data
+
+        return redirect('shop')
+    
+class CartRemoveView(View):
+    template_name = 'cart/cart.html'
+
+    def post (self, request, product_id):
+        cart_product_data = request.session.get('cart_product_data', {})
+        product_id = str(product_id)
+
+        if product_id in cart_product_data:
+            del cart_product_data[str(product_id)]
+            request.session['cart_product_data'] = cart_product_data
+        return redirect('cart_index')

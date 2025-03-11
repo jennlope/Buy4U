@@ -40,6 +40,12 @@
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">${{ product.price }}</p>
                 <a href="{% url 'product_detail' product.id %}" class="btn btn-success">View Details</a>
+
+                <!-- Formulario para agregar al carrito -->
+                <form method="post" action="{% url 'add_cart' product.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+                </form>
             </div>
         </div>
     </div>
