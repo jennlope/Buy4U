@@ -38,7 +38,7 @@ class DoAnOrderView(View):
 class OrderConfirmationView(View):
     def get(self, request, order_id):
         try:
-            order = Order.objects.get(order_id=order_id)
+            order = Order.objects.get(id=order_id)
             return render(request, 'pages/order_confirmation.html', {'order': order})
         except Order.DoesNotExist:
             messages.error(request, "Order not found.")
