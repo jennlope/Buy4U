@@ -1,0 +1,8 @@
+{% extends "pages/base.html" %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-success">Order successfully placed</h2>
+    <p>Your order #{{ order.order_id}} is in status: {{ order.status }}.</p>
+    <a href="{% url 'shop' %}" class="btn btn-primary">Continue shopping</a>
+</div>
+{% endblock %}

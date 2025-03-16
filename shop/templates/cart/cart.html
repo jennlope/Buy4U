@@ -12,12 +12,12 @@
             <div class="card-body text-center">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">${{ product.price }}</p>
-                <a href="{% url 'product_detail' product.id %}" class="btn btn-success">View Details</a>
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
 
                 <!-- Formulario para quitar del carrito -->
                 <form method="post" action="{% url 'remove_cart' product.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Remove</button>
+                    <button type="submit" class="btn btn-danger fw-bold fs-5 w-100 mt-3">Remove</button>
                 </form>
             </div>
         </div>
@@ -25,6 +25,10 @@
 {% empty %}
     <p>No products added to the cart.</p>  <!-- ← Esto mostrará en caso de no haber agregado nada al carro -->
 {% endfor %}
+<form method="post" action="{% url 'Do_Order' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success fw-bold fs-5 w-100">Place an order</button>
+</form>
     </div>
 </div>
 {% endblock %}
