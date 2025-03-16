@@ -8,7 +8,9 @@
             "brand": "Samsung",
             "warranty": "2 years",
             "description": "A high-end smartphone with great features.",
-            "image": "products/smartphone.jpg"
+            "image": "products/smartphone.jpg",
+            "quantity": 3,
+            "type": "Smartphone"
         }
     },
     {
@@ -20,7 +22,10 @@
             "brand": "Dell",
             "warranty": "3 years",
             "description": "A powerful laptop for professionals.",
-            "image": "products/laptop.jpg"
+            "image": "products/laptop.jpg",
+            "quantity": 3,
+            "type": "PC"
+
         }
     }
 ]

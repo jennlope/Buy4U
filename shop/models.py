@@ -8,6 +8,8 @@ class Product(models.Model):
     warranty = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to='products/', null=True, blank=True)
+    quantity = models.IntegerField(default=0)
+    type = models.CharField(max_length=255, default="Electrónico")
 
     def __str__(self):
         return self.name
