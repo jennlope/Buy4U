@@ -93,6 +93,9 @@ class CartView(View):
         return render(request, self.template_name, view_data)
     
     def post(self, request, product_id):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
         cart_product_data = request.session.get('cart_product_data', {})
         if product_id:
             cart_product_data[str(product_id)] = str(product_id)
@@ -104,6 +107,8 @@ class CartRemoveView(View):
     template_name = 'cart/cart.html'
 
     def post (self, request, product_id):
+        if not request.user.is_authenticated:
+            return redirect('login')
         cart_product_data = request.session.get('cart_product_data', {})
         product_id = str(product_id)
 
@@ -115,3 +120,61 @@ class CartRemoveView(View):
 def cart_count(request):
     cart_count = len(request.session.get('cart_product_data', {}))
     return {'cart_count': cart_count}
+
+class admin_product_view(View):
+    template_name = 'admin/manage.html'
+    
+    def get(self, request):
+        products = Product.objects.all()
+        view_data = {
+            "title": "Admin - Buy4U",
+            "subtitle": "Manage products",
+            "products": products,
+        }
+        return render(request, self.template_name, view_data)
+    
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
+        if request.POST.get('delete'):
+            product_id = request.POST.get('delete')
+            product = get_object_or_404(Product, pk=product_id)
+            product.delete()
+            return redirect('admin_dashboard')
+        
+        if request.POST.get('add'):
+            name = request.POST.get('name')
+            price = request.POST.get('price')
+            brand = request.POST.get('brand')
+            warranty = request.POST.get('warranty')
+            description = request.POST.get('description')
+            image = request.FILES.get('image')
+            quantity = request.POST.get('quantity')
+            type = request.POST.get('type')
+            product = Product(name=name, price=price, brand=brand, warranty=warranty, description=description, image=image, quantity=quantity, type=type)
+            product.save()
+            return redirect('admin_dashboard')
+        
+        if request.POST.get('edit'):
+            product_id = request.POST.get('edit')
+            product = get_object_or_404(Product, pk=product_id)
+            name = request.POST.get('name')
+            price = request.POST.get('price')
+            brand = request.POST.get('brand')
+            warranty = request.POST.get('warranty')
+            description = request.POST.get('description')
+            image = request.FILES.get('image')
+            quantity = request.POST.get('quantity')
+            type = request.POST.get('type')
+            product.name = name
+            product.price = price
+            product.brand = brand
+            product.warranty = warranty
+            product.description = description
+            product.image = image
+            product.quantity = quantity
+            product.type = type
+            product.save()
+            return redirect('admin_dashboard')
+        return redirect('admin_dashboard')

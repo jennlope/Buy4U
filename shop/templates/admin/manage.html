@@ -1,0 +1,129 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="h1">{{ title }}</h1>
+            <p>{{ subtitle }}</p>
+        </div>
+    </div>
+
+    <!-- Formulario para agregar un producto -->
+    <div class="card shadow-sm p-4 mb-4">
+        <h3 class="h3 text-center mb-3">Agregar Producto</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="add" value="1">
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Nombre:</label>
+                    <input type="text" name="name" class="form-control" required>
+
+                    <label class="form-label">Precio:</label>
+                    <input type="number" name="price" class="form-control" step="0.01" required>
+
+                    <label class="form-label">Marca:</label>
+                    <input type="text" name="brand" class="form-control" required>
+
+                    <label class="form-label">Garantía:</label>
+                    <input type="text" name="warranty" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Descripción:</label>
+                    <textarea name="description" class="form-control" rows="3" required></textarea>
+
+                    <label class="form-label">Imagen:</label>
+                    <input type="file" name="image" class="form-control" accept="image/*" required>
+
+                    <label class="form-label">Cantidad:</label>
+                    <input type="number" name="quantity" class="form-control" required>
+
+                    <label class="form-label">Tipo:</label>
+                    <input type="text" name="type" class="form-control" required>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success fw-bold">Agregar Producto</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Muestra todos los productos disponibles -->
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card shadow-sm">
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">${{ product.price }}</p>
+                    <p class="text-muted">{{ product.brand }} | Garantía: {{ product.warranty }}</p>
+                    <p class="small">{{ product.description }}</p>
+                    <p class="fw-bold">Stock: {{ product.quantity }}</p>
+                    <div class="d-grid gap-2">
+                        <!-- Botón eliminar -->
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete" value="{{ product.pk }}">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Seguro que quieres eliminar este producto?');">Eliminar</button>
+                        </form>
+
+                        <!-- Abre la interfaz de edición -->
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal{{ product.pk }}">Editar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de edición de productos -->
+        <div class="modal fade" id="editProductModal{{ product.pk }}" tabindex="-1" aria-labelledby="editProductLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="edit" value="{{ product.pk }}">
+                            <label class="form-label">Nombre:</label>
+                            <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+
+                            <label class="form-label">Precio:</label>
+                            <input type="number" name="price" class="form-control" value="{{ product.price }}" step="0.01" required>
+
+                            <label class="form-label">Marca:</label>
+                            <input type="text" name="brand" class="form-control" value="{{ product.brand }}" required>
+
+                            <label class="form-label">Garantía:</label>
+                            <input type="text" name="warranty" class="form-control" value="{{ product.warranty }}" required>
+
+                            <label class="form-label">Descripción:</label>
+                            <textarea name="description" class="form-control" rows="3" required>{{ product.description }}</textarea>
+
+                            <label class="form-label">Imagen:</label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+
+                            <label class="form-label">Cantidad:</label>
+                            <input type="number" name="quantity" class="form-control" value="{{ product.quantity }}" required>
+
+                            <label class="form-label">Tipo:</label>
+                            <input type="text" name="type" class="form-control" value="{{ product.type }}" required>
+
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No hay productos disponibles.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
