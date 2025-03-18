@@ -25,7 +25,20 @@
             "image": "products/laptop.jpg",
             "quantity": 3,
             "type": "PC"
-
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 3,
+        "fields": {
+            "name": "Tablet Pro",
+            "price": 799.99,
+            "brand": "Apple",
+            "warranty": "1 year",
+            "description": "Una tablet perfecta para creativos y profesionales, con pantalla Retina y Apple Pencil compatible.",
+            "image": "products/tablet.jpg",
+            "quantity": 3,
+            "type": "Tablet"
         }
     }
 ]

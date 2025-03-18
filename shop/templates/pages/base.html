@@ -42,15 +42,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#">Contact</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="navbar align-self-center d-flex">
@@ -67,11 +70,11 @@
                     </a>
                     <a class="nav-icon position-relative text-decoration-none" href="{% url 'cart_index' %}">
                         <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">#</span>
+                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">{{ cart_count }}</span>
                     </a>
                     <a class="nav-icon position-relative text-decoration-none" href="#">
                         <i class="fa fa-fw fa-user text-dark mr-3"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">+99</span>
+                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark"></span>
                     </a>
                 </div>
             </div>

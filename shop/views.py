@@ -98,7 +98,7 @@ class CartView(View):
             cart_product_data[str(product_id)] = str(product_id)
             request.session['cart_product_data'] = cart_product_data
 
-        return redirect('shop')
+        return redirect('cart_index')
     
 class CartRemoveView(View):
     template_name = 'cart/cart.html'
@@ -111,3 +111,7 @@ class CartRemoveView(View):
             del cart_product_data[str(product_id)]
             request.session['cart_product_data'] = cart_product_data
         return redirect('cart_index')
+    
+def cart_count(request):
+    cart_count = len(request.session.get('cart_product_data', {}))
+    return {'cart_count': cart_count}

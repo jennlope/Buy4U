@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic.edit import FormView
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 class loginView(FormView):
@@ -31,7 +32,7 @@ class loginView(FormView):
         else:
             messages.error(self.request, 'Username OR password is incorrect')
             return self.form_invalid(form)
-    
+
 class logoutView(View):
     def get(self, request):
         logout(request)
