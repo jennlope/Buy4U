@@ -12,20 +12,23 @@
 
     <!-- Form to search -->
     <form method="GET" class="mb-4">
-        <div class="row">
+        <div class="row g-2 align-items-end">
             <div class="col-md-3">
-                <input type="text" name="name" class="form-control" placeholder="Search product" value="{{ request.GET.name }}">
+                {{ form.name }}
             </div>
             <div class="col-md-2">
-                <input type="number" name="min_price" class="form-control" placeholder="Minimum price" value="{{ request.GET.min_price }}">
+                {{ form.min_price }}
             </div>
             <div class="col-md-2">
-                <input type="number" name="max_price" class="form-control" placeholder="Maximum price" value="{{ request.GET.max_price }}">
+                {{ form.max_price }}
             </div>
             <div class="col-md-3">
-                <input type="text" name="brand" class="form-control" placeholder="Brand" value="{{ request.GET.brand }}">
+                {{ form.brand }}
             </div>
             <div class="col-md-2">
+                {{ form.type }}
+            </div>
+            <div class="col-md-1 d-grid">
                 <button type="submit" class="btn btn-success fw-bold fs-5 w-100">Search</button>
             </div>
         </div>
@@ -41,7 +44,6 @@
                 <p class="card-text">${{ product.price }}</p>
                 <div class="d-grid gap-2">
                     <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
-
                     <!-- Formulario para agregar al carrito -->
                     <form method="post" action="{% url 'add_cart' product.id %}">
                         {% csrf_token %}

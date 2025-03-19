@@ -52,5 +52,12 @@ class registerView(FormView):
 
     def form_valid(self, form):
         user = form.save()
+        print(f"Usuario registrado: {user.username}")
+        login(self.request, user)
         messages.success(self.request, f'Account was created for {user.username}')
-        return super().form_valid(form)
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        print("ERROR en el formulario:", form.errors)
+        messages.error(self.request, "Error in the registration form.")
+        return self.render_to_response(self.get_context_data(form=form))

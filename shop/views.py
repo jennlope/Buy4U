@@ -14,16 +14,26 @@ class ShopPageView(TemplateView):
     template_name = 'pages/shop.html'
 
 class ProductFilterForm(forms.Form):
-    name = forms.CharField(required=False, label='Name', widget=forms.TextInput(attrs={'placeholder': 'Buscar producto...'}))
-    min_price = forms.DecimalField(required=False, label='Minimum price', min_value=0)
-    max_price = forms.DecimalField(required=False, label='Maximum price', min_value=0)
-    brand = forms.CharField(required=False, label='Brand')
+    name = forms.CharField(required=False, label='Name', widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'Search product'}))
+    min_price = forms.DecimalField(required=False, label='Minimum price', min_value=0,widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minimum'}))
+    max_price = forms.DecimalField(required=False, label='Maximum price', min_value=0,widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Maximum'}))
+    brand = forms.CharField(required=False, label='Brand',widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Brand'}))
+    
+    type = forms.ChoiceField(
+        choices=[],required=False,label="Type",widget=forms.Select(attrs={'class': 'form-select'})
+    )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        types = Product.objects.values_list('type', flat=True).distinct()
+        self.fields['type'].choices = [('', 'All')] + [(t, t) for t in types]
+
+    
 class ShopView(View):
     template_name = 'pages/shop.html'
 
     def get(self, request):
-        form = ProductFilterForm(request.GET)
+        form = ProductFilterForm(request.GET) 
         products = Product.objects.all()
         
         if form.is_valid():
@@ -31,6 +41,7 @@ class ShopView(View):
             min_price = form.cleaned_data.get('min_price')
             max_price = form.cleaned_data.get('max_price')
             brand = form.cleaned_data.get('brand')
+            type = form.cleaned_data.get('type')
 
             if name:
                 products = products.filter(name__icontains=name)
@@ -40,12 +51,14 @@ class ShopView(View):
                 products = products.filter(price__lte=max_price)
             if brand:
                 products = products.filter(brand__icontains=brand)
+            if type:
+                products = products.filter(type__iexact=type)
 
         view_data = {
             "title": "Shop - Buy4U",
             "subtitle": "List of products",
             "products": products,
-            "form": form
+            "form": form, 
         }
         return render(request, self.template_name, view_data)
 
@@ -79,15 +92,14 @@ class CartView(View):
         cart_products = {}
         cart_products_data = request.session.get('cart_product_data', {})
 
-        for product in products:
-            if str(product.id) in cart_products_data:
-                cart_products[product.id] = product
+        for product_id, quantity in cart_products_data.items():
+            product = get_object_or_404(Product, id=int(product_id))
+            cart_products[product] = quantity
 
         # Data for the view
         view_data = {
             "title": "Cart - Buy4U",
             "subtitle": "Shopping cart",
-            "products": products,
             "cart_products": cart_products,
         }
         return render(request, self.template_name, view_data)
@@ -97,12 +109,34 @@ class CartView(View):
             return redirect('login')
         
         cart_product_data = request.session.get('cart_product_data', {})
-        if product_id:
-            cart_product_data[str(product_id)] = str(product_id)
-            request.session['cart_product_data'] = cart_product_data
-
+        
+        quantity = int(request.POST.get("quantity", 1))
+        
+        if str(product_id) in cart_product_data:
+            cart_product_data[str(product_id)] += quantity
+        else:
+            cart_product_data[str(product_id)] = quantity
+            
+        
+        request.session['cart_product_data'] = cart_product_data
         return redirect('cart_index')
-    
+  
+class CartUpdateQuantityView(View):
+    def post(self, request, product_id):
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        cart_product_data = request.session.get('cart_product_data', {})
+
+        quantity = int(request.POST.get("quantity", 1))
+        if quantity > 0:
+            cart_product_data[str(product_id)] = quantity
+        else:
+            del cart_product_data[str(product_id)]  # Elimina si la cantidad es 0
+
+        request.session['cart_product_data'] = cart_product_data
+        return redirect('cart_index')
+  
 class CartRemoveView(View):
     template_name = 'cart/cart.html'
 

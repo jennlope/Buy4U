@@ -5,13 +5,25 @@
 <div class="container py-5">
     
     <div class="row">
-        {% for key, product in cart_products.items %}
+        {% for product, quantity in cart_products.items %}
     <div class="col-md-4 col-lg-3 mb-2">
         <div class="card">
             <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
             <div class="card-body text-center">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">${{ product.price }}</p>
+
+                <!-- Formulario para actualizar cantidad -->
+                <form method="post" action="{% url 'cart_update_quantity' product.id %}">
+                    {% csrf_token %}
+                    <label for="quantity_{{ product.id }}">quantity:</label>
+                    <input type="number" name="quantity" id="quantity_{{ product.id }}"
+                    value="{{ quantity }}" min="1" class="form-control mb-2"
+                    onchange="this.form.submit()">
+                </form>
+
+
+                 <!-- Botón para ver detalles -->
                 <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
 
                 <!-- Formulario para quitar del carrito -->
