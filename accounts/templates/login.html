@@ -16,5 +16,14 @@
         <button type="submit" class="btn btn-primary">Login</button>
         <a href="{% url 'register' %}"class="btn btn-link">¿No tienes cuenta? Regístrate</a>
     </form>
+    {% if form.errors %}
+        <ul style="color: red;">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock %}
