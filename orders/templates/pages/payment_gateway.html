@@ -3,8 +3,8 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-success">Payment Gateway</h2>
-    <p>Please review your order and proceed to payment.</p>
+    <h2 class="text-success">Pasarela de Pago (Basico)</h2>
+    <p>Piensa bien en si de verdad quieres estos productos bro.</p>
 
     <!-- Lista de productos en el carrito -->
     <div class="row">
@@ -12,9 +12,9 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
                         <th>Subtotal</th>
                     </tr>
                 </thead>
@@ -44,7 +44,7 @@
         <div class="col-lg-12 text-end">
             <form method="post" action="{% url 'process_payment' %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success">Proceed to Payment</button>
+                <button type="submit" class="btn btn-success">Ir a pagar</button>
             </form>
         </div>
     </div>
