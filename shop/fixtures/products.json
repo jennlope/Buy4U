@@ -8,7 +8,7 @@
             "brand": "Samsung",
             "warranty": "2 years",
             "description": "A high-end smartphone with great features.",
-            "image": "products/smartphone.jpg",
+            "image": "products/NK4.png",
             "quantity": 3,
             "type": "Smartphone"
         }
@@ -22,7 +22,7 @@
             "brand": "Dell",
             "warranty": "3 years",
             "description": "A powerful laptop for professionals.",
-            "image": "products/laptop.jpg",
+            "image": "products/NK3.png",
             "quantity": 3,
             "type": "PC"
         }
@@ -36,9 +36,149 @@
             "brand": "Apple",
             "warranty": "1 year",
             "description": "Una tablet perfecta para creativos y profesionales, con pantalla Retina y Apple Pencil compatible.",
-            "image": "products/tablet.jpg",
+            "image": "products/NK5.png",
             "quantity": 3,
             "type": "Tablet"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 4,
+        "fields": {
+            "name": "Smartphone Ultra",
+            "price": 999.99,
+            "brand": "Samsung",
+            "warranty": "2 years",
+            "description": "El último modelo con pantalla AMOLED y cámara de 108 MP.",
+            "image": "products/NK2.png",
+            "quantity": 5,
+            "type": "Smartphone"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 5,
+        "fields": {
+            "name": "Nokia Gaming X",
+            "price": 1599.99,
+            "brand": "Nokia",
+            "warranty": "2 years",
+            "description": "Nokia de alto rendimiento con GPU RTX 4080 y pantalla de 240Hz.",
+            "image": "products/NK1.png",
+            "quantity": 2,
+            "type": "Smartphone"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 6,
+        "fields": {
+            "name": "Auriculares Inalámbricos",
+            "price": 199.99,
+            "brand": "Sony",
+            "warranty": "1 year",
+            "description": "Auriculares con cancelación de ruido y hasta 30 horas de batería.",
+            "image": "products/NK6.png",
+            "quantity": 10,
+            "type": "Accesorios"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 7,
+        "fields": {
+            "name": "Monitor 4K 32\"",
+            "price": 499.99,
+            "brand": "LG",
+            "warranty": "3 years",
+            "description": "Monitor UHD 4K con HDR y tasa de refresco de 144Hz.",
+            "image": "products/NK7.png",
+            "quantity": 4,
+            "type": "Monitor"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 8,
+        "fields": {
+            "name": "Smartwatch Pro",
+            "price": 349.99,
+            "brand": "Garmin",
+            "warranty": "2 years",
+            "description": "Reloj inteligente con GPS, sensor cardíaco y resistencia al agua.",
+            "image": "products/NK8.png",
+            "quantity": 6,
+            "type": "Smartwatch"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 9,
+        "fields": {
+            "name": "Teclado Mecánico RGB",
+            "price": 129.99,
+            "brand": "Razer",
+            "warranty": "2 years",
+            "description": "Teclado mecánico con switches ópticos y retroiluminación RGB personalizable.",
+            "image": "products/NK9.png",
+            "quantity": 8,
+            "type": "Accesorios"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 10,
+        "fields": {
+            "name": "Router WiFi 6",
+            "price": 179.99,
+            "brand": "TP-Link",
+            "warranty": "3 years",
+            "description": "Router de alta velocidad con soporte para WiFi 6 y múltiples dispositivos.",
+            "image": "products/NK10.png",
+            "quantity": 7,
+            "type": "Redes"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 11,
+        "fields": {
+            "name": "Disco Duro Externo 2TB",
+            "price": 89.99,
+            "brand": "Western Digital",
+            "warranty": "3 years",
+            "description": "Almacenamiento portátil de 2TB con conexión USB 3.0.",
+            "image": "products/NK11.png",
+            "quantity": 12,
+            "type": "Almacenamiento"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 12,
+        "fields": {
+            "name": "Cámara Web 1080p",
+            "price": 69.99,
+            "brand": "Logitech",
+            "warranty": "1 year",
+            "description": "Cámara web Full HD con micrófono integrado y soporte ajustable.",
+            "image": "products/NK12.png",
+            "quantity": 9,
+            "type": "Cámara"
+        }
+    },
+    {
+        "model": "shop.product",
+        "pk": 13,
+        "fields": {
+            "name": "Silla Gamer Ergonómica",
+            "price": 299.99,
+            "brand": "Secretlab",
+            "warranty": "5 years",
+            "description": "Silla gamer de alta calidad con soporte lumbar y ajuste 4D.",
+            "image": "products/NK13.png",
+            "quantity": 3,
+            "type": "Mobiliario"
         }
     }
 ]
