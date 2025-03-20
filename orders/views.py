@@ -43,3 +43,53 @@ class OrderConfirmationView(View):
         except Order.DoesNotExist:
             messages.error(request, "Order not found.")
             return redirect('shop')
+
+class PaymentGatewayView(View):
+    def get(self, request):
+        # Obtener los productos del carrito desde la sesión
+        cart_products = request.session.get('cart_product_data', {})
+        
+        # Obtener los detalles de los productos y calcular el total
+        products = []
+        total = 0
+        for product_id, quantity in cart_products.items():
+            product = Product.objects.get(id=product_id)
+            subtotal = product.price * int(quantity)
+            total += subtotal
+            products.append({
+                'product': product,
+                'quantity': quantity,
+                'subtotal': subtotal,
+            })
+
+        # Pasar los datos a la plantilla
+        context = {
+            'products': products,
+            'total': total,
+        }
+        return render(request, 'pages/payment_gateway.html', context)        
+    
+class ProcessPaymentView(View):
+    def post(self, request):
+        # Simular el procesamiento del pago
+        # Aquí podrías integrar una API de pago real, pero en este caso solo redirigimos
+
+        # Obtener los productos del carrito desde la sesión
+        cart_products = request.session.get('cart_product_data', {})
+
+        if not cart_products:
+            messages.error(request, "Your cart is empty.")
+            return redirect('cart_index')
+
+        # Crear la orden (esto ya lo tienes en DoAnOrderView)
+        order = Order.objects.create()
+        for product_id, quantity in cart_products.items():
+            product = Product.objects.get(id=product_id)
+            ProductOrder.objects.create(order=order, product=product, quantity=quantity)
+
+        # Vaciar el carrito
+        request.session['cart_product_data'] = {}
+
+        # Redirigir a la página de confirmación del pedido
+        messages.success(request, f"Order {order.order_id} successfully completed.")
+        return redirect(reverse('order_confirmation', kwargs={'order_id': order.order_id}))

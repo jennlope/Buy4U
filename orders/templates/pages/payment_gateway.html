@@ -1,0 +1,52 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-success">Payment Gateway</h2>
+    <p>Please review your order and proceed to payment.</p>
+
+    <!-- Lista de productos en el carrito -->
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in products %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.product.price }}</td>
+                        <td>${{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Total a pagar -->
+    <div class="row">
+        <div class="col-lg-12 text-end">
+            <h4>Total: ${{ total }}</h4>
+        </div>
+    </div>
+
+    <!-- Botón para simular el pago -->
+    <div class="row">
+        <div class="col-lg-12 text-end">
+            <form method="post" action="{% url 'process_payment' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Proceed to Payment</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

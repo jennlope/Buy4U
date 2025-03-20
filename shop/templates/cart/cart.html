@@ -3,44 +3,45 @@
 
 {% block content %}
 <div class="container py-5">
-    
     <div class="row">
         {% for product, quantity in cart_products.items %}
-    <div class="col-md-4 col-lg-3 mb-2">
-        <div class="card">
-            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
-            <div class="card-body text-center">
-                <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text">${{ product.price }}</p>
+        <div class="col-md-4 col-lg-3 mb-2">
+            <div class="card">
+                <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">${{ product.price }}</p>
 
-                <!-- Formulario para actualizar cantidad -->
-                <form method="post" action="{% url 'cart_update_quantity' product.id %}">
-                    {% csrf_token %}
-                    <label for="quantity_{{ product.id }}">quantity:</label>
-                    <input type="number" name="quantity" id="quantity_{{ product.id }}"
-                    value="{{ quantity }}" min="1" class="form-control mb-2"
-                    onchange="this.form.submit()">
-                </form>
+                    <!-- Formulario para actualizar cantidad -->
+                    <form method="post" action="{% url 'cart_update_quantity' product.id %}">
+                        {% csrf_token %}
+                        <label for="quantity_{{ product.id }}">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity_{{ product.id }}"
+                               value="{{ quantity }}" min="1" class="form-control mb-2"
+                               onchange="this.form.submit()">
+                    </form>
 
+                    <!-- Botón para ver detalles -->
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
 
-                 <!-- Botón para ver detalles -->
-                <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
-
-                <!-- Formulario para quitar del carrito -->
-                <form method="post" action="{% url 'remove_cart' product.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger fw-bold fs-5 w-100 mt-3">Remove</button>
-                </form>
+                    <!-- Formulario para quitar del carrito -->
+                    <form method="post" action="{% url 'remove_cart' product.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger fw-bold fs-5 w-100 mt-3">Remove</button>
+                    </form>
+                </div>
             </div>
         </div>
+        {% empty %}
+        <p>No products added to the cart.</p>  <!-- ← Esto mostrará en caso de no haber agregado nada al carro -->
+        {% endfor %}
     </div>
-{% empty %}
-    <p>No products added to the cart.</p>  <!-- ← Esto mostrará en caso de no haber agregado nada al carro -->
-{% endfor %}
-<form method="post" action="{% url 'Do_Order' %}">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-success fw-bold fs-5 w-100">Place an order</button>
-</form>
+
+    <!-- Botón para proceder al pago -->
+    <div class="row">
+        <div class="col-lg-12 text-end">
+            <a href="{% url 'payment_gateway' %}" class="btn btn-success fw-bold fs-5 w-100">Proceed to Payment</a>
+        </div>
     </div>
 </div>
 {% endblock %}
