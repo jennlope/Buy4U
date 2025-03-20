@@ -33,7 +33,6 @@ class DoAnOrderView(View):
         messages.success(request, f"Su orden {order.order_id} se completo exitosamente.")
         
         return redirect(reverse('order_confirmation',kwargs={'order_id': order.order_id}))
-# Create your views here.
 
 class OrderConfirmationView(View):
     def get(self, request, order_id):
