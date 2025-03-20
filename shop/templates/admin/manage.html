@@ -35,7 +35,7 @@
                     <textarea name="description" class="form-control" rows="3" required></textarea>
 
                     <label class="form-label">Imagen:</label>
-                    <input type="file" name="image" class="form-control" accept="image/*" required>
+                    <input type="file" name="image" class="form-control" accept="image/*">
 
                     <label class="form-label">Cantidad:</label>
                     <input type="number" name="quantity" class="form-control" required>
@@ -63,7 +63,7 @@
                     <p class="small">{{ product.description }}</p>
                     <p class="fw-bold">Stock: {{ product.quantity }}</p>
                     <div class="d-grid gap-2">
-                        <!-- Botón eliminar -->
+                        <!-- Botón de eliminar -->
                         <form method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="delete" value="{{ product.pk }}">
