@@ -9,7 +9,7 @@
             "warranty": "2 years",
             "description": "A high-end smartphone with great features.",
             "image": "products/NK4.png",
-            "quantity": 3,
+            "quantity": 10,
             "type": "Smartphone"
         }
     },
@@ -23,7 +23,7 @@
             "warranty": "3 years",
             "description": "A powerful laptop for professionals.",
             "image": "products/NK3.png",
-            "quantity": 3,
+            "quantity": 10,
             "type": "PC"
         }
     },
@@ -37,7 +37,7 @@
             "warranty": "1 year",
             "description": "Una tablet perfecta para creativos y profesionales, con pantalla Retina y Apple Pencil compatible.",
             "image": "products/NK5.png",
-            "quantity": 3,
+            "quantity": 10,
             "type": "Tablet"
         }
     },
