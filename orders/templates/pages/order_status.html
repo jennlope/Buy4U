@@ -1,0 +1,19 @@
+{% extends "pages/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-success">Check Order Status</h2>
+    <p>Enter your order number to check its status.</p>
+
+    <!-- Formulario para consultar el estado del pedido -->
+    <form method="post" action="{% url 'order_status' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="order_id" class="form-label">Order Number:</label>
+            <input type="text" class="form-control" id="order_id" name="order_id" required>
+        </div>
+        <button type="submit" class="btn btn-success">Check Status</button>
+    </form>
+</div>
+{% endblock %}

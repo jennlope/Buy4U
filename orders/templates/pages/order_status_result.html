@@ -3,18 +3,18 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-success">Estado de Orden</h2>
-    <p>Este es el estado de tu orden, pasa bueno.</p>
+    <h2 class="text-success">Order Status</h2>
+    <p>Here is the status of your order.</p>
 
     <!-- Detalles del pedido -->
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Orden #{{ order.order_id }}</h5>
-            <p class="card-text"><strong>Estado:</strong> {{ order.get_status_display }}</p>
-            <p class="card-text"><strong>Fecha:</strong> {{ order.created_at }}</p>
+            <h5 class="card-title">Order #{{ order.order_id }}</h5>
+            <p class="card-text"><strong>Status:</strong> {{ order.get_status_display }}</p>
+            <p class="card-text"><strong>Date:</strong> {{ order.created_at }}</p>
 
             <!-- Lista de productos en el pedido -->
-            <h6 class="mt-4">Productos:</h6>
+            <h6 class="mt-4">Products:</h6>
             <ul class="list-group">
                 {% for product_order in order.product_orders.all %}
                 <li class="list-group-item">
@@ -27,7 +27,7 @@
 
     <!-- Botón para volver a la tienda -->
     <div class="mt-4">
-        <a href="{% url 'shop' %}" class="btn btn-primary">Vuelve a la tienda</a>
+        <a href="{% url 'shop' %}" class="btn btn-primary">Continue Shopping</a>
     </div>
 </div>
 {% endblock %}
