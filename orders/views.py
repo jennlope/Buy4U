@@ -11,28 +11,8 @@ class DoAnOrderView(View):
         if not cart_products:
             messages.error(request, "Tu carrito esta vacio")
             return redirect('cart_index')
-
-        order = Order.objects.create()
-        for product_id, quantity in cart_products.items():
-            product = Product.objects.get(id=product_id)
-            
-            # Verifica si el producto ya está en la orden
-            order_product, created = ProductOrder.objects.get_or_create(order=order,product=product)
-            
-            if not created:
-                # Si el producto ya estaba en la orden, actualiza la cantidad
-                order_product.quantity += int(quantity)
-                order_product.save()
-            else:
-                # Si es un nuevo producto, asigna la cantidad
-                order_product.quantity = int(quantity)
-                order_product.save()
-
-        # Vaciar carrito
-        request.session['cart_product_data'] = {}
-        messages.success(request, f"Su orden {order.order_id} se completo exitosamente.")
         
-        return redirect(reverse('order_confirmation',kwargs={'order_id': order.order_id}))
+        return redirect(reverse('payment_gateway'))
 
 class OrderConfirmationView(View):
     def get(self, request, order_id):
@@ -48,11 +28,21 @@ class PaymentGatewayView(View):
         #Sacar los productos del carrito
         cart_products = request.session.get('cart_product_data', {})
         
+        if not cart_products:
+            messages.error(request, "Tu carrito está vacío.")
+            return redirect('cart_index')
+        
         #Sabar los detalles de los productos y sumar el total
         products = []
         total = 0
+        
         for product_id, quantity in cart_products.items():
             product = Product.objects.get(id=product_id)
+            
+            if product.quantity < int(quantity):
+                messages.error(request, f"No hay suficiente stock para {product.name}. Solo quedan {product.quantity} disponibles.")
+                return redirect('cart_index')
+            
             subtotal = product.price * int(quantity)
             total += subtotal
             products.append({
@@ -78,11 +68,21 @@ class ProcessPaymentView(View):
             messages.error(request, "Carrito Vacio.")
             return redirect('cart_index')
 
-        #Lo mismo de DoAnOrderView 
-        order = Order.objects.create()
         for product_id, quantity in cart_products.items():
             product = Product.objects.get(id=product_id)
-            ProductOrder.objects.create(order=order, product=product, quantity=quantity)
+            
+            if product.quantity < int(quantity):
+                messages.error(request, f"No hay suficiente stock para {product.name}. Solo quedan {product.quantity} disponibles.")
+                return redirect('cart_index')
+            
+            order = Order.objects.create()
+            for product_id, quantity in cart_products.items():
+                product = Product.objects.get(id=product_id)
+                product.quantity -=int(quantity)
+                product.save()
+                #asocia los productos a la orden
+                ProductOrder.objects.create(order=order, product=product, quantity=quantity)
+                
 
         #Vaciar el carrito
         request.session['cart_product_data'] = {}
