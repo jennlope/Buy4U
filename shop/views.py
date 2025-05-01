@@ -69,7 +69,7 @@ class ProductDetailView(View):
         try:
             product_id = int(id)
             if product_id < 1:
-                raise ValueError("El ID de producto debe ser 1 o mayor")
+                raise ValueError("The product ID must be greater than or equal to 1.")
             product = get_object_or_404(Product, pk=product_id)
         except (ValueError, IndexError):
             return HttpResponseRedirect(reverse('home'))

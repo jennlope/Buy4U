@@ -9,7 +9,7 @@ class DoAnOrderView(View):
         cart_products = request.session.get('cart_product_data', {})
 
         if not cart_products:
-            messages.error(request, "Tu carrito esta vacio")
+            messages.error(request, "Oops! Your cart is currently empty.")
             return redirect('cart_index')
         
         return redirect(reverse('payment_gateway'))
@@ -20,7 +20,7 @@ class OrderConfirmationView(View):
             order = Order.objects.get(order_id=order_id)
             return render(request, 'pages/order_confirmation.html', {'order': order})
         except Order.DoesNotExist:
-            messages.error(request, "Orden no encontrada.")
+            messages.error(request, "Order not found.")
             return redirect('shop')
 
 class PaymentGatewayView(View):
@@ -29,7 +29,7 @@ class PaymentGatewayView(View):
         cart_products = request.session.get('cart_product_data', {})
         
         if not cart_products:
-            messages.error(request, "Tu carrito está vacío.")
+            messages.error(request, "Oops! Your cart is currently empty.")
             return redirect('cart_index')
         
         #Sabar los detalles de los productos y sumar el total
@@ -40,7 +40,7 @@ class PaymentGatewayView(View):
             product = Product.objects.get(id=product_id)
             
             if product.quantity < int(quantity):
-                messages.error(request, f"No hay suficiente stock para {product.name}. Solo quedan {product.quantity} disponibles.")
+                messages.error(request, f"There is not enough stock for {product.name}. Only {product.quantity} available.")
                 return redirect('cart_index')
             
             subtotal = product.price * int(quantity)
@@ -65,14 +65,14 @@ class ProcessPaymentView(View):
         cart_products = request.session.get('cart_product_data', {})
 
         if not cart_products:
-            messages.error(request, "Carrito Vacio.")
+            messages.error(request, "Your cart is empty.")
             return redirect('cart_index')
 
         for product_id, quantity in cart_products.items():
             product = Product.objects.get(id=product_id)
             
             if product.quantity < int(quantity):
-                messages.error(request, f"No hay suficiente stock para {product.name}. Solo quedan {product.quantity} disponibles.")
+                messages.error(request, f"There is not enough stock for {product.name}. Only {product.quantity} available.")
                 return redirect('cart_index')
             
             order = Order.objects.create()
@@ -87,7 +87,7 @@ class ProcessPaymentView(View):
         #Vaciar el carrito
         request.session['cart_product_data'] = {}
         #Volver a enviar a donde sale el pago
-        messages.success(request, f"Su orden {order.order_id} se completo exitosamente.")
+        messages.success(request, f"Order {order.order_id} has been successfully completed.")
         return redirect(reverse('order_confirmation', kwargs={'order_id': order.order_id}))
     
 class OrderStatusView(View):
@@ -105,5 +105,5 @@ class OrderStatusView(View):
             return render(request, 'pages/order_status_result.html', {'order': order})
         except Order.DoesNotExist:
             #Error si no existe (Vo va a pasar)
-            messages.error(request, "Como llegaste aqui? En fin, tu id de orden no es valido, prueba otro bro")
+            messages.error(request, "How did you even get here? Anyway, your order ID is not valid. Try another one, bro.")
             return redirect('order_status')

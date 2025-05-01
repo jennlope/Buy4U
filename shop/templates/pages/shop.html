@@ -51,13 +51,21 @@
 
             <div class="card-body text-center">
                 <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text">${{ product.price }}</p>
+                {% with product.price|stringformat:"0.2f" as full_price %}
+                {% with full_price|cut:"." as parts %}
+                    <p class="fw-bold" style="font-size: 2rem;">
+                        ${{ full_price|slice:":-3" }}<sup style="font-size: 1rem;">{{ full_price|slice:"-2:" }}</sup>
+                    </p>
+                {% endwith %}
+            {% endwith %}
+            
+                
                 <div class="d-grid gap-2">
                     <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
                     <!-- Formulario para agregar al carrito -->
                     <form method="post" action="{% url 'add_cart' product.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary fw-bold fs-5 w-100" {% if product.quantity == 0 %}disabled{% endif %}>Add to Cart</button>
+                        <button type="submit" class="btn btn-primary fw-bold fs-5 w-100" style="background-color: #093314; border: none; color: white;" {% if product.quantity == 0 %}disabled{% endif %}>Add to Cart</button>
                     </form>
                 </div>
             </div>
