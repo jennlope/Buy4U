@@ -5,11 +5,20 @@ from django.views import View
 from django import forms
 from django.urls import reverse
 from .models import Product
+from django.conf import settings
+import requests
+
 
 # Create your views here.
 class HomePageView(TemplateView):
     template_name = 'pages/home.html'
-
+    
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            weather = WeatherService(api_key=settings.WEATHER_API_KEY).get_weather_data()
+            context["weather"] = weather
+            return context
+        
 class ShopPageView(TemplateView):
     template_name = 'pages/shop.html'
 
@@ -212,3 +221,32 @@ class admin_product_view(View):
             product.save()
             return redirect('admin_dashboard')
         return redirect('admin_dashboard')
+    
+class WeatherService:
+    def __init__(self, api_key, city="Medellin,CO"):
+        self.api_key = api_key
+        self.city = city
+
+    def get_weather_data(self):
+        url = (
+            f"https://api.openweathermap.org/data/2.5/weather"
+            f"?q={self.city}&units=metric&appid={self.api_key}&lang=en"
+        )
+
+        try:
+            response = requests.get(url)
+            data = response.json()
+            temp = data["main"]["temp"]
+            desc = data["weather"][0]["description"]
+            icon = data["weather"][0]["icon"]
+            return {
+                "temp": round(temp),
+                "desc": desc.capitalize(),
+                "icon": f"http://openweathermap.org/img/wn/{icon}.png"
+            }
+        except:
+            return {
+                "temp": None,
+                "desc": "Unavailable",
+                "icon": ""
+            }

@@ -18,7 +18,20 @@
 </head>
 
 <body>
+
+    {% if weather.temp %}
+    <div class="text-center py-2 shadow-sm" style="background-color: #437450; color: #fff;">
+        <span style="font-size: 1.2rem; font-weight: 500;">
+            <img src="{{ weather.icon }}" alt="Weather icon" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;">
+            <strong>Medellín Weather:</strong> {{ weather.temp }}°C, {{ weather.desc }}
+        </span>
+    </div>
+    {% endif %}
+    
+    
+
     <nav class="navbar navbar-expand-lg navbar-light shadow">
+
         <div class="container d-flex justify-content-between align-items-center">
 
             <a class="navbar-brand text-success logo h1 align-self-center" href="{% url 'home' %}">Buy4U</a>
