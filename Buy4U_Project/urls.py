@@ -20,12 +20,13 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.conf.urls.i18n import set_language
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),
     path('accounts/', include('accounts.urls')),
     path('orders/', include('orders.urls')),
-    path('set_language/', set_language, name='set_language'),
+    path('set_language/', csrf_exempt(set_language), name='set_language'),
     path('api/', include('api.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
