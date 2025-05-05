@@ -1,24 +1,25 @@
 {% extends "pages/base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-success">Order Status</h2>
-    <p>Here is the status of your order.</p>
+    <h2 class="text-success">{% trans "Order Status" %}</h2>
+    <p>{% trans "Here is the status of your order." %}</p>
 
     <!-- Detalles del pedido -->
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Order #{{ order.order_id }}</h5>
-            <p class="card-text"><strong>Status:</strong> {{ order.get_status_display }}</p>
-            <p class="card-text"><strong>Date:</strong> {{ order.created_at }}</p>
+            <h5 class="card-title">{% trans "Order" %} #{{ order.order_id }}</h5>
+            <p class="card-text"><strong>{% trans "Status:" %}</strong> {{ order.get_status_display }}</p>
+            <p class="card-text"><strong>{% trans "Date:" %}</strong> {{ order.created_at }}</p>
 
             <!-- Lista de productos en el pedido -->
-            <h6 class="mt-4">Products:</h6>
+            <h6 class="mt-4">{% trans "Products:" %}</h6>
             <ul class="list-group">
                 {% for product_order in order.product_orders.all %}
                 <li class="list-group-item">
-                    {{ product_order.product.name }} (Quantity: {{ product_order.quantity }})
+                    {{ product_order.product.name }} ({% trans "Quantity:" %} {{ product_order.quantity }})
                 </li>
                 {% endfor %}
             </ul>
@@ -27,7 +28,7 @@
 
     <!-- Botón para volver a la tienda -->
     <div class="mt-4">
-        <a href="{% url 'shop' %}" class="btn btn-primary fw-bold fs-5 w-100" style="background-color: #093314; border: none; color: white;">Continue Shopping</a>
+        <a href="{% url 'shop' %}" class="btn btn-primary fw-bold fs-5 w-100" style="background-color: #093314; border: none; color: white;">{% trans "Continue Shopping" %}</a>
     </div>
 </div>
 {% endblock %}

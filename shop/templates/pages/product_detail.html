@@ -1,5 +1,6 @@
 {% extends "pages/base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="container py-5">
@@ -17,13 +18,13 @@
         <div class="col-md-6">
             <!-- Mostrar los detalles del producto -->
             <ul class="list-group">
-                <li class="list-group-item"><strong>Name:</strong> {{ product.name }}</li>
-                <li class="list-group-item"><strong>Price:</strong> ${{ product.price }}</li>
-                <li class="list-group-item"><strong>Brand:</strong> {{ product.brand }}</li>
-                <li class="list-group-item"><strong>Warranty:</strong> {{ product.warranty }}</li>
-                <li class="list-group-item"><strong>Quantity:</strong> {{ product.quantity }}</li>
-                <li class="list-group-item"><strong>Type:</strong> {{ product.type }}</li>
-                <li class="list-group-item"><strong>Description:</strong> {{ product.description }}</li>
+                <li class="list-group-item"><strong>{% trans "Name" %}:</strong> {% trans product.name %}</li>
+                <li class="list-group-item"><strong>{% trans "Price" %}:</strong> ${{ product.price }}</li>
+                <li class="list-group-item"><strong>{% trans "Brand" %}:</strong> {% trans product.brand %}</li>
+                <li class="list-group-item"><strong>{% trans "Warranty" %}:</strong> {% trans product.warranty %}</li>
+                <li class="list-group-item"><strong>{% trans "Quantity" %}:</strong> {{ product.quantity }}</li>
+                <li class="list-group-item"><strong>{% trans "Type" %}:</strong> {% trans product.type %}</li>
+                <li class="list-group-item"><strong>{% trans "Description" %}:</strong> {% trans product.description %}</li>
             </ul>
         </div>
     </div>

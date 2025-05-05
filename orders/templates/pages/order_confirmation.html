@@ -1,8 +1,9 @@
 {% extends "pages/base.html" %}
+{% load i18n %}
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-success">Order successfully placed</h2>
-    <p>Your order #{{ order.order_id}} is in status: {{ order.status }}.</p>
-    <a href="{% url 'shop' %}" class="btn btn-primary">Continue shopping</a>
+    <h2 class="text-success">{% trans "Order successfully placed" %}</h2>
+    <p>{% blocktrans with order_id=order.order_id status=order.status %}Your order #{{ order_id }} is in status: {{ status }}.{% endblocktrans %}</p>
+    <a href="{% url 'shop' %}" class="btn btn-primary">{% trans "Continue shopping" %}</a>
 </div>
 {% endblock %}

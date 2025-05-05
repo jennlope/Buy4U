@@ -1,9 +1,11 @@
 {% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Buy4U eCommerce</title>
+    <title>{% trans "Buy4U eCommerce" %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -22,62 +24,50 @@
     {% if weather.temp %}
     <div class="text-center py-2 shadow-sm" style="background-color: #437450; color: #fff;">
         <span style="font-size: 1.2rem; font-weight: 500;">
-            <img src="{{ weather.icon }}" alt="Weather icon" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;">
-            <strong>Medellín Weather:</strong> {{ weather.temp }}°C, {{ weather.desc }}
+            <img src="{{ weather.icon }}" alt="{% trans 'Weather icon' %}" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;">
+            <strong>{% trans "Medellín Weather:" %}</strong> {{ weather.temp }}°C, {{ weather.desc }}
         </span>
     </div>
     {% endif %}
-    
-    
 
     <nav class="navbar navbar-expand-lg navbar-light shadow">
 
         <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand text-success logo h1 align-self-center" href="{% url 'home' %}">{% trans "Buy4U" %}</a>
 
-            <a class="navbar-brand text-success logo h1 align-self-center" href="{% url 'home' %}">Buy4U</a>
-
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{% trans 'Toggle navigation' %}">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home' %}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'order_status' %}">Orders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'shop' %}">Shop</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">{% trans "Home" %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'order_status' %}">{% trans "Orders" %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'shop' %}">{% trans "Shop" %}</a></li>
                         {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">{% trans "Logout" %}</a></li>
                         {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'register' %}">Register</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">{% trans "Login" %}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">{% trans "Register" %}</a></li>
                         {% endif %}
                         {% if user.is_staff %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'admin_dashboard' %}">Administrador</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">{% trans "Administrator" %}</a></li>
                         {% endif %}
                     </ul>
                 </div>
                 <div class="navbar align-self-center d-flex">
+                    <form action="{% url 'set_language' %}" method="post" class="ms-3">
+                        {% csrf_token %}
+                        <select name="language" onchange="this.form.submit()" class="form-select form-select-sm">
+                            <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>Español</option>
+                            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
+                        </select>
+                    </form>
                     <div class="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="inputMobileSearch" placeholder="Search ...">
-                            <div class="input-group-text">
-                                <i class="fa fa-fw fa-search"></i>
-                            </div>
+                            <input type="text" class="form-control" id="inputMobileSearch" placeholder="{% trans 'Search ...' %}">
+                            <div class="input-group-text"><i class="fa fa-fw fa-search"></i></div>
                         </div>
                     </div>
                     <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
@@ -98,9 +88,7 @@
     </nav>
 
     <!-- Main Content -->
-    {% block content %}
-
-    {% endblock %}
+    {% block content %}{% endblock %}
 
     <!-- Footer -->
     <footer class="bg-dark" id="tempaltemo_footer">
@@ -108,40 +96,31 @@
             <div class="row">
 
                 <div class="col-lg-3 col-md-6 col-sm-12 pt-5">
-                    <img src="{% static 'img/Logo.png' %}" alt="Logo Buy4U" style="max-width: 140px;">
+                    <img src="{% static 'img/Logo.png' %}" alt="{% trans 'Logo Buy4U' %}" style="max-width: 140px;">
                 </div>  
 
                 <div class="col-lg-3 col-md-6 col-sm-12 pt-5">
-                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">Buy4U Shop</h2>
+                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">{% trans "Buy4U Shop" %}</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li>
-                            <i class="fas fa-map-marker-alt fa-fw"></i>
-                            123 Consectetur at ligula 10660
-                        </li>
-                        <li>
-                            <i class="fa fa-phone fa-fw"></i>
-                            <a class="text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
-                        </li>
-                        <li>
-                            <i class="fa fa-envelope fa-fw"></i>
-                            <a class="text-decoration-none" href="mailto:info@company.com">info@company.com</a>
-                        </li>
+                        <li><i class="fas fa-map-marker-alt fa-fw"></i> {% trans "123 Consectetur at ligula 10660" %}</li>
+                        <li><i class="fa fa-phone fa-fw"></i> <a class="text-decoration-none" href="tel:010-020-0340">010-020-0340</a></li>
+                        <li><i class="fa fa-envelope fa-fw"></i> <a class="text-decoration-none" href="mailto:info@company.com">info@company.com</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-3 col-md-6 col-sm-12 pt-5">
-                    <h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
+                    <h2 class="h2 text-light border-bottom pb-3 border-light">{% trans "Products" %}</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="{% url 'shop' %}">Shop</a></li>
+                        <li><a class="text-decoration-none" href="{% url 'shop' %}">{% trans "Shop" %}</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-3 col-md-6 col-sm-12 pt-5">
-                    <h2 class="h2 text-light border-bottom pb-3 border-light">Further Info</h2>
+                    <h2 class="h2 text-light border-bottom pb-3 border-light">{% trans "Further Info" %}</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="{% url 'home' %}">Home</a></li>
-                        <li><a class="text-decoration-none" href="#">About Us</a></li>
-                        <li><a class="text-decoration-none" href="#">FAQs</a></li>
+                        <li><a class="text-decoration-none" href="{% url 'home' %}">{% trans "Home" %}</a></li>
+                        <li><a class="text-decoration-none" href="#">{% trans "About Us" %}</a></li>
+                        <li><a class="text-decoration-none" href="#">{% trans "FAQs" %}</a></li>
                     </ul>
                 </div>
 
@@ -153,8 +132,10 @@
                 <div class="row pt-2">
                     <div class="col-12">
                         <p class="text-left text-light">
-                            Copyright &copy; 2025 Buy4U
-                            | Designed by <a rel="sponsored" href="https://templatemo.com" target="_blank">TemplateMo</a>
+                            {% blocktrans %}Copyright © 2025 Buy4U{% endblocktrans %}
+                            |
+                            {% blocktrans %}Designed by{% endblocktrans %}
+                            <a rel="sponsored" href="https://templatemo.com" target="_blank">TemplateMo</a>
                         </p>
                     </div>
                 </div>

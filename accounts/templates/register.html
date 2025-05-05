@@ -1,27 +1,28 @@
 {% extends 'pages/base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="container"> 
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
-            <label for="id_username">Username:</label>
+            <label for="id_username">{% trans "Username:" %}</label>
             <input type="text" name="username" id="id_username" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="id_password1">Password:</label>
+            <label for="id_password1">{% trans "Password:" %}</label>
             <input type="password" name="password1" id="id_password1" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="id_password2">Confirm password:</label>
+            <label for="id_password2">{% trans "Confirm password:" %}</label>
             <input type="password" name="password2" id="id_password2" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="id_email">Email address:</label>
+            <label for="id_email">{% trans "Email address:" %}</label>
             <input type="email" name="email" id="id_email" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-primary">Sign up</button>
-        <a href="{% url 'login' %}" class="btn btn-link">Already have an account? Log in</a>
+        <button type="submit" class="btn btn-primary">{% trans "Sign up" %}</button>
+        <a href="{% url 'login' %}" class="btn btn-link">{% trans "Already have an account? Log in" %}</a>
     </form>
     {% if form.errors %}
         <ul style="color: red;">
@@ -33,6 +34,5 @@
         </ul>
     {% endif %}
 </div>
-
 
 {% endblock %}

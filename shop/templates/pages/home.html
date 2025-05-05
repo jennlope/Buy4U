@@ -1,15 +1,16 @@
 {% extends "pages/base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="w-100 pt-1 mb-5 text-right">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
         </div>
         <form action="" method="get" class="modal-content modal-body border-0 p-0">
             <div class="input-group mb-2">
-                <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
+                <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="{% trans 'Search ...' %}">
                 <button type="submit" class="input-group-text bg-success text-light">
                     <i class="fa fa-fw fa-search text-white"></i>
                 </button>
@@ -33,10 +34,10 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left align-self-center">
-                            <h1 class="h1 text-success"><b>Buy4U</b> eCommerce</h1>
-                            <h3 class="h2">Compra de forma rápida y segura</h3>
+                            <h1 class="h1 text-success"><b>Buy4U</b> {% trans 'eCommerce' %}</h1>
+                            <h3 class="h2">{% trans 'Buy quickly and safely' %}</h3>
                             <p>
-                                Buy4U es un eCommerce una plataforma web de comercio electrónico enfocada en la venta de dispositivos electrónicos, ofreciendo una experiencia de compra fácil, rápida y segura. 
+                                {% trans 'Buy4U It is an eCommerce web platform focused on the sale of electronic devices, offering an easy, fast, and secure shopping experience.' %}
                             </p>
                         </div>
                     </div>
@@ -51,8 +52,8 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left">
-                            <h1 class="h1">iPhone 16</h1>
-                            <h3 class="h2">Innovación y Potencia en su Máxima Expresión</h3>
+                            <h1 class="h1">{% trans 'iPhone 16' %}</h1>
+                            <h3 class="h2">{% trans 'Innovation and Power at its Best' %}</h3>
                         </div>
                     </div>
                 </div>
@@ -66,8 +67,8 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left">
-                            <h1 class="h1">Nokia 3310</h1>
-                            <h3 class="h2">El Clásico Indestructible </h3>
+                            <h1 class="h1">{% trans 'Nokia 3310' %}</h1>
+                            <h3 class="h2">{% trans 'The Indestructible Classic' %}</h3>
                         </div>
                     </div>
                 </div>
@@ -86,28 +87,27 @@
 <section class="container py-5">
     <div class="row text-center pt-3">
         <div class="col-lg-6 m-auto">
-            <h1 class="h1">Categories of The Month</h1>
+            <h1 class="h1">{% trans 'Categories of The Month' %}</h1>
             <p>
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim id est laborum.
+                {% trans 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.' %}
             </p>
         </div>
     </div>
     <div class="row">
         <div class="col-12 col-md-4 p-5 mt-3">
             <a href="{% url 'shop' %}"><img src="{% static 'img/smartphone.png' %}" class="rounded-circle img-fluid border"></a>
-            <h5 class="text-center mt-3 mb-3">Smartphones</h5>
-            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">Go Shop</a></p>
+            <h5 class="text-center mt-3 mb-3">{% trans 'Smartphones' %}</h5>
+            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">{% trans 'Go Shop' %}</a></p>
         </div>
         <div class="col-12 col-md-4 p-5 mt-3">
             <a href="{% url 'shop' %}"><img src="{% static 'img/laptop_cm.png' %}" class="rounded-circle img-fluid border"></a>
-            <h2 class="h5 text-center mt-3 mb-3">Laptops</h2>
-            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">Go Shop</a></p>
+            <h2 class="h5 text-center mt-3 mb-3">{% trans 'Laptops' %}</h2>
+            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">{% trans 'Go Shop' %}</a></p>
         </div>
         <div class="col-12 col-md-4 p-5 mt-3">
             <a href="{% url 'shop' %}"><img src="{% static 'img/tablet_cm.png' %}" class="rounded-circle img-fluid border"></a>
-            <h2 class="h5 text-center mt-3 mb-3">Tablets</h2>
-            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">Go Shop</a></p>
+            <h2 class="h5 text-center mt-3 mb-3">{% trans 'Tablets' %}</h2>
+            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">{% trans 'Go Shop' %}</a></p>
         </div>
     </div>
 </section>
@@ -117,10 +117,9 @@
     <div class="container py-5">
         <div class="row text-center py-3">
             <div class="col-lg-6 m-auto">
-                <h1 class="h1">Featured Product</h1>
+                <h1 class="h1">{% trans 'Featured Product' %}</h1>
                 <p>
-                    Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                    Excepteur sint occaecat cupidatat non proident.
+                    {% trans 'Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.' %}
                 </p>
             </div>
         </div>
@@ -141,11 +140,11 @@
                             </li>
                             <li class="text-muted text-right">$1299.00</li>
                         </ul>
-                        <a href="" class="h2 text-decoration-none text-dark">Laptop</a>
+                        <a href="" class="h2 text-decoration-none text-dark">{% trans 'Laptop' %}</a>
                         <p class="card-text">
-                            A powerful laptop for professionals.
+                            {% trans 'A powerful laptop for professionals.' %}
                         </p>
-                        <p class="text-muted">Reviews (24)</p>
+                        <p class="text-muted">{% trans 'Reviews (24)' %}</p>
                     </div>
                 </div>
             </div>
@@ -165,11 +164,11 @@
                             </li>
                             <li class="text-muted text-right">$599.99</li>
                         </ul>
-                        <a href="{% url 'shop' %}" class="h2 text-decoration-none text-dark">Smartphone</a>
+                        <a href="{% url 'shop' %}" class="h2 text-decoration-none text-dark">{% trans 'Smartphone' %}</a>
                         <p class="card-text">
-                            A high-end smartphone with great features.
+                            {% trans 'A high-end smartphone with great features.' %}
                         </p>
-                        <p class="text-muted">Reviews (48)</p>
+                        <p class="text-muted">{% trans 'Reviews (48)' %}</p>
                     </div>
                 </div>
             </div>
@@ -189,11 +188,11 @@
                             </li>
                             <li class="text-muted text-right">$799.99</li>
                         </ul>
-                        <a href="#" class="h2 text-decoration-none text-dark">Tablet pro</a>
+                        <a href="#" class="h2 text-decoration-none text-dark">{% trans 'Tablet pro' %}</a>
                         <p class="card-text">
-                            Una tablet perfecta para creativos y profesionales, con pantalla Retina y Apple Pencil compatible.
+                            {% trans 'A perfect tablet for creatives and professionals, with a Retina display and compatible Apple Pencil.' %}
                         </p>
-                        <p class="text-muted">Reviews (74)</p>
+                        <p class="text-muted">{% trans 'Reviews (74)' %}</p>
                     </div>
                 </div>
             </div>

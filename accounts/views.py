@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic.edit import FormView
+from django.utils.translation import gettext_lazy as _
 
 # Create your views here.
 class loginView(FormView):
@@ -15,8 +16,8 @@ class loginView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'title': 'Login - Online Store',
-            'subtitle': 'Login to your account',
+            'title': _('Login - Online Store'),
+            'subtitle': _('Login to your account'),
         })
         return context
 
@@ -29,7 +30,7 @@ class loginView(FormView):
             login(self.request, user)
             return super().form_valid(form)
         else:
-            messages.error(self.request, 'Username OR password is incorrect')
+            messages.error(self.request, _('Username OR password is incorrect'))
             return self.form_invalid(form)
 
 class logoutView(View):
@@ -45,8 +46,8 @@ class registerView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'title': 'Register - Online Store',
-            'subtitle': 'Sign up',
+            'title': -('Register - Online Store'),
+            'subtitle': _('Sign up'),
         })
         return context
 
@@ -54,10 +55,10 @@ class registerView(FormView):
         user = form.save()
         print(f"Registered user: {user.username}")
         login(self.request, user)
-        messages.success(self.request, f'Account was created for {user.username}')
+        messages.success(self.request, _('Account was created for %(username)s') % {'username': user.username})
         return redirect(self.success_url)
 
     def form_invalid(self, form):
         print("Error in the form:", form.errors)
-        messages.error(self.request, "Error in the registration form.")
+        messages.error(self.request, _("Error in the registration form."))
         return self.render_to_response(self.get_context_data(form=form))

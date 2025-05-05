@@ -30,6 +30,21 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Para poder tener dos idiomas
+LANGUAGE_CODE = 'en'  # Idioma por defecto, puede ser 'en', 'es', etc.
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,6 +62,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Para la traducción
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

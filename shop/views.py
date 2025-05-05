@@ -7,7 +7,7 @@ from django.urls import reverse
 from .models import Product
 from django.conf import settings
 import requests
-
+from django.utils.translation import gettext_lazy as _
 
 # Create your views here.
 class HomePageView(TemplateView):
@@ -23,19 +23,19 @@ class ShopPageView(TemplateView):
     template_name = 'pages/shop.html'
 
 class ProductFilterForm(forms.Form):
-    name = forms.CharField(required=False, label='Name', widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'Search product'}))
-    min_price = forms.DecimalField(required=False, label='Minimum price', min_value=0,widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Minimum'}))
-    max_price = forms.DecimalField(required=False, label='Maximum price', min_value=0,widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Maximum'}))
-    brand = forms.CharField(required=False, label='Brand',widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Brand'}))
+    name = forms.CharField(required=False, label=_('Name'), widget=forms.TextInput(attrs={'class': 'form-control','placeholder': _('Search product')}))
+    min_price = forms.DecimalField(required=False, label=_('Minimum price'), min_value=0,widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': _('Minimum')}))
+    max_price = forms.DecimalField(required=False, label=_('Maximum price'), min_value=0,widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': _('Maximum')}))
+    brand = forms.CharField(required=False, label=_('Brand'),widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Brand')}))
     
     type = forms.ChoiceField(
-        choices=[],required=False,label="Type",widget=forms.Select(attrs={'class': 'form-select'})
+        choices=[],required=False,label=_("Type"),widget=forms.Select(attrs={'class': 'form-select'})
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         types = Product.objects.values_list('type', flat=True).distinct()
-        self.fields['type'].choices = [('', 'All')] + [(t, t) for t in types]
+        self.fields['type'].choices = [('', _('All'))] + [(t, t) for t in types]
 
     
 class ShopView(View):
@@ -64,8 +64,8 @@ class ShopView(View):
                 products = products.filter(type__iexact=type)
 
         view_data = {
-            "title": "Shop - Buy4U",
-            "subtitle": "List of products",
+            "title": _("Shop - Buy4U"),
+            "subtitle": _("List of products"),
             "products": products,
             "form": form, 
         }
@@ -78,14 +78,14 @@ class ProductDetailView(View):
         try:
             product_id = int(id)
             if product_id < 1:
-                raise ValueError("The product ID must be greater than or equal to 1.")
+                raise ValueError(_("The product ID must be greater than or equal to 1."))
             product = get_object_or_404(Product, pk=product_id)
         except (ValueError, IndexError):
             return HttpResponseRedirect(reverse('home'))
 
         view_data = {
-            "title": product.name + " - Buy4U",
-            "subtitle": product.name + " - Product information",
+            "title": product.name + _(" - Buy4U"),
+            "subtitle": product.name + _(" - Product information"),
             "product": product
         }
         return render(request, self.template_name, view_data)
@@ -107,8 +107,8 @@ class CartView(View):
 
         # Data for the view
         view_data = {
-            "title": "Cart - Buy4U",
-            "subtitle": "Shopping cart",
+            "title": _("Cart - Buy4U"),
+            "subtitle": _("Shopping cart"),
             "cart_products": cart_products,
         }
         return render(request, self.template_name, view_data)
@@ -170,8 +170,8 @@ class admin_product_view(View):
     def get(self, request):
         products = Product.objects.all()
         view_data = {
-            "title": "Admin - Buy4U",
-            "subtitle": "Manage products",
+            "title": _("Admin - Buy4U"),
+            "subtitle": _("Manage products"),
             "products": products,
         }
         return render(request, self.template_name, view_data)
@@ -223,7 +223,7 @@ class admin_product_view(View):
         return redirect('admin_dashboard')
     
 class WeatherService:
-    def __init__(self, api_key, city="Medellin,CO"):
+    def __init__(self, api_key, city=_("Medellin,CO")):
         self.api_key = api_key
         self.city = city
 
@@ -239,14 +239,33 @@ class WeatherService:
             temp = data["main"]["temp"]
             desc = data["weather"][0]["description"]
             icon = data["weather"][0]["icon"]
+
+            # Diccionario de traducciones
+            translations = {
+                "clear sky": _("Clear sky"),
+                "few clouds": _("Few clouds"),
+                "scattered clouds": _("Scattered clouds"),
+                "broken clouds": _("Broken clouds"),
+                "shower rain": _("Shower rain"),
+                "rain": _("Rain"),
+                "thunderstorm": _("Thunderstorm"),
+                "snow": _("Snow"),
+                "mist": _("Mist"),
+                "drizzle": _("Drizzle"),
+                "overcast clouds": _("Overcast clouds"),
+            }
+
+            # Traducción de la descripción
+            translated_desc = translations.get(desc.lower(), desc.capitalize())
+
             return {
                 "temp": round(temp),
-                "desc": desc.capitalize(),
+                "desc": translated_desc,
                 "icon": f"http://openweathermap.org/img/wn/{icon}.png"
             }
         except:
             return {
                 "temp": None,
-                "desc": "Unavailable",
+                "desc": _("Unavailable"),
                 "icon": ""
             }
