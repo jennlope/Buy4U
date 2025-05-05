@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-!d)!cz!39iy9+nzj3sewa=ht2k3j2jhel_vc)qwz(l=^ya+--z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Para poder tener dos idiomas
@@ -57,6 +57,9 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'shop.apps.ShopConfig',
     'orders.apps.OrdersConfig',
+    'api.apps.ApiConfig',
+    'rest_framework',
+    
 ]
 
 MIDDLEWARE = [
