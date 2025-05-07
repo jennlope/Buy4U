@@ -50,6 +50,15 @@
         </form>
     </div>
 
+    <div class="text-end mb-3">
+        <a href="{% url 'generar_reporte' 'excel' %}" class="btn btn-outline-success me-2">
+            Descargar Excel
+        </a>
+        <a href="{% url 'generar_reporte' 'pdf' %}" class="btn btn-outline-danger">
+            Descargar PDF
+        </a>        
+    </div>
+    
     <!-- Muestra todos los productos disponibles -->
     <div class="row">
         {% for product in products %}

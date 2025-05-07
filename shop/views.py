@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect 
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import TemplateView, ListView
 from django.views import View
 from django import forms
@@ -8,6 +8,12 @@ from .models import Product
 from django.conf import settings
 import requests
 from django.utils.translation import gettext_lazy as _
+from django.views import View
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
+from .reportes import ReporteExcel, ReportePDF
+from .models import Product
 
 # Create your views here.
 class HomePageView(TemplateView):
@@ -269,3 +275,18 @@ class WeatherService:
                 "desc": _("Unavailable"),
                 "icon": ""
             }
+        
+
+@method_decorator(staff_member_required, name='dispatch')
+class GenerarReporteView(View):
+    def get(self, request, tipo):
+        queryset = Product.objects.all()
+
+        if tipo == 'excel':
+            generador = ReporteExcel()
+        elif tipo == 'pdf':
+            generador = ReportePDF()
+        else:
+            return HttpResponse("Tipo de reporte no válido", status=400)
+
+        return generador.generar(queryset)
