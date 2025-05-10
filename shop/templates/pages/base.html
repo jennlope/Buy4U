@@ -42,19 +42,57 @@
             <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">{% trans "Home" %}</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'order_status' %}">{% trans "Orders" %}</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'shop' %}">{% trans "Shop" %}</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/' %}active fw-bold text-success{% endif %}" href="{% url 'home' %}">
+                                {% trans "Home" %}
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/shop' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'shop' %}">
+                                {% trans "Shop" %}
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/orders' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'order_status' %}">
+                                {% trans "Orders" %}
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/cart' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'cart_index' %}">
+                                {% trans "Cart" %}
+                            </a>
+                        </li>
+                    
                         {% if user.is_authenticated %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">{% trans "Logout" %}</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/logout/' %}active fw-bold text-success{% endif %}" href="{% url 'logout' %}">
+                                    {% trans "Logout" %}
+                                </a>
+                            </li>
                         {% else %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">{% trans "Login" %}</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">{% trans "Register" %}</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/login' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'login' %}">
+                                    {% trans "Login" %}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/register' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'register' %}">
+                                    {% trans "Register" %}
+                                </a>
+                            </li>
                         {% endif %}
+                    
                         {% if user.is_staff %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">{% trans "Administrator" %}</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/admin_product' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'admin_dashboard' %}">
+                                    {% trans "Administrator" %}
+                                </a>
+                            </li>
                         {% endif %}
-                    </ul>
+                    </ul>                    
                 </div>
                 <div class="navbar align-self-center d-flex">
                     <form action="{% url 'set_language' %}" method="post" class="ms-3">

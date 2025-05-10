@@ -31,5 +31,4 @@ urlpatterns = [
     path('set_language/', csrf_exempt(set_language), name='set_language'),
     path('api/', include('api.urls')),
     path('admin/generar_reporte/<str:tipo>/', GenerarReporteView.as_view(), name='generar_reporte'),
-    path('shop/', include('shop.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
