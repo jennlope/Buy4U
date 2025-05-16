@@ -24,11 +24,13 @@ from django.views.decorators.csrf import csrf_exempt
 from shop.views import GenerarReporteView 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/generar_reporte/<str:tipo>/', GenerarReporteView.as_view(), name='generar_reporte'),
     path('', include('shop.urls')),
     path('accounts/', include('accounts.urls')),
     path('orders/', include('orders.urls')),
     path('set_language/', csrf_exempt(set_language), name='set_language'),
     path('api/', include('api.urls')),
-    path('admin/generar_reporte/<str:tipo>/', GenerarReporteView.as_view(), name='generar_reporte'),
+    
+    path('admin/', admin.site.urls),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
