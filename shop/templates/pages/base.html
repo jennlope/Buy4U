@@ -25,7 +25,7 @@
     <div class="text-center py-2 shadow-sm" style="background-color: #437450; color: #fff;">
         <span style="font-size: 1.2rem; font-weight: 500;">
             <img src="{{ weather.icon }}" alt="{% trans 'Weather icon' %}" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;">
-            <strong>{% trans "Medellín Weather:" %}</strong> {{ weather.temp }}°C
+            <strong>{% trans "Medellín Weather:" %}</strong> {{ weather.temp }}°C, {{ weather.desc }}
         </span>
     </div>
     {% endif %}
