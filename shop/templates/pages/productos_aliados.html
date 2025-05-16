@@ -1,0 +1,44 @@
+{% extends "pages/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row text-center mb-4">
+        <div class="col-lg-6 m-auto">
+            <h1 class="h1">{% trans "Allied Products" %}</h1>
+            <p>{% trans "Discover high-quality products from our partner providers." %}</p>
+        </div>
+    </div>
+
+    {% if productos %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for producto in productos %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="{{ producto.image }}" class="card-img-top p-4" alt="{{ producto.name }}" style="height: 200px; object-fit: contain;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.name }}</h5>
+                            <p class="card-text text-success fw-bold">${{ producto.price }}</p>
+                            <ul class="list-unstyled mb-2">
+                                <li><strong>{% trans "Brand" %}:</strong> {{ producto.brand }}</li>
+                                <li><strong>{% trans "Warranty" %}:</strong> {{ producto.warranty }}</li>
+                                <li><strong>{% trans "Type" %}:</strong> {{ producto.type }}</li>
+                            </ul>
+                            <p class="card-text text-secondary small">{% trans 'Available quantity:' %} {{ producto.quantity }}</p>
+                            <p class="card-text">{{ producto.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-end">
+                            <a href="{% url 'shop' %}" class="btn btn-sm btn-outline-success">{% trans "Shop Now" %}</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center mt-4" role="alert">
+            {% trans "No allied products found." %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

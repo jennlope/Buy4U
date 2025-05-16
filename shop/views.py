@@ -276,6 +276,20 @@ class WeatherService:
                 "icon": ""
             }
         
+#Api HU11  /productos-aliados.
+class ProductosAliadosView(TemplateView):
+    template_name = "pages/productos_aliados.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            response = requests.get("http://buy4u.3utilities.com:8000/api/products/")
+            context['productos'] = response.json() if response.status_code == 200 else []
+        except Exception as e:
+            context['productos'] = []
+            print("No se pudieron cargar los productos {e}")
+        return context
+
 
 @method_decorator(staff_member_required, name='dispatch')
 class GenerarReporteView(View):
