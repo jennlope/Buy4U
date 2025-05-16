@@ -18,7 +18,7 @@
                     <div class="card h-100 shadow-sm border-0">
                         <img src="{{ producto.image }}" class="card-img-top p-4" alt="{{ producto.name }}" style="height: 200px; object-fit: contain;">
                         <div class="card-body">
-                            <h5 class="card-title">{{ producto.name }}</h5>
+                            <h5 class="card-title">{% trans producto.name %}</h5>
                             <p class="card-text text-success fw-bold">${{ producto.price }}</p>
                             <ul class="list-unstyled mb-2">
                                 <li><strong>{% trans "Brand" %}:</strong> {{ producto.brand }}</li>

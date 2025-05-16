@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-04 19:52-0500\n"
+"POT-Creation-Date: 2025-05-16 06:38-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr "Usuario"
 msgid "Password"
 msgstr "Contraseña"
 
-#: .\accounts\templates\login.html:17 .\shop\templates\pages\base.html:51
+#: .\accounts\templates\login.html:17 .\shop\templates\pages\base.html:78
 msgid "Login"
 msgstr "Iniciar sesión"
 
@@ -70,6 +70,12 @@ msgstr "Inicia sesión en tu cuenta"
 #: .\accounts\views.py:33
 msgid "Username OR password is incorrect"
 msgstr "El nombre de usuario o la contraseña son incorrectos"
+
+#: .\accounts\views.py:49
+#, fuzzy
+#| msgid "Login - Online Store"
+msgid "Register - Online Store"
+msgstr "Iniciar sesión - Tienda en línea"
 
 #: .\accounts\views.py:58
 #, python-format
@@ -210,7 +216,7 @@ msgstr ""
 "con otro, amigo."
 
 #: .\shop\models.py:6 .\shop\templates\pages\product_detail.html:21
-#: .\shop\views.py:26
+#: .\shop\views.py:32
 msgid "Name"
 msgstr "Nombre"
 
@@ -238,67 +244,71 @@ msgstr "Buy4U"
 msgid "Toggle navigation"
 msgstr "Alternar navegación"
 
-#: .\shop\templates\pages\base.html:45 .\shop\templates\pages\base.html:121
+#: .\shop\templates\pages\base.html:47 .\shop\templates\pages\base.html:159
 msgid "Home"
 msgstr "Inicio"
 
-#: .\shop\templates\pages\base.html:46
-msgid "Orders"
-msgstr "Órdenes"
-
-#: .\shop\templates\pages\base.html:47 .\shop\templates\pages\base.html:114
+#: .\shop\templates\pages\base.html:53 .\shop\templates\pages\base.html:152
 msgid "Shop"
 msgstr "Tienda"
 
-#: .\shop\templates\pages\base.html:49
+#: .\shop\templates\pages\base.html:59
+msgid "Orders"
+msgstr "Órdenes"
+
+#: .\shop\templates\pages\base.html:65
+msgid "Cart"
+msgstr ""
+
+#: .\shop\templates\pages\base.html:72
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: .\shop\templates\pages\base.html:52
+#: .\shop\templates\pages\base.html:83
 msgid "Register"
 msgstr "Registrarse"
 
-#: .\shop\templates\pages\base.html:55
+#: .\shop\templates\pages\base.html:91
 msgid "Administrator"
 msgstr "Administrador"
 
-#: .\shop\templates\pages\base.html:69 .\shop\templates\pages\home.html:13
+#: .\shop\templates\pages\base.html:107 .\shop\templates\pages\home.html:13
 msgid "Search ..."
 msgstr "Buscar ..."
 
-#: .\shop\templates\pages\base.html:99
+#: .\shop\templates\pages\base.html:137
 msgid "Logo Buy4U"
 msgstr "Logo Buy4U"
 
-#: .\shop\templates\pages\base.html:103
+#: .\shop\templates\pages\base.html:141
 msgid "Buy4U Shop"
 msgstr "Tienda Buy4U"
 
-#: .\shop\templates\pages\base.html:105
+#: .\shop\templates\pages\base.html:143
 msgid "123 Consectetur at ligula 10660"
 msgstr "123 Consectetur en Ligula 10660"
 
-#: .\shop\templates\pages\base.html:112
+#: .\shop\templates\pages\base.html:150
 msgid "Products"
 msgstr "Productos"
 
-#: .\shop\templates\pages\base.html:119
+#: .\shop\templates\pages\base.html:157
 msgid "Further Info"
 msgstr "Más información"
 
-#: .\shop\templates\pages\base.html:122
+#: .\shop\templates\pages\base.html:160
 msgid "About Us"
 msgstr "Acerca de nosotros"
 
-#: .\shop\templates\pages\base.html:123
+#: .\shop\templates\pages\base.html:161
 msgid "FAQs"
 msgstr "Preguntas frecuentes"
 
-#: .\shop\templates\pages\base.html:135
+#: .\shop\templates\pages\base.html:173
 msgid "Copyright © 2025 Buy4U"
 msgstr "Derechos de autor © 2025 Buy4U"
 
-#: .\shop\templates\pages\base.html:137
+#: .\shop\templates\pages\base.html:175
 msgid "Designed by"
 msgstr "Diseñado por"
 
@@ -420,17 +430,44 @@ msgstr ""
 msgid "Reviews (74)"
 msgstr "Reseñas (74)"
 
-#: .\shop\templates\pages\product_detail.html:23 .\shop\views.py:29
+#: .\shop\templates\pages\product_detail.html:23
+#: .\shop\templates\pages\productos_aliados.html:24 .\shop\views.py:35
 msgid "Brand"
 msgstr "Marca"
 
 #: .\shop\templates\pages\product_detail.html:24
+#: .\shop\templates\pages\productos_aliados.html:25
 msgid "Warranty"
 msgstr "Garantía"
 
-#: .\shop\templates\pages\product_detail.html:26 .\shop\views.py:32
+#: .\shop\templates\pages\product_detail.html:26
+#: .\shop\templates\pages\productos_aliados.html:26 .\shop\views.py:38
 msgid "Type"
 msgstr "Tipo"
+
+#: .\shop\templates\pages\productos_aliados.html:9
+#, fuzzy
+#| msgid "Products"
+msgid "Allied Products"
+msgstr "Productos aliados"
+
+#: .\shop\templates\pages\productos_aliados.html:10
+msgid "Discover high-quality products from our partner providers."
+msgstr "Descubra productos de alta calidad de nuestros proveedores asociados."
+
+#: .\shop\templates\pages\productos_aliados.html:28
+msgid "Available quantity:"
+msgstr "Cantidad disponible"
+
+#: .\shop\templates\pages\productos_aliados.html:32
+#, fuzzy
+#| msgid "Shop"
+msgid "Shop Now"
+msgstr "Tienda"
+
+#: .\shop\templates\pages\productos_aliados.html:40
+msgid "No allied products found."
+msgstr "Ningún producto aliado encontrado"
 
 #: .\shop\templates\pages\shop.html:33
 msgid "Search"
@@ -452,116 +489,126 @@ msgstr "Agregar al carrito"
 msgid "No products available."
 msgstr "No hay productos disponibles."
 
-#: .\shop\views.py:26
+#: .\shop\views.py:32
 msgid "Search product"
 msgstr "Buscar producto"
 
-#: .\shop\views.py:27
+#: .\shop\views.py:33
 msgid "Minimum price"
 msgstr "Precio mínimo"
 
-#: .\shop\views.py:27
+#: .\shop\views.py:33
 msgid "Minimum"
 msgstr "Mínimo"
 
-#: .\shop\views.py:28
+#: .\shop\views.py:34
 msgid "Maximum price"
 msgstr "Precio máximo"
 
-#: .\shop\views.py:28
+#: .\shop\views.py:34
 msgid "Maximum"
 msgstr "Máximo"
 
-#: .\shop\views.py:38
+#: .\shop\views.py:44
 msgid "All"
 msgstr "Todos"
 
-#: .\shop\views.py:67
+#: .\shop\views.py:73
 msgid "Shop - Buy4U"
 msgstr "Tienda - Buy4U"
 
-#: .\shop\views.py:68
+#: .\shop\views.py:74
 msgid "List of products"
 msgstr "Lista de productos"
 
-#: .\shop\views.py:81
+#: .\shop\views.py:87
 msgid "The product ID must be greater than or equal to 1."
 msgstr "El ID del producto debe ser mayor o igual a 1."
 
-#: .\shop\views.py:87
+#: .\shop\views.py:93
 msgid " - Buy4U"
 msgstr " - Buy4U"
 
-#: .\shop\views.py:88
+#: .\shop\views.py:94
 msgid " - Product information"
 msgstr " - Información del producto"
 
-#: .\shop\views.py:110
+#: .\shop\views.py:116
 msgid "Cart - Buy4U"
 msgstr "Carrito - Buy4U"
 
-#: .\shop\views.py:111
+#: .\shop\views.py:117
 msgid "Shopping cart"
 msgstr "Carrito de compras"
 
-#: .\shop\views.py:173
+#: .\shop\views.py:179
 msgid "Admin - Buy4U"
 msgstr "Administrador - Buy4U"
 
-#: .\shop\views.py:174
+#: .\shop\views.py:180
 msgid "Manage products"
 msgstr "Gestionar productos"
 
-#: .\shop\views.py:226
+#: .\shop\views.py:232
 msgid "Medellin,CO"
 msgstr "Medellín,CO"
 
-#: .\shop\views.py:245
+#: .\shop\views.py:251
 msgid "Clear sky"
 msgstr "Cielo despejado"
 
-#: .\shop\views.py:246
+#: .\shop\views.py:252
 msgid "Few clouds"
 msgstr "Pocas nubes"
 
-#: .\shop\views.py:247
+#: .\shop\views.py:253
 msgid "Scattered clouds"
 msgstr "Nubes dispersas"
 
-#: .\shop\views.py:248
+#: .\shop\views.py:254
 msgid "Broken clouds"
 msgstr "Nubes rotas"
 
-#: .\shop\views.py:249
+#: .\shop\views.py:255
 msgid "Shower rain"
 msgstr "Lluvia ligera"
 
-#: .\shop\views.py:250
+#: .\shop\views.py:256
 msgid "Rain"
 msgstr "Lluvia"
 
-#: .\shop\views.py:251
+#: .\shop\views.py:257
 msgid "Thunderstorm"
 msgstr "Tormenta eléctrica"
 
-#: .\shop\views.py:252
+#: .\shop\views.py:258
 msgid "Snow"
 msgstr "Nieve"
 
-#: .\shop\views.py:253
+#: .\shop\views.py:259
 msgid "Mist"
 msgstr "Niebla"
 
-#: .\shop\views.py:254
+#: .\shop\views.py:260
 msgid "Drizzle"
 msgstr "Llovizna"
 
-#: .\shop\views.py:255
+#: .\shop\views.py:261
 #, fuzzy
 #| msgid "Scattered clouds"
 msgid "Overcast clouds"
 msgstr "Nubes dispersas"
 
-#: .\shop\views.py:269
+#: .\shop\views.py:275
 msgid "Unavailable"
 msgstr "No disponible"
+
+#: .\shop\views.py:290
+#, fuzzy
+#| msgid "The products could not be loaded {e}"
+msgid "The products could not be loaded"
+msgstr "Los productos no pudieron ser cargados"
+
+#: .\shop\views.py:304
+msgid "Invalid report type"
+msgstr "Tipo de informe no válido"

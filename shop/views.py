@@ -287,7 +287,7 @@ class ProductosAliadosView(TemplateView):
             context['productos'] = response.json() if response.status_code == 200 else []
         except Exception as e:
             context['productos'] = []
-            print("No se pudieron cargar los productos {e}")
+            print(_("The products could not be loaded"), e)
         return context
 
 
@@ -301,6 +301,6 @@ class GenerarReporteView(View):
         elif tipo == 'pdf':
             generador = ReportePDF()
         else:
-            return HttpResponse("Tipo de reporte no válido", status=400)
+            return HttpResponse(_("Invalid report type"), status=400)
 
         return generador.generar(queryset)
