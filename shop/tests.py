@@ -15,7 +15,7 @@ class LoginTests(TestCase):
             'password': 'test1234'
         })
         self.assertEqual(response.status_code, 302)  # Redirige tras login
-        self.assertRedirects(response, reverse('home'))  # Ajusta según tu redirección
+        self.assertRedirects(response, reverse('home'))
 
     def test_login_invalido(self):
         response = self.client.post(reverse('login'), {
