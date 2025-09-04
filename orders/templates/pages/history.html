@@ -1,0 +1,97 @@
+{% extends "pages/base.html" %}
+
+{% block content %}
+<style>
+  .page-wrap { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+  .header { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom: 16px; }
+  .title { font-size: clamp(22px, 2.5vw, 28px); font-weight: 700; margin: 0; color: #166534; }
+  .btn { display:inline-block; padding:10px 14px; border-radius:8px; text-decoration:none; font-weight:500; }
+  .btn-success { background:#16a34a; color:#fff; border:1px solid #16a34a; }
+  .btn-success:hover { background:#15803d; border-color:#15803d; }
+  .btn-outline { background:#fff; color:#166534; border:1px solid #bbf7d0; }
+  .btn-outline:hover { background:#ecfdf5; }
+  .grid { display:grid; gap:16px; }
+  .card { border:1px solid #bbf7d0; border-radius:12px; padding:16px; background:#f0fdf4; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .muted { color:#065f46; font-size: 12px; }
+  .badge { display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:4px 8px; border-radius:999px; font-weight:600; }
+  .badge.success { background:#dcfce7; color:#166534; }
+  .badge.info { background:#bbf7d0; color:#065f46; }
+  .badge.warn { background:#fef9c3; color:#854d0e; }
+  .list { margin:8px 0 0; padding-left: 20px; }
+  .list li { margin:2px 0; }
+  .tot { margin-top:8px; font-weight:600; color:#14532d; }
+  .empty { margin-top:20px; padding:24px; text-align:center; border:2px dashed #bbf7d0; border-radius:12px; color:#065f46; background:#f0fdf4; }
+  .pagination { display:flex; align-items:center; gap:10px; justify-content:center; margin-top: 16px; }
+</style>
+
+<div class="page-wrap">
+  <div class="header">
+    <h1 class="title">Historial de compras</h1>
+
+    {% if user.is_authenticated %}
+      <a class="btn btn-success" href="{% url 'shop' %}">🛍️ Nueva compra</a>
+    {% endif %}
+  </div>
+
+  {% if orders %}
+    <div class="grid">
+      {% for order in orders %}
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div><strong>Orden #{{ order.order_id }}</strong></div>
+              <div class="muted">{{ order.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+            <div>
+              {% with s=order.status %}
+                <span class="badge {% if s == 'delivered' %}success{% elif s == 'pending' or s == 'in_process' %}info{% elif s == 'shipped' %}info{% else %}warn{% endif %}">
+                  {{ order.get_status_display }}
+                </span>
+              {% endwith %}
+            </div>
+          </div>
+
+          <div style="margin-top:8px;">
+            <div><strong>Productos</strong></div>
+            <ul class="list">
+              {% for po in order.product_orders.all %}
+                <li>
+                  {{ po.quantity }} × {{ po.product.name }}
+                  {% if po.product.price %}
+                    — ${{ po.product.price|floatformat:2 }}
+                  {% endif %}
+                </li>
+              {% empty %}
+                <li class="muted"><em>Sin productos asociados</em></li>
+              {% endfor %}
+            </ul>
+
+            {% if order.total %}
+              <div class="tot">Total: ${{ order.total|floatformat:2 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}<a class="btn btn-outline" href="?page={{ page_obj.previous_page_number }}">« Anterior</a>{% endif %}
+        <span class="muted">Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a class="btn btn-outline" href="?page={{ page_obj.next_page_number }}">Siguiente »</a>{% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty">
+      <div style="font-size:18px; margin-bottom:8px;">Aún no tienes compras</div>
+      <div class="muted">Cuando realices tu primera orden, aparecerá aquí.</div>
+      {% if user.is_authenticated %}
+        <div style="margin-top:12px;">
+          <a class="btn btn-success" href="{% url 'shop' %}">Explorar productos</a>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

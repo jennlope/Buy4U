@@ -72,6 +72,13 @@
                                     {% trans "Logout" %}
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/orders/history/' %}active fw-bold text-success{% endif %}" 
+                                href="{% url 'order_history' %}">
+                                    {% trans "Historial de compras" %}
+                                </a>
+                            </li>
+
                         {% else %}
                             <li class="nav-item">
                                 <a class="nav-link {% if '/login' in request.path %}active fw-bold text-success{% endif %}" href="{% url 'login' %}">

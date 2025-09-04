@@ -2,8 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _, get_language
 from .models import Order, Product, ProductOrder
+from shop.models import Product
 from django.views import View
 from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from django.db.models import Prefetch
 import requests
 
 class DoAnOrderView(View):
@@ -83,7 +87,11 @@ class ProcessPaymentView(View):
                 })
                 return redirect('cart_index')
             
-            order = Order.objects.create()
+            # Crear la orden y asignar al usuario si esta logueado
+            order = Order.objects.create(
+                user=request.user if request.user.is_authenticated else None
+            )
+
             for product_id, quantity in cart_products.items():
                 product = Product.objects.get(id=product_id)
                 product.quantity -= int(quantity)
@@ -113,3 +121,18 @@ class OrderStatusView(View):
         except Order.DoesNotExist:
             messages.error(request, _("How did you even get here? Anyway, your order ID is not valid. Try another one, bro."))
             return redirect('order_status')
+        
+class PurchaseHistoryView(LoginRequiredMixin, ListView):
+    template_name = 'pages/history.html'
+    context_object_name = 'orders'
+    paginate_by = 10  # opcional
+
+    def get_queryset(self):
+        return (
+            Order.objects.filter(user=self.request.user)
+            .select_related('user')
+            .prefetch_related(
+                Prefetch('product_orders', queryset=ProductOrder.objects.select_related('product'))
+            )
+            .order_by('-created_at', '-order_id')
+        )
