@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
     'api.apps.ApiConfig',
     'rest_framework',
+    'services.tracking_app.apps.TrackingAppConfig',
+    'services.browsing_app.apps.BrowsingAppConfig',
     
 ]
 
@@ -71,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'services.tracking_app.middleware.UserInteractionMiddleware',
+    'services.browsing_app.middleware.BrowsingHistoryMiddleware',
 ]
 
 ROOT_URLCONF = 'Buy4U_Project.urls'
