@@ -118,14 +118,21 @@ class ProductDetailView(View):
         try:
             product_id = int(id)
             if product_id < 1:
-                raise ValueError(
-                    _("The product ID must be greater than or equal to 1.")
-                )
+                raise ValueError(_("The product ID must be greater than or equal to 1."))
             product = get_object_or_404(Product, pk=product_id)
         except (ValueError, IndexError):
             return HttpResponseRedirect(reverse("home"))
 
-        reviews = product.reviews.select_related("user").all()
+        # ⬇️ ORDENAMIENTO
+        sort = request.GET.get("sort", "recent")
+        if sort == "rating":
+            reviews_qs = product.reviews.select_related("user").order_by("-rating", "-created_at")
+        elif sort == "useful":
+            reviews_qs = product.reviews.select_related("user").order_by("-useful_count", "-created_at")
+        else:
+            # recent (default)
+            reviews_qs = product.reviews.select_related("user").order_by("-created_at")
+
         can_review = user_purchased_product(request.user, product)
         review_form = ReviewForm() if can_review else None
 
@@ -133,16 +140,16 @@ class ProductDetailView(View):
             "title": product.name + _(" - Buy4U"),
             "subtitle": product.name + _(" - Product information"),
             "product": product,
-            "reviews": reviews,
+            "reviews": reviews_qs,
             "can_review": can_review,
             "review_form": review_form,
+            "sort": sort,
         }
-        
+
         avg = product.reviews.aggregate(avg=Avg("rating"), total=Count("id"))
         view_data["avg_rating"] = avg["avg"] or 0
         view_data["reviews_count"] = avg["total"] or 0
         return render(request, self.template_name, view_data)
-
 
 class CartView(View):
     template_name = "cart/cart.html"

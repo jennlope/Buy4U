@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.views.generic import CreateView
-
+from django.views.generic import CreateView, View
+from django.db.models import F
 from shop.models import Product
 from .forms import ReviewForm
 from .models import Review
@@ -55,3 +55,11 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse("product_detail", kwargs={"id": self.product.id})
+
+class MarkReviewUsefulView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        review = get_object_or_404(Review, pk=pk)
+        # Incremento atómico
+        Review.objects.filter(pk=pk).update(useful_count=F("useful_count") + 1)
+        messages.success(request, "¡Gracias por tu feedback!")
+        return redirect(reverse("product_detail", kwargs={"id": review.product_id}))
