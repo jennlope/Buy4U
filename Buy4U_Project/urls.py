@@ -14,24 +14,28 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.static import static
+
 from django.conf import settings
-from django.contrib.auth import views as auth_views
 from django.conf.urls.i18n import set_language
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
-from shop.views import GenerarReporteView 
+
+from shop.views import GenerarReporteView
 
 urlpatterns = [
-    path('admin/generar_reporte/<str:tipo>/', GenerarReporteView.as_view(), name='generar_reporte'),
-    path('', include('shop.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('orders/', include('orders.urls')),
-    path('set_language/', csrf_exempt(set_language), name='set_language'),
-    path('api/', include('api.urls')),
-    path('', include('services.reviews_app.urls')),  
-    
-    path('admin/', admin.site.urls),
-    
+    path(
+        "admin/generar_reporte/<str:tipo>/",
+        GenerarReporteView.as_view(),
+        name="generar_reporte",
+    ),
+    path("", include("shop.urls")),
+    path("accounts/", include("accounts.urls")),
+    path("orders/", include("orders.urls")),
+    path("set_language/", csrf_exempt(set_language), name="set_language"),
+    path("api/", include("api.urls")),
+    path("", include("services.reviews_app.urls")),
+    path("admin/", admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,13 +1,16 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 
 class Event(models.Model):
     EVENT_TYPES = [
-        ('view', 'View'),
-        ('click', 'Click'),
-        ('purchase', 'Purchase'),
+        ("view", "View"),
+        ("click", "Click"),
+        ("purchase", "Purchase"),
     ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL
+    )
     session_key = models.CharField(max_length=40, null=True, blank=True)
     event_type = models.CharField(max_length=10, choices=EVENT_TYPES)
     product_id = models.IntegerField(null=True, blank=True)
@@ -17,8 +20,8 @@ class Event(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['event_type', 'created_at']),
-            models.Index(fields=['user', 'created_at']),
+            models.Index(fields=["event_type", "created_at"]),
+            models.Index(fields=["user", "created_at"]),
         ]
 
     def __str__(self):
