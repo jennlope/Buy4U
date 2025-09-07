@@ -38,19 +38,14 @@
 
 <hr>
 
-<!-- Calificación promedio -->
+<!-- Calificación promedio (UNA sola vez) -->
 <div class="container mb-3">
   <div class="d-flex align-items-center">
-    <div class="me-2">
-      <strong>{% trans "Average rating" %}:</strong>
-      {% if avg_rating %}
-        {{ avg_rating|floatformat:1 }}/5
-      {% else %}
-        N/A
-      {% endif %}
-      ({{ reviews_count }} {% trans "reviews" %})
-    </div>
-    <div aria-hidden="true" class="ms-3">
+    <span class="badge bg-success-subtle text-success border border-success-subtle me-2">
+      {% if avg_rating %}{{ avg_rating|floatformat:1 }}{% else %}N/A{% endif %}/5
+    </span>
+
+    <div aria-hidden="true" class="me-2">
       {% with rounded=avg_rating|default:0|floatformat:0 %}
         {% for _ in "12345" %}
           <span class="text-warning" style="font-size:1.1rem;">
@@ -59,6 +54,10 @@
         {% endfor %}
       {% endwith %}
     </div>
+
+    <small class="text-muted">
+      ({{ reviews_count }} reseñas)
+    </small>
   </div>
 </div>
 
@@ -92,22 +91,18 @@
       {% csrf_token %}
 
       <!-- Widget de estrellas accesible -->
-        <div class="mb-2">
-            <label class="form-label"><strong>Calificación</strong></label>
-            <div class="star-group" role="radiogroup" aria-label="Califica de 1 a 5">
-                {# iteramos 5 veces; revcounter dará 5,4,3,2,1 #}
-                {% for _ in "12345" %}
-                {% with val=forloop.revcounter %}
-                    <input class="btn-check" type="radio" name="rating" id="star{{ val }}" value="{{ val }}"
-                        {% if review_form.rating.value == val %}checked{% endif %}>
-                    <label for="star{{ val }}" class="star-label" title="{{ val }} estrellas" aria-label="{{ val }} estrellas">★</label>
-                {% endwith %}
-                {% endfor %}
-            </div>
-            <div class="form-text">Selecciona de 1 a 5 estrellas.</div>
-            {% for err in review_form.rating.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+      <div class="mb-2">
+        <label class="form-label"><strong>{% trans "Rating" %}</strong></label>
+        <div class="star-group" role="radiogroup" aria-label="{% trans 'Rate from 1 to 5' %}">
+          {# 5,4,3,2,1 para buen hover #}
+          {% for _ in "12345" %}
+            {% with val=forloop.revcounter %}
+              <input class="btn-check" type="radio" name="rating" id="star{{ val }}" value="{{ val }}"
+                     {% if review_form.rating.value|stringformat:"s" == val|stringformat:"s" %}checked{% endif %}>
+              <label for="star{{ val }}" class="star-label" title="{{ val }} {% trans 'stars' %}" aria-label="{{ val }} {% trans 'stars' %}">★</label>
+            {% endwith %}
+          {% endfor %}
         </div>
-
         <div class="form-text">{% trans "Select from 1 to 5 stars." %}</div>
         {% for err in review_form.rating.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
       </div>
@@ -137,7 +132,6 @@
       .star-group:hover .star-label:hover,
       .star-group:hover .star-label:hover ~ .star-label { color: #198754; }
     </style>
-
   {% else %}
     {% if user.is_authenticated %}
       <div class="alert alert-warning mt-2">
