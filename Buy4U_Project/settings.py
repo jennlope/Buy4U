@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'services.tracking_app.apps.TrackingAppConfig',
     'services.browsing_app.apps.BrowsingAppConfig',
+    'services.reviews_app.apps.ReviewsAppConfig',  
     
 ]
 

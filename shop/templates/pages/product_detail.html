@@ -1,32 +1,84 @@
 {% extends "pages/base.html" %}
-{% load static %}
-{% load i18n %}
+{% load static i18n %}
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="h1">{{ title }}</h1>
-            <h2 class="h2">{{ subtitle }}</h2>
-        </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="h1">{{ title }}</h1>
+      <h2 class="h2">{{ subtitle }}</h2>
     </div>
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Mostrar la imagen del producto -->
-            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+      {% else %}
+        <div class="border rounded d-flex align-items-center justify-content-center" style="height:320px;">
+          <span class="text-muted">{% trans "No image available" %}</span>
         </div>
-        <div class="col-md-6">
-            <!-- Mostrar los detalles del producto -->
-            <ul class="list-group">
-                <li class="list-group-item"><strong>{% trans "Name" %}:</strong> {% trans product.name %}</li>
-                <li class="list-group-item"><strong>{% trans "Price" %}:</strong> ${{ product.price }}</li>
-                <li class="list-group-item"><strong>{% trans "Brand" %}:</strong> {% trans product.brand %}</li>
-                <li class="list-group-item"><strong>{% trans "Warranty" %}:</strong> {% trans product.warranty %}</li>
-                <li class="list-group-item"><strong>{% trans "Quantity" %}:</strong> {{ product.quantity }}</li>
-                <li class="list-group-item"><strong>{% trans "Type" %}:</strong> {% trans product.type %}</li>
-                <li class="list-group-item"><strong>{% trans "Description" %}:</strong> {% trans product.description %}</li>
-            </ul>
-        </div>
+      {% endif %}
     </div>
+
+    <div class="col-md-6">
+      <ul class="list-group">
+        <li class="list-group-item"><strong>{% trans "Name" %}:</strong> {{ product.name }}</li>
+        <li class="list-group-item"><strong>{% trans "Price" %}:</strong> ${{ product.price|floatformat:2 }}</li>
+        <li class="list-group-item"><strong>{% trans "Brand" %}:</strong> {{ product.brand }}</li>
+        <li class="list-group-item"><strong>{% trans "Warranty" %}:</strong> {{ product.warranty }}</li>
+        <li class="list-group-item"><strong>{% trans "Quantity" %}:</strong> {{ product.quantity }}</li>
+        <li class="list-group-item"><strong>{% trans "Type" %}:</strong> {{ product.type }}</li>
+        <li class="list-group-item"><strong>{% trans "Description" %}:</strong> {{ product.description }}</li>
+      </ul>
+      <a href="#reviews" class="btn btn-success mt-3">{% trans "Read reviews" %}</a>
+    </div>
+  </div>
 </div>
+
+<hr id="reviews">
+<h3 class="h5 text-success">{% trans "Reviews" %}</h3>
+
+{% if reviews %}
+  <ul class="list-group mb-3">
+    {% for r in reviews %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <strong>{{ r.user.username }}</strong>
+          <small class="text-muted">{{ r.created_at|date:"Y-m-d H:i" }}</small>
+        </div>
+        <div class="mt-1">{{ r.text|linebreaksbr }}</div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">{% trans "Be the first to review this product." %}</p>
+{% endif %}
+
+{% if can_review and review_form %}
+  <form action="{% url 'product_review' id=product.id %}" method="post" class="card card-body border-success-subtle">
+    {% csrf_token %}
+    <div class="mb-2">
+      {{ review_form.text.label_tag }}
+      {{ review_form.text }}
+      {% if review_form.text.help_text %}
+        <div class="form-text">{{ review_form.text.help_text }}</div>
+      {% endif %}
+      {% for err in review_form.text.errors %}
+        <div class="text-danger small">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <button class="btn btn-success" type="submit">{% trans "Submit review" %}</button>
+  </form>
+{% else %}
+  {% if user.is_authenticated %}
+    <div class="alert alert-warning mt-2">
+      {% trans "You can only review products you have purchased." %}
+    </div>
+  {% else %}
+    <div class="alert alert-info mt-2">
+      {% trans "Please sign in to leave a review." %}
+    </div>
+  {% endif %}
+{% endif %}
 {% endblock %}

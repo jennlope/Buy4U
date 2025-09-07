@@ -30,6 +30,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
     path('set_language/', csrf_exempt(set_language), name='set_language'),
     path('api/', include('api.urls')),
+    path('', include('services.reviews_app.urls')),  
     
     path('admin/', admin.site.urls),
     

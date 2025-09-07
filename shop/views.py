@@ -14,6 +14,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
 from .reportes import ReporteExcel, ReportePDF
 from .models import Product
+from services.reviews_app.forms import ReviewForm
+from services.reviews_app.utils import user_purchased_product
+
 
 # Create your views here.
 class HomePageView(TemplateView):
@@ -88,11 +91,19 @@ class ProductDetailView(View):
             product = get_object_or_404(Product, pk=product_id)
         except (ValueError, IndexError):
             return HttpResponseRedirect(reverse('home'))
+        
+        reviews = product.reviews.select_related('user').all()
+        can_review = user_purchased_product(request.user, product)
+        review_form = ReviewForm() if can_review else None
+
 
         view_data = {
             "title": product.name + _(" - Buy4U"),
             "subtitle": product.name + _(" - Product information"),
-            "product": product
+            "product": product,
+            "reviews": reviews,
+            "can_review": can_review,
+            "review_form": review_form,
         }
         return render(request, self.template_name, view_data)
 
