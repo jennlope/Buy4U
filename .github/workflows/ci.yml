@@ -69,7 +69,8 @@ jobs:
           pip install bandit pip-audit
 
       - name: Bandit (SAST)
-        run: bandit -r . -x **/migrations/**
+        run: bandit -r . -x "**/migrations/**,**/__pycache__/**"
+
 
       - name: pip-audit (deps vulns)
         run: pip-audit -r requirements.txt
