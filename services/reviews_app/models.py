@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 from shop.models import Product
 
 
@@ -12,6 +13,7 @@ class Review(models.Model):
         Product, on_delete=models.CASCADE, related_name="reviews"
     )
     text = models.TextField()
+    rating = models.PositiveSmallIntegerField(default=5,validators=[MinValueValidator(1), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
