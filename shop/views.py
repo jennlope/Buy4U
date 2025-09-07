@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView, TemplateView
-
+from django.db.models import Avg, Count 
 from services.reviews_app.forms import ReviewForm
 from services.reviews_app.utils import user_purchased_product
 
@@ -137,6 +137,10 @@ class ProductDetailView(View):
             "can_review": can_review,
             "review_form": review_form,
         }
+        
+        avg = product.reviews.aggregate(avg=Avg("rating"), total=Count("id"))
+        view_data["avg_rating"] = avg["avg"] or 0
+        view_data["reviews_count"] = avg["total"] or 0
         return render(request, self.template_name, view_data)
 
 
