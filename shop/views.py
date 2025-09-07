@@ -12,7 +12,7 @@ from django.views import View
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
-from .reportes import ReporteExcel, ReportePDF
+#from .reportes import ReporteExcel, ReportePDF
 from .models import Product
 from services.reviews_app.forms import ReviewForm
 from services.reviews_app.utils import user_purchased_product
@@ -305,6 +305,7 @@ class ProductosAliadosView(TemplateView):
 @method_decorator(staff_member_required, name='dispatch')
 class GenerarReporteView(View):
     def get(self, request, tipo):
+        from .reportes import ReporteExcel, ReportePDF
         queryset = Product.objects.all()
 
         if tipo == 'excel':
