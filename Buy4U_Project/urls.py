@@ -37,5 +37,6 @@ urlpatterns = [
     path("set_language/", csrf_exempt(set_language), name="set_language"),
     path("api/", include("api.urls")),
     path("", include("services.reviews_app.urls")),
+    path("reviews/", include("services.reviews_app.urls")),
     path("admin/", admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
