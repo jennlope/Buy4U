@@ -38,7 +38,7 @@
 
 <hr>
 
-<!-- Calificación promedio (UNA sola vez) -->
+<!-- Calificación promedio + número de reseñas -->
 <div class="container mb-3">
   <div class="d-flex align-items-center">
     <span class="badge bg-success-subtle text-success border border-success-subtle me-2">
@@ -56,29 +56,53 @@
     </div>
 
     <small class="text-muted">
-      ({{ reviews_count }} reseñas)
+      ({{ reviews_count }} {% trans "reviews" %})
     </small>
   </div>
 </div>
 
-<div class="container" id="reviews">
-  <h3 class="h5 text-success">{% trans "Reviews" %}</h3>
+<!-- Cabecera reseñas + selector de orden -->
+<div class="container d-flex justify-content-between align-items-center mb-2" id="reviews">
+  <h3 class="h5 text-success mb-0">{% trans "Reviews" %}</h3>
+  <form method="get" class="d-flex align-items-center">
+    <label for="sort" class="me-2 small text-muted">{% trans "Sort by" %}:</label>
+    <select id="sort" name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+      <option value="recent" {% if sort == 'recent' %}selected{% endif %}>{% trans "Most recent" %}</option>
+      <option value="rating" {% if sort == 'rating' %}selected{% endif %}>{% trans "Highest rating" %}</option>
+      <option value="useful" {% if sort == 'useful' %}selected{% endif %}>{% trans "Most useful" %}</option>
+    </select>
+  </form>
+</div>
 
+<!-- Lista de reseñas -->
+<div class="container">
   {% if reviews %}
     <ul class="list-group mb-3">
       {% for r in reviews %}
         <li class="list-group-item">
           <div class="d-flex justify-content-between">
-            <strong>{{ r.user.username }}</strong>
+            <div>
+              <strong>{{ r.user.username }}</strong>
+              <span class="ms-2 small text-muted">({{ r.rating }}/5)</span>
+            </div>
             <small class="text-muted">{{ r.created_at|date:"Y-m-d H:i" }}</small>
           </div>
+
           <div class="mb-1" aria-label="{% blocktrans %}Rating {{ r.rating }} of 5{% endblocktrans %}">
             {% for _ in "12345" %}
               <span class="text-warning">{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}</span>
             {% endfor %}
-            <span class="ms-1 small text-muted">({{ r.rating }}/5)</span>
           </div>
-          <div>{{ r.text|linebreaksbr }}</div>
+
+          <div class="mb-2">{{ r.text|linebreaksbr }}</div>
+
+          <!-- Botón “Helpful” -->
+          <form action="{% url 'review_useful' pk=r.id %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-success btn-sm">
+              {% trans "Helpful" %} ({{ r.useful_count }})
+            </button>
+          </form>
         </li>
       {% endfor %}
     </ul>
@@ -86,15 +110,15 @@
     <p class="text-muted">{% trans "Be the first to review this product." %}</p>
   {% endif %}
 
+  <!-- Formulario para crear reseña (solo si puede) -->
   {% if can_review and review_form %}
     <form action="{% url 'product_review' id=product.id %}" method="post" class="card card-body border-success-subtle">
       {% csrf_token %}
 
-      <!-- Widget de estrellas accesible -->
+      <!-- Estrellas -->
       <div class="mb-2">
         <label class="form-label"><strong>{% trans "Rating" %}</strong></label>
         <div class="star-group" role="radiogroup" aria-label="{% trans 'Rate from 1 to 5' %}">
-          {# 5,4,3,2,1 para buen hover #}
           {% for _ in "12345" %}
             {% with val=forloop.revcounter %}
               <input class="btn-check" type="radio" name="rating" id="star{{ val }}" value="{{ val }}"
@@ -120,11 +144,8 @@
     </form>
 
     <style>
-      /* Estrellas en tono verde Bootstrap */
       .star-group { direction: rtl; unicode-bidi: bidi-override; }
-      .star-label {
-        font-size: 1.6rem; cursor: pointer; color: #ced4da; padding: 0 .15rem;
-      }
+      .star-label { font-size: 1.6rem; cursor: pointer; color: #ced4da; padding: 0 .15rem; }
       .btn-check:checked + .star-label,
       .star-label:hover,
       .star-label:hover ~ .star-label { color: #198754; }
@@ -144,4 +165,5 @@
     {% endif %}
   {% endif %}
 </div>
+
 {% endblock %}

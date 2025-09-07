@@ -15,6 +15,7 @@ class Review(models.Model):
     text = models.TextField()
     rating = models.PositiveSmallIntegerField(default=5,validators=[MinValueValidator(1), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
+    useful_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ("user", "product")  # un usuario 1 sola reseña por producto
