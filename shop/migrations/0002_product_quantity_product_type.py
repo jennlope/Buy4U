@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0001_initial'),
+        ("shop", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='quantity',
+            model_name="product",
+            name="quantity",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='product',
-            name='type',
-            field=models.CharField(default='Electrónico', max_length=255),
+            model_name="product",
+            name="type",
+            field=models.CharField(default="Electrónico", max_length=255),
         ),
     ]

@@ -1,21 +1,27 @@
 from abc import ABC, abstractmethod
+from io import BytesIO
+
 import pandas as pd
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
-from io import BytesIO
+
 
 class GeneradorReporte(ABC):
     @abstractmethod
     def generar(self, queryset):
         pass
 
+
 class ReporteExcel(GeneradorReporte):
     def generar(self, queryset):
         df = pd.DataFrame(list(queryset.values()))
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename=reporte.xlsx'
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = "attachment; filename=reporte.xlsx"
         df.to_excel(response, index=False)
         return response
+
 
 class ReportePDF(GeneradorReporte):
     def generar(self, queryset):
@@ -32,4 +38,4 @@ class ReportePDF(GeneradorReporte):
         p.showPage()
         p.save()
         buffer.seek(0)
-        return HttpResponse(buffer, content_type='application/pdf')
+        return HttpResponse(buffer, content_type="application/pdf")
