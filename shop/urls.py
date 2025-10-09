@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from .views import (CartRemoveView, CartUpdateQuantityView, CartView,
                     GenerarReporteView, HomePageView, ProductDetailView,
@@ -17,6 +17,8 @@ urlpatterns = [
         name="cart_update_quantity",
     ),
     path("admin_product/", admin_product_view.as_view(), name="admin_dashboard"),
+        # Ruta adicional que acepta sin slash (para evitar 301 en tests que piden /admin_product)
+    re_path(r'^admin_product/?$', admin_product_view.as_view(), name='admin_product_noslash'),
     path(
         "admin_product/generar_reporte/<str:tipo>/",
         GenerarReporteView.as_view(),
