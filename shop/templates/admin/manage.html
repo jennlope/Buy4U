@@ -1,5 +1,5 @@
 {% extends "pages/base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 <div class="container py-5">
@@ -59,6 +59,128 @@
         </a>        
     </div>
     
+    <!-- SECTION: Historial de búsqueda (solo staff) -->
+    {% if request.user.is_staff %}
+    <div class="card shadow-sm p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h5 mb-0">Historial de búsqueda</h3>
+        <div>
+        <a href="?bh_export=csv" class="btn btn-outline-secondary btn-sm">Export CSV</a>
+        </div>
+    </div>
+
+    {# FILTROS: selector de usuario, query, acción, fechas #}
+    <form method="get" class="row g-2 mb-3">
+        {# Mantén otros params de paginación si necesitas #}
+        <div class="col-auto">
+        <label class="form-label small mb-1">Usuario</label>
+        <select name="bh_user_id" class="form-select form-select-sm">
+            <option value="">{% trans "All users" %}</option>
+            {% if browsing_users_page %}
+            {% for u in browsing_users_page.object_list %}
+                <option value="{{ u.id }}" {% if browsing_filters.user_id|stringformat:"s" == u.id|stringformat:"s" %}selected{% endif %}>
+                {{ u.username }} (id:{{ u.id }})
+                </option>
+            {% endfor %}
+            {% endif %}
+        </select>
+        </div>
+
+        <div class="col-auto">
+        <label class="form-label small mb-1">Query</label>
+        <input type="text" name="bh_query" class="form-control form-control-sm" placeholder="Query" value="{{ browsing_filters.query }}">
+        </div>
+
+        <div class="col-auto">
+        <label class="form-label small mb-1">Acción</label>
+        <select name="bh_action" class="form-select form-select-sm">
+            <option value="">{% trans "All actions" %}</option>
+            <option value="search" {% if browsing_filters.action == 'search' %}selected{% endif %}>{% trans "Search" %}</option>
+            <option value="product_view" {% if browsing_filters.action == 'product_view' %}selected{% endif %}>{% trans "Product view" %}</option>
+        </select>
+        </div>
+
+        <div class="col-auto">
+        <label class="form-label small mb-1">Desde</label>
+        <input type="date" name="bh_start" class="form-control form-control-sm" value="{{ browsing_filters.start }}">
+        </div>
+        <div class="col-auto">
+        <label class="form-label small mb-1">Hasta</label>
+        <input type="date" name="bh_end" class="form-control form-control-sm" value="{{ browsing_filters.end }}">
+        </div>
+
+        <div class="col-auto align-self-end">
+        <button class="btn btn-success btn-sm">Filtrar</button>
+        </div>
+    </form>
+
+    {# LISTADO: tabla de historial #}
+    <div class="table-responsive">
+        <table class="table table-sm">
+        <thead>
+            <tr>
+            <th>ID</th><th>Usuario</th><th>Acción</th><th>Producto</th><th>Query</th><th>Path</th><th>Sesión</th><th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if browsing_history_page %}
+            {% for b in browsing_history_page.object_list %}
+                <tr>
+                <td>{{ b.id }}</td>
+                <td>{% if b.user %}{{ b.user.username }}{% else %}<span class="text-muted">anon</span>{% endif %}</td>
+                <td>{{ b.action }}</td>
+                <td>{{ b.product_id|default:"-" }}</td>
+                <td>{{ b.query|default:"" }}</td>
+                <td><small>{{ b.path|truncatechars:50 }}</small></td>
+                <td>{{ b.session_key|default:"" }}</td>
+                <td class="text-muted">{{ b.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+            {% endfor %}
+            {% else %}
+            <tr><td colspan="8" class="text-center text-muted">No records</td></tr>
+            {% endif %}
+        </tbody>
+        </table>
+    </div>
+
+    {# PAGINACIÓN para historial #}
+    {% if browsing_history_page and browsing_history_page.paginator.num_pages > 1 %}
+        <nav>
+        <ul class="pagination pagination-sm">
+            {% if browsing_history_page.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?bh_page={{ browsing_history_page.previous_page_number }}{% if browsing_filters.query %}&bh_query={{ browsing_filters.query }}{% endif %}{% if browsing_filters.user_id %}&bh_user_id={{ browsing_filters.user_id }}{% endif %}">Anterior</a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">{{ browsing_history_page.number }}/{{ browsing_history_page.paginator.num_pages }}</span></li>
+            {% if browsing_history_page.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?bh_page={{ browsing_history_page.next_page_number }}{% if browsing_filters.query %}&bh_query={{ browsing_filters.query }}{% endif %}{% if browsing_filters.user_id %}&bh_user_id={{ browsing_filters.user_id }}{% endif %}">Siguiente</a>
+            </li>
+            {% endif %}
+        </ul>
+        </nav>
+    {% endif %}
+
+    {# PAGINACIÓN para lista de usuarios (opcional) #}
+    {% if browsing_users_page and browsing_users_page.paginator.num_pages > 1 %}
+        <nav aria-label="Browsing users paginator">
+        <ul class="pagination pagination-sm">
+            {% if browsing_users_page.has_previous %}
+            <li class="page-item"><a class="page-link" href="?bpage={{ browsing_users_page.previous_page_number }}">« anterior</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Página {{ browsing_users_page.number }} / {{ browsing_users_page.paginator.num_pages }}</span></li>
+            {% if browsing_users_page.has_next %}
+            <li class="page-item"><a class="page-link" href="?bpage={{ browsing_users_page.next_page_number }}">siguiente »</a></li>
+            {% endif %}
+        </ul>
+        </nav>
+    {% endif %}
+    </div>
+    {% endif %}
+    <!-- END: Historial de búsqueda -->
+
+
     <!-- Muestra todos los productos disponibles -->
     <div class="row">
         {% for product in products %}

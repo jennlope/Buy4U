@@ -12,6 +12,9 @@ from django.views.generic import ListView, TemplateView
 from django.db.models import Avg, Count 
 from services.reviews_app.forms import ReviewForm
 from services.reviews_app.utils import user_purchased_product
+from services.browsing_app.models import BrowsingHistory
+from django.core.paginator import Paginator
+from django.contrib.auth import get_user_model
 
 # from .reportes import ReporteExcel, ReportePDF
 from .models import Product
@@ -90,7 +93,15 @@ class ShopView(View):
             max_price = form.cleaned_data.get("max_price")
             brand = form.cleaned_data.get("brand")
             type = form.cleaned_data.get("type")
-
+            query = request.GET.get('name', '').strip()
+            if query:
+                BrowsingHistory.objects.create(
+                    user=request.user if request.user.is_authenticated else None,
+                    session_key=request.session.session_key,
+                    action='search',
+                    query=query,
+                    path=request.get_full_path()
+                )
             if name:
                 products = products.filter(name__icontains=name)
             if min_price is not None:
@@ -101,7 +112,7 @@ class ShopView(View):
                 products = products.filter(brand__icontains=brand)
             if type:
                 products = products.filter(type__iexact=type)
-
+    
         view_data = {
             "title": _("Shop - Buy4U"),
             "subtitle": _("List of products"),
@@ -238,6 +249,79 @@ class admin_product_view(View):
             "subtitle": _("Manage products"),
             "products": products,
         }
+                # --- browsing history + users (solo para staff) ---
+        browsing_history_page = None
+        browsing_users_page = None
+
+        # inicializar filtros por si no es staff (evita NameError más abajo)
+        user_id = request.GET.get('bh_user_id', '')
+        query = request.GET.get('bh_query', '')
+        action = request.GET.get('bh_action', '')
+        start = request.GET.get('bh_start', '')
+        end = request.GET.get('bh_end', '')
+
+        if request.user.is_staff:
+            # base queryset de historial (más reciente primero)
+            bh_qs = BrowsingHistory.objects.select_related('user').all().order_by('-created_at')
+
+            # aplicar filtros al historial
+            if user_id:
+                try:
+                    bh_qs = bh_qs.filter(user_id=int(user_id))
+                except ValueError:
+                    pass
+            if query:
+                bh_qs = bh_qs.filter(query__icontains=query)
+            if action:
+                bh_qs = bh_qs.filter(action=action)
+            if start:
+                bh_qs = bh_qs.filter(created_at__date__gte=start)
+            if end:
+                bh_qs = bh_qs.filter(created_at__date__lte=end)
+
+            # Export CSV del historial filtrado
+            if request.GET.get('bh_export') == 'csv':
+                import csv
+                from django.http import HttpResponse
+                filename = "browsing_history.csv"
+                resp = HttpResponse(content_type='text/csv; charset=utf-8')
+                resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+                writer = csv.writer(resp)
+                writer.writerow(['id','user','session_key','action','product_id','query','path','created_at'])
+                for b in bh_qs:
+                    writer.writerow([b.id, b.user.username if b.user else '', b.session_key, b.action, b.product_id, b.query, b.path, b.created_at])
+                return resp
+
+            # paginar historial (20 por página)
+            bh_page_num = request.GET.get('bh_page', 1)
+            paginator = Paginator(bh_qs, 20)
+            browsing_history_page = paginator.get_page(bh_page_num)
+
+            # Lista de usuarios distintos que aparecen en el historial (solo no-null)
+            bh_user_ids = BrowsingHistory.objects.exclude(user__isnull=True).values_list('user_id', flat=True).distinct()
+            User = get_user_model()
+            browsing_users_qs = User.objects.filter(id__in=bh_user_ids).order_by('username')
+
+            # Paginador de usuarios (10 por página)
+            users_page_num = request.GET.get('bpage', 1)
+            paginator_users = Paginator(browsing_users_qs, 10)
+            browsing_users_page = paginator_users.get_page(users_page_num)
+
+            # Añadir al context
+            view_data.update({
+                "browsing_history_page": browsing_history_page,
+                "browsing_users_page": browsing_users_page,
+                "browsing_users_count": browsing_users_qs.count(),
+            })
+
+        # incluir en el view_data (si no es staff serán None)
+        view_data['browsing_history_page'] = browsing_history_page
+        view_data['browsing_users_page'] = browsing_users_page
+        view_data['browsing_filters'] = {
+            'user_id': user_id, 'query': query, 'action': action, 'start': start, 'end': end
+        }
+
+
         return render(request, self.template_name, view_data)
 
     def post(self, request):
