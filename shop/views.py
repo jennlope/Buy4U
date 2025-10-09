@@ -869,3 +869,110 @@ def top_products_json(request):
 @user_passes_test(lambda u: u.is_staff)
 def top_products_page(request):
     return render(request, "admin/top_products.html")
+
+##HU14
+# al principio del archivo shop/views.py (imports principales)
+import csv
+import io
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Avg, Count, F
+from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+from django.apps import apps
+
+# Import correcto del browsing history existente:
+from services.browsing_app.models import BrowsingHistory
+
+# Importa Product y Orders dinámicamente cuando lo necesites:
+Product = apps.get_model('shop', 'Product')
+# Order / OrderProduct pueden recogerse así:
+try:
+    OrderProduct = apps.get_model('orders', 'ProductOrder')  # o el nombre que uses
+except LookupError:
+    OrderProduct = None
+
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+
+@method_decorator(staff_member_required, name="dispatch")
+class GenerarReporteView(View):
+    """
+    Genera reportes básicos: CSV export con estadísticas de ventas y visitas.
+    Rutas: /admin/reports/export/ (GET ?type=csv)
+    """
+    def get(self, request, tipo=None):
+        # tipo puede ser 'excel' o 'pdf' o 'csv' según lo que envíes; por ahora soportamos csv de forma robusta
+        report_type = request.GET.get('type', 'csv').lower()
+
+        # Datos básicos: top productos por vistas y por compras
+        # Top por vistas: usar BrowsingHistory (product_view)
+        top_views = (BrowsingHistory.objects
+                     .filter(action='product_view', product_id__isnull=False)
+                     .values('product_id')
+                     .annotate(views=Count('id'))
+                     .order_by('-views')[:20])
+
+        # Top por compras: intentar usar orders.ProductOrder o el modelo de pedidos
+        top_bought = []
+        if OrderProduct is not None:
+            top_bought = (OrderProduct.objects
+                          .values('product_id')
+                          .annotate(qty=Count('pk'))
+                          .order_by('-qty')[:20])
+        else:
+            # fallback: consultar orders app por relacion M2M si existe
+            try:
+                Order = apps.get_model('orders', 'Order')
+                top_bought = (Order.objects
+                              .values('product_orders__product_id')
+                              .annotate(qty=Count('product_orders__id'))
+                              .order_by('-qty')[:20])
+            except Exception:
+                top_bought = []
+
+        # Si piden CSV, generar y devolver
+        if report_type == 'csv':
+            filename = "reporte_detallado.csv"
+            resp = HttpResponse(content_type='text/csv')
+            resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+            writer = csv.writer(resp)
+
+            # Encabezado más claro
+            writer.writerow(["Tipo", "Producto", "Métrica", "Valor"])
+
+            # Mejorar: obtener nombres de productos
+            product_names = {
+                p.id: p.name for p in Product.objects.filter(
+                    id__in=[
+                        *[v["product_id"] for v in top_views],
+                        *[b.get("product_id") or b.get("product_orders__product_id") for b in top_bought]
+                    ]
+                )
+            }
+
+            # Escribir vistas
+            for tv in top_views:
+                pid = tv.get("product_id")
+                pname = product_names.get(pid, f"Producto {pid}")
+                writer.writerow(["Visualizaciones", pname, "Vistas", tv.get("views")])
+
+            # Escribir compras
+            for tb in top_bought:
+                pid = tb.get("product_id") or tb.get("product_orders__product_id")
+                pname = product_names.get(pid, f"Producto {pid}")
+                val = tb.get("qty") or tb.get("qty", "")
+                writer.writerow(["Compras", pname, "Cantidad", val])
+
+            return resp
+
+
+        # Para otros tipos (excel/pdf) se puede delegar a librerías, pero por ahora mostramos JSON con datos
+        return JsonResponse({
+            'top_views': list(top_views),
+            'top_bought': list(top_bought),
+        })
