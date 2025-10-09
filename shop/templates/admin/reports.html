@@ -1,0 +1,100 @@
+{% extends "pages/base.html" %}
+{% load static i18n %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="h3">Admin Reports</h1>
+  <p class="text-muted">Tendencias y top productos</p>
+
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card p-3">
+        <h5>Trends (last {{ days|default:30 }})</h5>
+        <canvas id="trendChart" height="120"></canvas>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3 mb-3">
+        <h6>Top viewed</h6>
+        <ul id="topViewed" class="list-group list-group-flush"></ul>
+      </div>
+      <div class="card p-3">
+        <h6>Top bought</h6>
+        <ul id="topBought" class="list-group list-group-flush"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-3">
+    <a id="exportCsv" href="{% url 'admin_reports_export_csv' %}" class="btn btn-outline-secondary btn-sm">Export CSV (last {{ days|default:30 }} days)</a>
+    <a href="?days=7" class="btn btn-sm btn-light">7d</a>
+    <a href="?days=30" class="btn btn-sm btn-light">30d</a>
+    <a href="?days=90" class="btn btn-sm btn-light">90d</a>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  (function(){
+    // days viene del contexto: si no existe, toma 30
+    const days = {{ days|default:30 }};
+    const dataUrl = "{% url 'admin_reports_data_json' %}?days=" + encodeURIComponent(days);
+    const topUrl  = "{% url 'admin_reports_top_json' %}?n=5&days=" + encodeURIComponent(days);
+
+    // Cargar datos de tendencias
+    fetch(dataUrl).then(r => {
+      if (!r.ok) throw new Error('data fetch failed');
+      return r.json();
+    }).then(d => {
+      const labels = d.labels || [];
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            { label: 'Visits', data: d.visits || [], fill: false, tension: 0.2, borderWidth:1 },
+            { label: 'Purchases', data: d.purchases || [], fill: false, tension: 0.2, borderWidth:1 },
+            { label: 'Avg rating', data: d.avg_ratings || [], fill: false, tension: 0.2, borderWidth:1, yAxisID: 'rating' },
+          ]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero:true },
+            rating: { position: 'right', suggestedMin:0, suggestedMax:5 }
+          },
+          interaction: { mode: 'index', intersect: false }
+        }
+      });
+    }).catch(e=>console.error(e));
+
+    // Cargar top lists
+    fetch(topUrl).then(r => r.json()).then(d => {
+      const tv = document.getElementById('topViewed');
+      (d.top_viewed || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `<span>${item.product_name || 'Unknown'}</span><span class="badge bg-success">${item.views}</span>`;
+        tv.appendChild(li);
+      });
+      const tb = document.getElementById('topBought');
+      (d.top_bought || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `<span>${item.product_name || 'Unknown'}</span><span class="badge bg-primary">${item.qty}</span>`;
+        tb.appendChild(li);
+      });
+    }).catch(e=>console.error(e));
+
+    // export CSV: añade params days y start si existe today en contexto
+    const exportBtn = document.getElementById('exportCsv');
+    const params = new URLSearchParams();
+    params.set('days', String({{ days|default:30 }}));
+    {% if today %}
+    params.set('start', '{{ today }}');
+    {% endif %}
+    exportBtn.href = exportBtn.href + "?" + params.toString();
+
+  })();
+</script>
+{% endblock %}

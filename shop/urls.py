@@ -3,6 +3,7 @@ from django.urls import path, re_path
 from .views import (CartRemoveView, CartUpdateQuantityView, CartView,
                     GenerarReporteView, HomePageView, ProductDetailView,
                     ProductosAliadosView, ShopView, admin_product_view)
+from .views import ReportsOverviewView, reports_data_json, reports_top_json, export_reports_csv
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
@@ -27,4 +28,11 @@ urlpatterns = [
     path(
         "productos-aliados/", ProductosAliadosView.as_view(), name="productos_aliados"
     ),
+]
+
+urlpatterns += [
+    path("admin/reports/", ReportsOverviewView.as_view(), name="admin_reports_overview"),
+    path("admin/reports/data/", reports_data_json, name="admin_reports_data_json"),
+    path("admin/reports/top/", reports_top_json, name="admin_reports_top_json"),
+    path("admin/reports/export_csv/", export_reports_csv, name="admin_reports_export_csv"),
 ]
