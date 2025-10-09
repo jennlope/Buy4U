@@ -500,3 +500,243 @@ class GenerarReporteView(View):
             return HttpResponse(_("Invalid report type"), status=400)
 
         return generador.generar(queryset)
+    
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse, HttpResponse
+from django.views import View
+from django.utils import timezone
+from django.db.models import Count, Avg
+from django.db.models.functions import TruncDate
+import csv
+from datetime import timedelta, date
+
+from services.browsing_app.models import BrowsingHistory
+from services.reviews_app.models import Review
+from shop.models import Product
+from orders.models import Order  # ajusta el import si tu app/archivo se llama diferente
+
+@method_decorator(staff_member_required, name='dispatch')
+class ReportsOverviewView(TemplateView):
+    template_name = "admin/reports.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        days = int(self.request.GET.get('days', 30))
+        ctx['days'] = days
+        # pasar today en formato ISO para inputs date / querystring
+        ctx['today'] = timezone.localdate().isoformat()
+        return ctx
+
+@staff_member_required
+def reports_data_json(request):
+    # days param
+    days = int(request.GET.get("days", 30))
+    end_date = timezone.localdate()
+    start_date = end_date - timedelta(days=days-1)
+
+    # Visits per day (BrowsingHistory action='product_view')
+    visits_qs = (
+        BrowsingHistory.objects
+        .filter(action='product_view', created_at__date__gte=start_date, created_at__date__lte=end_date)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
+    # Purchases per day (Order) — cuenta por order_id porque tu modelo tiene ese campo
+    purchases_qs = (
+        Order.objects
+        .filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(count=Count('order_id'))   # usa order_id tal como aparece en tu modelo
+        .order_by('day')
+    )
+
+    # Avg rating per day (Review)
+    ratings_qs = (
+        Review.objects
+        .filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(avg_rating=Avg('rating'))
+        .order_by('day')
+    )
+
+    # build a list of labels covering the full date range so chart.js siempre tenga todas las fechas
+    labels = []
+    for i in range(days):
+        d = start_date + timedelta(days=i)
+        labels.append(d.isoformat())
+
+    # helper dicts for quick lookup
+    visits_map = {str(item['day']): item['count'] for item in visits_qs}
+    purchases_map = {str(item['day']): item['count'] for item in purchases_qs}
+    ratings_map = {str(item['day']): float(item['avg_rating']) if item['avg_rating'] is not None else None for item in ratings_qs}
+
+    visits = [visits_map.get(lbl, 0) for lbl in labels]
+    purchases = [purchases_map.get(lbl, 0) for lbl in labels]
+    avg_ratings = [ratings_map.get(lbl, None) for lbl in labels]
+
+    return JsonResponse({
+        "labels": labels,
+        "visits": visits,
+        "purchases": purchases,
+        "avg_ratings": avg_ratings,
+    })
+
+
+
+@staff_member_required
+def reports_top_json(request):
+    n = int(request.GET.get("n", 5))
+    days = int(request.GET.get("days", 30))
+    end_date = timezone.localdate()
+    start_date = end_date - timedelta(days=days-1)
+
+    # Top viewed: contar BrowsingHistory por product_id
+    top_viewed_qs = (
+        BrowsingHistory.objects
+        .filter(action='product_view', created_at__date__gte=start_date, created_at__date__lte=end_date, product_id__isnull=False)
+        .values('product_id')
+        .annotate(views=Count('id'))
+        .order_by('-views')[:n]
+    )
+    product_ids_viewed = [item['product_id'] for item in top_viewed_qs]
+    products_viewed = Product.objects.in_bulk(product_ids_viewed)
+    top_viewed = []
+    for item in top_viewed_qs:
+        pid = item['product_id']
+        p = products_viewed.get(pid)
+        top_viewed.append({
+            "product_id": pid,
+            "product_name": p.name if p else "Unknown",
+            "views": item['views'],
+        })
+
+    # Top bought: dependiendo de cómo almacenas order-product relation.
+    # Si Order tiene M2M "products" o "product_orders" con qty, adapta la consulta.
+    # Aquí asumo que hay una relación Order.products (m2m) o ProductOrder con order and product.
+    # Intento contar por product en la tabla intermedia si existe:
+    top_bought = []
+    try:
+        # Attempts for common patterns:
+        # 1) if you have a through model `ProductOrder` with (order, product, quantity)
+        from orders.models import ProductOrder  # ajusta nombre si es distinto
+        bought_qs = (
+            ProductOrder.objects
+            .filter(order__created_at__date__gte=start_date, order__created_at__date__lte=end_date)
+            .values('product_id')
+            .annotate(qty=Count('id'))  # si hay campo quantity usa Sum('quantity')
+            .order_by('-qty')[:n]
+        )
+        product_ids_bought = [i['product_id'] for i in bought_qs]
+        products_bought = Product.objects.in_bulk(product_ids_bought)
+        for it in bought_qs:
+            pid = it['product_id']
+            p = products_bought.get(pid)
+            top_bought.append({
+                "product_id": pid,
+                "product_name": p.name if p else "Unknown",
+                "qty": it['qty'],
+            })
+    except Exception:
+        # Fallback: si no existe ProductOrder, intentamos contar orders.products (m2m)
+        try:
+            bought_qs = (
+                Order.objects
+                .filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+                .values('products__id', 'products__name')
+                .annotate(qty=Count('products__id'))
+                .order_by('-qty')[:n]
+            )
+            for it in bought_qs:
+                top_bought.append({
+                    "product_id": it.get('products__id'),
+                    "product_name": it.get('products__name') or "Unknown",
+                    "qty": it.get('qty'),
+                })
+        except Exception:
+            # No data source found — devolver vacío
+            top_bought = []
+
+    return JsonResponse({
+        "top_viewed": top_viewed,
+        "top_bought": top_bought,
+    })
+
+
+@staff_member_required
+def export_reports_csv(request):
+    days = int(request.GET.get("days", 30))
+    end_date = timezone.localdate()
+    start_date = end_date - timedelta(days=days-1)
+
+    # build visits and purchases (simple rows)
+    visits_qs = (
+        BrowsingHistory.objects
+        .filter(action='product_view', created_at__date__gte=start_date, created_at__date__lte=end_date)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(views=Count('id'))
+        .order_by('day')
+    )
+
+    purchases_qs = (
+        Order.objects
+        .filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        .annotate(day=TruncDate('created_at'))
+        .values('day')
+        .annotate(orders=Count('order_id'))
+        .order_by('day')
+    )
+
+    # zip days together for CSV rows
+    labels = []
+    for i in range(days):
+        d = start_date + timedelta(days=i)
+        labels.append(d.isoformat())
+
+    visits_map = {str(x['day']): x['views'] for x in visits_qs}
+    purchases_map = {str(x['day']): x['orders'] for x in purchases_qs}
+
+    filename = f"reports_{start_date.isoformat()}_to_{end_date.isoformat()}.csv"
+    resp = HttpResponse(content_type='text/csv')
+    resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+    writer = csv.writer(resp)
+    writer.writerow(['date', 'visits', 'orders'])
+    for lbl in labels:
+        writer.writerow([lbl, visits_map.get(lbl, 0), purchases_map.get(lbl, 0)])
+
+    return resp
+
+from django.http import JsonResponse, HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from django.views import View
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminReportsDataJson(View):
+    def get(self, request):
+        days = int(request.GET.get('days', 30))
+        # Aquí calculas labels, visitas, compras, avg_ratings por día
+        # Ejemplo ficticio:
+        labels = ["2025-10-01","2025-10-02"]
+        visits = [10, 12]
+        purchases = [1, 3]
+        avg_ratings = [4.2, 4.0]
+        return JsonResponse({
+            "labels": labels, "visits": visits, "purchases": purchases, "avg_ratings": avg_ratings
+        })
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminReportsTopJson(View):
+    def get(self, request):
+        # consulta a BrowsingHistory y Orders para construir top
+        # ejemplo mínimo:
+        top_viewed = [{"product_name": "Phone X", "views": 42}]
+        top_bought = [{"product_name": "Phone X", "qty": 10}]
+        return JsonResponse({"top_viewed": top_viewed, "top_bought": top_bought})
