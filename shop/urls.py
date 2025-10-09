@@ -3,7 +3,7 @@ from . import views
 from .views import (CartRemoveView, CartUpdateQuantityView, CartView,
                     GenerarReporteView, HomePageView, ProductDetailView,
                     ProductosAliadosView, ShopView, admin_product_view)
-from .views import ReportsOverviewView, reports_data_json, reports_top_json, export_reports_csv
+from .views import ReportsOverviewView, reports_data_json, reports_top_json, export_reports_csv, GenerarReporteView
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
@@ -39,5 +39,7 @@ urlpatterns += [
     path("admin/reports/ratings/data/", views.rating_stats_json, name="admin_reports_ratings_json"),
     path("admin/reports/top-products/", views.top_products_page, name="admin_top_products"),
     path("admin/reports/top-products/data/", views.top_products_json, name="admin_top_products_json"),
+    path('admin/reports/export/', GenerarReporteView.as_view(), name='admin_reports_export'),
+
 
 ]

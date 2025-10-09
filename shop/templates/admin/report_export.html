@@ -1,0 +1,11 @@
+{% extends "pages/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="h4 mb-4">Informe Detallado</h2>
+  <p class="text-muted">Descarga un resumen PDF con los principales indicadores.</p>
+
+  <a href="{% url 'admin_report_pdf' %}" class="btn btn-danger">
+    Descargar informe PDF
+  </a>
+</div>
+{% endblock %}
