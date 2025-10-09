@@ -249,78 +249,121 @@ class admin_product_view(View):
             "subtitle": _("Manage products"),
             "products": products,
         }
-                # --- browsing history + users (solo para staff) ---
+
+        # Default values (para evitar NameError en template)
         browsing_history_page = None
         browsing_users_page = None
-
-        # inicializar filtros por si no es staff (evita NameError más abajo)
-        user_id = request.GET.get('bh_user_id', '')
-        query = request.GET.get('bh_query', '')
-        action = request.GET.get('bh_action', '')
-        start = request.GET.get('bh_start', '')
-        end = request.GET.get('bh_end', '')
+        browsing_categories = []
+        browsing_filters = {
+            "user_id": "", "query": "", "action": "", "start": "", "end": "",
+            "category": "", "country": "", "gender": ""
+        }
 
         if request.user.is_staff:
-            # base queryset de historial (más reciente primero)
-            bh_qs = BrowsingHistory.objects.select_related('user').all().order_by('-created_at')
+            # Query inicial
+            bh_qs = BrowsingHistory.objects.select_related("user").all().order_by("-created_at")
 
-            # aplicar filtros al historial
+            # Leer filtros del GET
+            user_id = request.GET.get("bh_user_id", "")
+            query = request.GET.get("bh_query", "")
+            action = request.GET.get("bh_action", "")
+            start = request.GET.get("bh_start", "")
+            end = request.GET.get("bh_end", "")
+            category = request.GET.get("bh_category", "")
+            country = request.GET.get("bh_country", "")
+            gender = request.GET.get("bh_gender", "")
+
+            # Aplicar filtros sobre browsing history
             if user_id:
                 try:
                     bh_qs = bh_qs.filter(user_id=int(user_id))
                 except ValueError:
                     pass
+
             if query:
                 bh_qs = bh_qs.filter(query__icontains=query)
+
             if action:
                 bh_qs = bh_qs.filter(action=action)
+
             if start:
                 bh_qs = bh_qs.filter(created_at__date__gte=start)
             if end:
                 bh_qs = bh_qs.filter(created_at__date__lte=end)
 
-            # Export CSV del historial filtrado
-            if request.GET.get('bh_export') == 'csv':
+            # Filtrar por categoria (type en Product) si se especifica
+            if category:
+                from shop.models import Product as ShopProduct
+                product_ids = ShopProduct.objects.filter(type__iexact=category).values_list("id", flat=True)
+                bh_qs = bh_qs.filter(product_id__in=product_ids)
+
+            # Filtrar por demografía (opcional) si existe perfil con esos campos
+            User = get_user_model()
+            try:
+                sample_user = User.objects.first()
+            except Exception:
+                sample_user = None
+
+            profile_has_country = False
+            profile_has_gender = False
+            if sample_user is not None and hasattr(sample_user, "profile"):
+                prof = getattr(sample_user, "profile")
+                profile_has_country = hasattr(prof, "country")
+                profile_has_gender = hasattr(prof, "gender")
+
+            if country and profile_has_country:
+                user_ids = User.objects.filter(profile__country__iexact=country).values_list("id", flat=True)
+                bh_qs = bh_qs.filter(user_id__in=user_ids)
+
+            if gender and profile_has_gender:
+                user_ids = User.objects.filter(profile__gender__iexact=gender).values_list("id", flat=True)
+                bh_qs = bh_qs.filter(user_id__in=user_ids)
+
+            # Export CSV si se solicita (respeta filtros ya aplicados)
+            if request.GET.get("bh_export") == "csv":
                 import csv
                 from django.http import HttpResponse
-                filename = "browsing_history.csv"
-                resp = HttpResponse(content_type='text/csv; charset=utf-8')
-                resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+                filename = "browsing_history_filtered.csv"
+                resp = HttpResponse(content_type="text/csv")
+                resp["Content-Disposition"] = f'attachment; filename="{filename}"'
                 writer = csv.writer(resp)
-                writer.writerow(['id','user','session_key','action','product_id','query','path','created_at'])
+                writer.writerow(["id", "user", "session_key", "action", "product_id", "query", "path", "created_at"])
                 for b in bh_qs:
-                    writer.writerow([b.id, b.user.username if b.user else '', b.session_key, b.action, b.product_id, b.query, b.path, b.created_at])
+                    writer.writerow([b.id, b.user.username if b.user else "", b.session_key, b.action, b.product_id, b.query, b.path, b.created_at])
                 return resp
 
-            # paginar historial (20 por página)
-            bh_page_num = request.GET.get('bh_page', 1)
+            # Paginación historial
+            from django.core.paginator import Paginator
+            page_num = request.GET.get("bh_page", 1)
             paginator = Paginator(bh_qs, 20)
-            browsing_history_page = paginator.get_page(bh_page_num)
+            browsing_history_page = paginator.get_page(page_num)
 
-            # Lista de usuarios distintos que aparecen en el historial (solo no-null)
-            bh_user_ids = BrowsingHistory.objects.exclude(user__isnull=True).values_list('user_id', flat=True).distinct()
-            User = get_user_model()
-            browsing_users_qs = User.objects.filter(id__in=bh_user_ids).order_by('username')
+            # Lista de categorías (para el select)
+            from shop.models import Product as ShopProduct
+            browsing_categories = list(ShopProduct.objects.values_list("type", flat=True).distinct())
 
-            # Paginador de usuarios (10 por página)
-            users_page_num = request.GET.get('bpage', 1)
-            paginator_users = Paginator(browsing_users_qs, 10)
-            browsing_users_page = paginator_users.get_page(users_page_num)
+            # Lista de usuarios que aparecen en el historial (para select/paginador)
+            bh_user_ids = BrowsingHistory.objects.values_list("user_id", flat=True).distinct()
+            browsing_users_qs = User.objects.filter(id__in=[uid for uid in bh_user_ids if uid]).order_by("username")
+            users_paginator = Paginator(browsing_users_qs, 10)
+            bpage = request.GET.get("bpage", 1)
+            browsing_users_page = users_paginator.get_page(bpage)
 
-            # Añadir al context
-            view_data.update({
-                "browsing_history_page": browsing_history_page,
-                "browsing_users_page": browsing_users_page,
-                "browsing_users_count": browsing_users_qs.count(),
-            })
+            # preparar filtros para el template
+            browsing_filters = {
+                "user_id": user_id, "query": query, "action": action,
+                "start": start, "end": end, "category": category,
+                "country": country, "gender": gender
+            }
 
-        # incluir en el view_data (si no es staff serán None)
-        view_data['browsing_history_page'] = browsing_history_page
-        view_data['browsing_users_page'] = browsing_users_page
-        view_data['browsing_filters'] = {
-            'user_id': user_id, 'query': query, 'action': action, 'start': start, 'end': end
-        }
-
+        # Añadir al contexto (sea staff o no)
+        view_data.update({
+            "browsing_history_page": browsing_history_page,
+            "browsing_users_page": browsing_users_page,
+            "browsing_categories": browsing_categories,
+            "browsing_users_count": browsing_users_qs.count() if request.user.is_staff else 0,
+            "browsing_filters": browsing_filters,
+        })
 
         return render(request, self.template_name, view_data)
 
