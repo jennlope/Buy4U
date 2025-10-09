@@ -37,4 +37,7 @@ urlpatterns += [
     path("admin/reports/export_csv/", export_reports_csv, name="admin_reports_export_csv"),
     path("admin/reports/ratings/", views.rating_stats_page, name="admin_reports_ratings"),
     path("admin/reports/ratings/data/", views.rating_stats_json, name="admin_reports_ratings_json"),
+    path("admin/reports/top-products/", views.top_products_page, name="admin_top_products"),
+    path("admin/reports/top-products/data/", views.top_products_json, name="admin_top_products_json"),
+
 ]
