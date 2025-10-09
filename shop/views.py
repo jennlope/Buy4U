@@ -740,3 +740,92 @@ class AdminReportsTopJson(View):
         top_viewed = [{"product_name": "Phone X", "views": 42}]
         top_bought = [{"product_name": "Phone X", "qty": 10}]
         return JsonResponse({"top_viewed": top_viewed, "top_bought": top_bought})
+
+# al inicio del fichero donde ya usas aggregates
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse, HttpResponse
+import csv
+from django.shortcuts import render
+from django.db.models import Avg, Count, F
+from services.reviews_app.models import Review
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def rating_stats_json(request):
+    top = request.GET.get("top")
+    try:
+        top = int(top)
+    except (TypeError, ValueError):
+        top = None
+
+    qs = Review.objects.values(name=F("product__name")).annotate(
+        avg_rating=Avg("rating"),
+        reviews_count=Count("id"),
+    ).order_by("-avg_rating")
+
+    # intentar StdDev solo si DB lo soporta
+    try:
+        from django.db.models import StdDev
+        qs = qs.annotate(stddev_rating=StdDev("rating"))
+    except Exception:
+        # en SQLite omitimos desviación
+        qs = qs.annotate(stddev_rating=None)
+
+    if top:
+        qs = qs[:top]
+
+    data = [{
+        "name": r["name"],
+        "avg_rating": round(r["avg_rating"], 2) if r["avg_rating"] else 0,
+        "stddev_rating": round(r.get("stddev_rating") or 0, 2),
+        "reviews_count": r["reviews_count"]
+    } for r in qs]
+
+    return JsonResponse({"rating_stats": data})
+
+
+@staff_member_required
+def rating_stats_export_csv(request):
+    """
+    Exporta CSV con las mismas columnas.
+    """
+    top = request.GET.get("top")
+    qs = Product.objects.all().annotate(
+        reviews_count=Count("reviews"),
+        avg_rating=Avg("reviews__rating"),
+        stddev_rating=StdDev("reviews__rating"),
+    ).values("id", "name", "reviews_count", "avg_rating", "stddev_rating")
+
+    if top:
+        try:
+            top_n = int(top)
+            qs = sorted(qs, key=lambda x: (-(x["avg_rating"] or 0), -(x["reviews_count"] or 0)))[:top_n]
+        except Exception:
+            pass
+    else:
+        qs = list(qs)
+
+    resp = HttpResponse(content_type="text/csv")
+    resp["Content-Disposition"] = 'attachment; filename="rating_stats.csv"'
+    writer = csv.writer(resp)
+    writer.writerow(["product_id", "name", "reviews_count", "avg_rating", "stddev_rating"])
+    for item in qs:
+        writer.writerow([
+            item["id"],
+            item["name"],
+            item["reviews_count"] or 0,
+            round(item["avg_rating"] or 0, 2),
+            round(item["stddev_rating"] or 0, 2),
+        ])
+    return resp
+
+
+@staff_member_required
+def rating_stats_page(request):
+    """
+    Página HTML que muestra tabla simple y link al CSV (usa fetch al JSON).
+    Rutas: /admin/reports/ratings/
+    """
+    top = request.GET.get("top", "")
+    context = {"top": top}
+    return render(request, "admin/rating_stats.html", context)
