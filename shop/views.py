@@ -805,3 +805,67 @@ def rating_stats_page(request):
     top = request.GET.get("top", "")
     context = {"top": top}
     return render(request, "admin/rating_stats.html", context)
+
+
+##HU13
+# arriba de todo en shop/views.py (reemplaza la import rota)
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.db.models import Count, Sum
+from django.apps import apps
+
+from services.browsing_app.models import BrowsingHistory
+from shop.models import Product
+
+# obtiene el modelo OrderProduct de forma dinámica (evita ModuleNotFoundError si el nombre cambia)
+OrderProduct = apps.get_model("orders", "ProductOrder") or apps.get_model("orders", "OrderProduct") or apps.get_model("orders", "ProductOrderModel")
+# si tu proyecto usa otro nombre para la tabla intermedia ajusta el string anterior
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def top_products_json(request):
+    n = int(request.GET.get("n", 10))
+
+    top_viewed_qs = (
+        BrowsingHistory.objects
+        .filter(action="product_view", product_id__isnull=False)
+        .values("product_id")
+        .annotate(views=Count("id"))
+        .order_by("-views")[:n]
+    )
+
+    # maneja caso en que OrderProduct pueda no existir
+    top_bought_list = []
+    try:
+        top_bought_qs = (
+            OrderProduct.objects
+            .values("product_id")
+            .annotate(qty=Sum("quantity"))
+            .order_by("-qty")[:n]
+        )
+    except Exception:
+        top_bought_qs = []
+
+    top_viewed_list = []
+    for v in top_viewed_qs:
+        product = Product.objects.filter(id=v["product_id"]).first()
+        top_viewed_list.append({
+            "product": product.name if product else "Unknown",
+            "views": v["views"]
+        })
+
+    for b in top_bought_qs:
+        product = Product.objects.filter(id=b["product_id"]).first()
+        top_bought_list.append({
+            "product": product.name if product else "Unknown",
+            "qty": b.get("qty", 0)
+        })
+
+    return JsonResponse({"top_viewed": top_viewed_list, "top_bought": top_bought_list})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def top_products_page(request):
+    return render(request, "admin/top_products.html")

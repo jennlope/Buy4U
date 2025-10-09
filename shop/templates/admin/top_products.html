@@ -1,0 +1,64 @@
+{% extends "pages/base.html" %}
+{% load static i18n %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="h4 mb-4">Top productos</h2>
+  <p class="text-muted">Visualiza los productos más vistos y más comprados.</p>
+
+  <div class="mb-3">
+    <label for="topSelect" class="form-label">Top</label>
+    <select id="topSelect" class="form-select" style="max-width:150px;">
+      <option value="5">Top 5</option>
+      <option value="10" selected>Top 10</option>
+      <option value="20">Top 20</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h6>Más vistos</h6>
+        <ul id="topViewed" class="list-group list-group-flush"></ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h6>Más comprados</h6>
+        <ul id="topBought" class="list-group list-group-flush"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function loadTop(){
+    const n = document.getElementById('topSelect').value;
+    fetch(`/admin/reports/top-products/data/?n=${n}`)
+      .then(r => r.json())
+      .then(data => {
+        const tv = document.getElementById('topViewed');
+        const tb = document.getElementById('topBought');
+        tv.innerHTML = '';
+        tb.innerHTML = '';
+
+        data.top_viewed.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item d-flex justify-content-between align-items-center';
+          li.innerHTML = `<span>${item.product}</span><span class="badge bg-success">${item.views}</span>`;
+          tv.appendChild(li);
+        });
+
+        data.top_bought.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item d-flex justify-content-between align-items-center';
+          li.innerHTML = `<span>${item.product}</span><span class="badge bg-primary">${item.qty}</span>`;
+          tb.appendChild(li);
+        });
+      });
+  }
+  document.getElementById('topSelect').addEventListener('change', loadTop);
+  loadTop();
+})();
+</script>
+{% endblock %}
