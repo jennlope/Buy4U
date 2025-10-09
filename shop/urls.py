@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-
+from . import views
 from .views import (CartRemoveView, CartUpdateQuantityView, CartView,
                     GenerarReporteView, HomePageView, ProductDetailView,
                     ProductosAliadosView, ShopView, admin_product_view)
@@ -35,4 +35,6 @@ urlpatterns += [
     path("admin/reports/data/", reports_data_json, name="admin_reports_data_json"),
     path("admin/reports/top/", reports_top_json, name="admin_reports_top_json"),
     path("admin/reports/export_csv/", export_reports_csv, name="admin_reports_export_csv"),
+    path("admin/reports/ratings/", views.rating_stats_page, name="admin_reports_ratings"),
+    path("admin/reports/ratings/data/", views.rating_stats_json, name="admin_reports_ratings_json"),
 ]

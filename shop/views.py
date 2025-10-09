@@ -740,3 +740,68 @@ class AdminReportsTopJson(View):
         top_viewed = [{"product_name": "Phone X", "views": 42}]
         top_bought = [{"product_name": "Phone X", "qty": 10}]
         return JsonResponse({"top_viewed": top_viewed, "top_bought": top_bought})
+
+# al inicio del fichero donde ya usas aggregates
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Avg, Count, F
+from django.db import connection
+import csv
+import statistics
+
+# Intentamos importar StdDev (algunas DBs lo soportan)
+try:
+    from django.db.models import StdDev
+except Exception:
+    StdDev = None
+
+# Model imports
+from services.reviews_app.models import Review
+from shop.models import Product
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def rating_stats_json(request):
+    top = request.GET.get("top")
+    try:
+        top = int(top)
+    except (TypeError, ValueError):
+        top = None
+
+    qs = Review.objects.values(name=F("product__name")).annotate(
+        avg_rating=Avg("rating"),
+        reviews_count=Count("id"),
+    ).order_by("-avg_rating")
+
+    # intentar StdDev solo si DB lo soporta
+    try:
+        from django.db.models import StdDev
+        qs = qs.annotate(stddev_rating=StdDev("rating"))
+    except Exception:
+        # en SQLite omitimos desviación
+        qs = qs.annotate(stddev_rating=None)
+
+    if top:
+        qs = qs[:top]
+
+    data = [{
+        "name": r["name"],
+        "avg_rating": round(r["avg_rating"], 2) if r["avg_rating"] else 0,
+        "stddev_rating": round(r.get("stddev_rating") or 0, 2),
+        "reviews_count": r["reviews_count"]
+    } for r in qs]
+
+    return JsonResponse({"rating_stats": data})
+
+@staff_member_required
+def rating_stats_page(request):
+    """
+    Página HTML que muestra tabla simple y link al CSV (usa fetch al JSON).
+    Rutas: /admin/reports/ratings/
+    """
+    top = request.GET.get("top", "")
+    context = {"top": top}
+    return render(request, "admin/rating_stats.html", context)

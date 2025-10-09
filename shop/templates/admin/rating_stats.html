@@ -1,0 +1,58 @@
+{% extends "pages/base.html" %}
+{% load static i18n %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="h4 mb-4">Rating statistics</h1>
+  <p class="text-muted">Promedio, desviación y conteo de reseñas por producto.</p>
+
+  <div class="mb-3">
+    <label for="topSelect" class="form-label">Top</label>
+    <select id="topSelect" class="form-select" style="max-width:150px;">
+      <option value="5">Top 5</option>
+      <option value="10" selected>Top 10</option>
+      <option value="20">Top 20</option>
+    </select>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Reviews</th>
+        <th>Avg rating</th>
+        <th>Stddev</th>
+      </tr>
+    </thead>
+    <tbody id="ratingTable">
+      <tr><td colspan="4">Loading...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+(function(){
+  const loadData = () => {
+    const top = document.getElementById('topSelect').value;
+    fetch(`/admin/reports/ratings/data/?top=${top}`)
+      .then(r => r.json())
+      .then(d => {
+        const tbody = document.getElementById('ratingTable');
+        tbody.innerHTML = '';
+        d.rating_stats.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.reviews_count}</td>
+            <td>${item.avg_rating ?? '-'}</td>
+            <td>${item.stddev_rating ?? '-'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  };
+  document.getElementById('topSelect').addEventListener('change', loadData);
+  loadData();
+})();
+</script>
+{% endblock %}
