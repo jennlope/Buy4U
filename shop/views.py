@@ -743,11 +743,24 @@ class AdminReportsTopJson(View):
 
 # al inicio del fichero donde ya usas aggregates
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse, HttpResponse
-import csv
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Avg, Count, F
+from django.db import connection
+import csv
+import statistics
+
+# Intentamos importar StdDev (algunas DBs lo soportan)
+try:
+    from django.db.models import StdDev
+except Exception:
+    StdDev = None
+
+# Model imports
 from services.reviews_app.models import Review
+from shop.models import Product
+
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
@@ -782,43 +795,6 @@ def rating_stats_json(request):
     } for r in qs]
 
     return JsonResponse({"rating_stats": data})
-
-
-@staff_member_required
-def rating_stats_export_csv(request):
-    """
-    Exporta CSV con las mismas columnas.
-    """
-    top = request.GET.get("top")
-    qs = Product.objects.all().annotate(
-        reviews_count=Count("reviews"),
-        avg_rating=Avg("reviews__rating"),
-        stddev_rating=StdDev("reviews__rating"),
-    ).values("id", "name", "reviews_count", "avg_rating", "stddev_rating")
-
-    if top:
-        try:
-            top_n = int(top)
-            qs = sorted(qs, key=lambda x: (-(x["avg_rating"] or 0), -(x["reviews_count"] or 0)))[:top_n]
-        except Exception:
-            pass
-    else:
-        qs = list(qs)
-
-    resp = HttpResponse(content_type="text/csv")
-    resp["Content-Disposition"] = 'attachment; filename="rating_stats.csv"'
-    writer = csv.writer(resp)
-    writer.writerow(["product_id", "name", "reviews_count", "avg_rating", "stddev_rating"])
-    for item in qs:
-        writer.writerow([
-            item["id"],
-            item["name"],
-            item["reviews_count"] or 0,
-            round(item["avg_rating"] or 0, 2),
-            round(item["stddev_rating"] or 0, 2),
-        ])
-    return resp
-
 
 @staff_member_required
 def rating_stats_page(request):
