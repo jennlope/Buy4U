@@ -3,282 +3,219 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="h1">{{ title }}</h1>
-            <p>{{ subtitle }}</p>
-        </div>
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="display-6 mb-1">{{ title }}</h1>
+      <p class="text-muted mb-0">{{ subtitle }}</p>
     </div>
 
-    <!-- Formulario para agregar un producto -->
-    <div class="card shadow-sm p-4 mb-4">
-        <h3 class="h3 text-center mb-3">Agregar Producto</h3>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden" name="add" value="1">
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Nombre:</label>
-                    <input type="text" name="name" class="form-control" required>
+    <div class="text-end">
+      <div class="d-flex gap-2 mb-2">
+        <div class="input-group input-group-sm" style="width:220px">
+          <span class="input-group-text bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line></svg></span>
+          <input id="searchInput" class="form-control form-control-sm" placeholder="Buscar producto..." aria-label="Buscar">
+        </div>
 
-                    <label class="form-label">Precio:</label>
-                    <input type="number" name="price" class="form-control" step="0.01" required>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Acciones rápidas">
+          <a href="{% url 'admin_reports_overview' %}" class="btn btn-outline-success">📊</a>
+          <a href="{% url 'admin_top_products' %}" class="btn btn-outline-primary">🔥</a>
+          <a href="{% url 'admin_reports_ratings' %}" class="btn btn-outline-warning">⭐</a>
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">🏷️</a>
+          <a href="{% url 'admin_browsing_history_ui' %}" class="btn btn-outline-info">🔎</a>
+        </div>
+      </div>
+      <div class="small text-muted">Accesos rápidos a reportes y herramientas administrativas</div>
+    </div>
+  </div>
 
-                    <label class="form-label">Marca:</label>
-                    <input type="text" name="brand" class="form-control" required>
+  <!-- Agregar producto (panel compacto y moderno) -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="h5 mb-0">Agregar producto</h3>
+        <small class="text-muted">Rellena los datos y pulsa <strong>Agregar</strong></small>
+      </div>
 
-                    <label class="form-label">Garantía:</label>
-                    <input type="text" name="warranty" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Descripción:</label>
-                    <textarea name="description" class="form-control" rows="3" required></textarea>
+      <form method="POST" enctype="multipart/form-data" class="row g-3">
+        {% csrf_token %}
+        <input type="hidden" name="add" value="1">
 
-                    <label class="form-label">Imagen:</label>
-                    <input type="file" name="image" class="form-control" accept="image/*">
+        <div class="col-md-6">
+          <label class="form-label small">Nombre</label>
+          <input type="text" name="name" class="form-control form-control-sm" required>
 
-                    <label class="form-label">Cantidad:</label>
-                    <input type="number" name="quantity" class="form-control" required>
+          <label class="form-label small mt-2">Marca</label>
+          <input type="text" name="brand" class="form-control form-control-sm" required>
 
-                    <label class="form-label">Tipo:</label>
-                    <input type="text" name="type" class="form-control" required>
-                </div>
+          <label class="form-label small mt-2">Cantidad</label>
+          <input type="number" name="quantity" class="form-control form-control-sm" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small">Precio</label>
+          <input type="number" name="price" class="form-control form-control-sm" step="0.01" required>
+
+          <label class="form-label small mt-2">Garantía</label>
+          <input type="text" name="warranty" class="form-control form-control-sm">
+
+          <label class="form-label small mt-2">Tipo</label>
+          <input type="text" name="type" class="form-control form-control-sm">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label small">Descripción</label>
+          <textarea name="description" rows="2" class="form-control form-control-sm" required></textarea>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small">Imagen</label>
+          <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end justify-content-end">
+          <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Agregar producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mb-3 gap-2">
+    <a href="{% url 'generar_reporte' 'excel' %}" class="btn btn-outline-success btn-sm">Descargar Excel</a>
+    <a href="{% url 'generar_reporte' 'pdf' %}" class="btn btn-outline-danger btn-sm">Descargar PDF</a>
+  </div>
+
+  <!-- Grid de productos -->
+  <div id="productsGrid" class="row g-3">
+    {% for product in products %}
+    <div class="col-sm-6 col-lg-4">
+      <div class="card h-100 shadow-sm rounded-4 overflow-hidden product-card">
+        <div style="height:160px; background:#f8fafc; display:flex; align-items:center; justify-content:center;">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height:140px; object-fit:contain;">
+          {% else %}
+            <div class="text-muted text-center">Sin imagen</div>
+          {% endif %}
+        </div>
+
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="h6 mb-0">{{ product.name }}</h5>
+            <div class="text-end">
+              <div class="badge bg-success text-white">${{ product.price }}</div>
             </div>
-            <div class="text-center mt-3">
-                <button type="submit" class="btn btn-success fw-bold">Agregar Producto</button>
+          </div>
+
+          <p class="mb-1 text-muted small">{{ product.brand }} • {{ product.type }}</p>
+          <p class="mb-2 small text-truncate" title="{{ product.description }}">{{ product.description }}</p>
+
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <span class="small text-muted">Stock</span>
+              <div class="fw-semibold">{{ product.quantity }}</div>
             </div>
-        </form>
+
+            <div class="d-flex gap-2">
+              <form method="POST" onsubmit="return confirm('¿Seguro que quieres eliminar este producto?');">
+                {% csrf_token %}
+                <input type="hidden" name="delete" value="{{ product.pk }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+              </form>
+
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal{{ product.pk }}">Editar</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="text-end mb-3">
-        <a href="{% url 'generar_reporte' 'excel' %}" class="btn btn-outline-success me-2">
-            Descargar Excel
-        </a>
-        <a href="{% url 'generar_reporte' 'pdf' %}" class="btn btn-outline-danger">
-            Descargar PDF
-        </a>        
-    </div>
-    
-    <!-- SECTION: Historial de búsqueda (solo staff) -->
-    {% if request.user.is_staff %}
-    <div class="card shadow-sm p-3 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h3 class="h5 mb-0">Historial de búsqueda</h3>
-        <div>
-        <a href="?{% if browsing_filters.user_id %}bh_user_id={{ browsing_filters.user_id }}&{% endif %}{% if browsing_filters.query %}bh_query={{ browsing_filters.query }}&{% endif %}{% if browsing_filters.action %}bh_action={{ browsing_filters.action }}&{% endif %}{% if browsing_filters.start %}bh_start={{ browsing_filters.start }}&{% endif %}{% if browsing_filters.end %}bh_end={{ browsing_filters.end }}&{% endif %}{% if browsing_filters.category %}bh_category={{ browsing_filters.category }}&{% endif %}{% if browsing_filters.country %}bh_country={{ browsing_filters.country }}&{% endif %}{% if browsing_filters.gender %}bh_gender={{ browsing_filters.gender }}&{% endif %}bh_export=csv" class="btn btn-outline-secondary btn-sm">Export CSV</a>
-        </div>
-    </div>
+    <!-- Modal edición (se mantiene igual funcionalmente) -->
+    <div class="modal fade" id="editProductModal{{ product.pk }}" tabindex="-1" aria-labelledby="editProductLabel{{ product.pk }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar producto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="edit" value="{{ product.pk }}">
 
-    {# FILTROS: selector de usuario, query, acción, fechas #}
-    <form method="get" class="row g-2 mb-3">
-        {# Mantén otros params de paginación si necesitas #}
-        <div class="col-auto">
-        <label class="form-label small mb-1">Usuario</label>
-        <select name="bh_user_id" class="form-select form-select-sm">
-            <option value="">{% trans "All users" %}</option>
-            {% if browsing_users_page %}
-            {% for u in browsing_users_page.object_list %}
-                <option value="{{ u.id }}" {% if browsing_filters.user_id|stringformat:"s" == u.id|stringformat:"s" %}selected{% endif %}>
-                {{ u.username }} (id:{{ u.id }})
-                </option>
-            {% endfor %}
-            {% endif %}
-        </select>
-        </div>
+              <div class="mb-2">
+                <label class="form-label small">Nombre</label>
+                <input type="text" name="name" class="form-control form-control-sm" value="{{ product.name }}" required>
+              </div>
 
-        <div class="col-auto">
-        <label class="form-label small mb-1">Query</label>
-        <input type="text" name="bh_query" class="form-control form-control-sm" placeholder="Query" value="{{ browsing_filters.query }}">
-        </div>
-
-        <div class="col-auto">
-        <label class="form-label small mb-1">Acción</label>
-        <select name="bh_action" class="form-select form-select-sm">
-            <option value="">{% trans "All actions" %}</option>
-            <option value="search" {% if browsing_filters.action == 'search' %}selected{% endif %}>{% trans "Search" %}</option>
-            <option value="product_view" {% if browsing_filters.action == 'product_view' %}selected{% endif %}>{% trans "Product view" %}</option>
-        </select>
-        </div>
-
-        <div class="col-auto">
-        <label class="form-label small mb-1">Desde</label>
-        <input type="date" name="bh_start" class="form-control form-control-sm" value="{{ browsing_filters.start }}">
-        </div>
-        <div class="col-auto">
-        <label class="form-label small mb-1">Hasta</label>
-        <input type="date" name="bh_end" class="form-control form-control-sm" value="{{ browsing_filters.end }}">
-        </div>
-
-        <div class="col-auto align-self-end">
-        <button class="btn btn-success btn-sm">Filtrar</button>
-        </div>
-
-        <!-- Category selector -->
-        <div class="col-auto">
-        <select name="bh_category" class="form-select form-select-sm">
-            <option value="">{% trans "All categories" %}</option>
-            {% for cat in browsing_categories %}
-            <option value="{{ cat }}" {% if browsing_filters.category == cat %}selected{% endif %}>{{ cat }}</option>
-            {% endfor %}
-        </select>
-        </div>
-
-        <!-- Demography: country / gender (only shown if available in the project) -->
-        <div class="col-auto">
-        <input type="text" name="bh_country" class="form-control form-control-sm" placeholder="{% trans 'Country' %}" value="{{ browsing_filters.country }}">
-        </div>
-        <div class="col-auto">
-        <select name="bh_gender" class="form-select form-select-sm">
-            <option value="">{% trans "Any gender" %}</option>
-            <option value="male" {% if browsing_filters.gender == 'male' %}selected{% endif %}>{% trans "Male" %}</option>
-            <option value="female" {% if browsing_filters.gender == 'female' %}selected{% endif %}>{% trans "Female" %}</option>
-            <option value="other" {% if browsing_filters.gender == 'other' %}selected{% endif %}>{% trans "Other" %}</option>
-        </select>
-        </div>
-
-    </form>
-
-    {# LISTADO: tabla de historial #}
-    <div class="table-responsive">
-        <table class="table table-sm">
-        <thead>
-            <tr>
-            <th>ID</th><th>Usuario</th><th>Acción</th><th>Producto</th><th>Query</th><th>Path</th><th>Sesión</th><th>Fecha</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if browsing_history_page %}
-            {% for b in browsing_history_page.object_list %}
-                <tr>
-                <td>{{ b.id }}</td>
-                <td>{% if b.user %}{{ b.user.username }}{% else %}<span class="text-muted">anon</span>{% endif %}</td>
-                <td>{{ b.action }}</td>
-                <td>{{ b.product_id|default:"-" }}</td>
-                <td>{{ b.query|default:"" }}</td>
-                <td><small>{{ b.path|truncatechars:50 }}</small></td>
-                <td>{{ b.session_key|default:"" }}</td>
-                <td class="text-muted">{{ b.created_at|date:"Y-m-d H:i" }}</td>
-                </tr>
-            {% endfor %}
-            {% else %}
-            <tr><td colspan="8" class="text-center text-muted">No records</td></tr>
-            {% endif %}
-        </tbody>
-        </table>
-    </div>
-
-    {# PAGINACIÓN para historial #}
-    {% if browsing_history_page and browsing_history_page.paginator.num_pages > 1 %}
-        <nav>
-        <ul class="pagination pagination-sm">
-            {% if browsing_history_page.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?bh_page={{ browsing_history_page.previous_page_number }}{% if browsing_filters.query %}&bh_query={{ browsing_filters.query }}{% endif %}{% if browsing_filters.user_id %}&bh_user_id={{ browsing_filters.user_id }}{% endif %}">Anterior</a>
-            </li>
-            {% endif %}
-            <li class="page-item disabled"><span class="page-link">{{ browsing_history_page.number }}/{{ browsing_history_page.paginator.num_pages }}</span></li>
-            {% if browsing_history_page.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?bh_page={{ browsing_history_page.next_page_number }}{% if browsing_filters.query %}&bh_query={{ browsing_filters.query }}{% endif %}{% if browsing_filters.user_id %}&bh_user_id={{ browsing_filters.user_id }}{% endif %}">Siguiente</a>
-            </li>
-            {% endif %}
-        </ul>
-        </nav>
-    {% endif %}
-
-    {# PAGINACIÓN para lista de usuarios (opcional) #}
-    {% if browsing_users_page and browsing_users_page.paginator.num_pages > 1 %}
-        <nav aria-label="Browsing users paginator">
-        <ul class="pagination pagination-sm">
-            {% if browsing_users_page.has_previous %}
-            <li class="page-item"><a class="page-link" href="?bpage={{ browsing_users_page.previous_page_number }}">« anterior</a></li>
-            {% endif %}
-            <li class="page-item disabled"><span class="page-link">Página {{ browsing_users_page.number }} / {{ browsing_users_page.paginator.num_pages }}</span></li>
-            {% if browsing_users_page.has_next %}
-            <li class="page-item"><a class="page-link" href="?bpage={{ browsing_users_page.next_page_number }}">siguiente »</a></li>
-            {% endif %}
-        </ul>
-        </nav>
-    {% endif %}
-    </div>
-    {% endif %}
-    <!-- END: Historial de búsqueda -->
-
-
-    <!-- Muestra todos los productos disponibles -->
-    <div class="row">
-        {% for product in products %}
-        <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card shadow-sm">
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text">${{ product.price }}</p>
-                    <p class="text-muted">{{ product.brand }} | Garantía: {{ product.warranty }}</p>
-                    <p class="small">{{ product.description }}</p>
-                    <p class="fw-bold">Stock: {{ product.quantity }}</p>
-                    <div class="d-grid gap-2">
-                        <!-- Botón de eliminar -->
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="delete" value="{{ product.pk }}">
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Seguro que quieres eliminar este producto?');">Eliminar</button>
-                        </form>
-
-                        <!-- Abre la interfaz de edición -->
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal{{ product.pk }}">Editar</button>
-                    </div>
+              <div class="mb-2 row">
+                <div class="col-6">
+                  <label class="form-label small">Precio</label>
+                  <input type="number" name="price" class="form-control form-control-sm" value="{{ product.price }}" step="0.01" required>
                 </div>
-            </div>
-        </div>
-
-        <!-- Formulario de edición de productos -->
-        <div class="modal fade" id="editProductModal{{ product.pk }}" tabindex="-1" aria-labelledby="editProductLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Producto</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <input type="hidden" name="edit" value="{{ product.pk }}">
-                            <label class="form-label">Nombre:</label>
-                            <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
-
-                            <label class="form-label">Precio:</label>
-                            <input type="number" name="price" class="form-control" value="{{ product.price }}" step="0.01" required>
-
-                            <label class="form-label">Marca:</label>
-                            <input type="text" name="brand" class="form-control" value="{{ product.brand }}" required>
-
-                            <label class="form-label">Garantía:</label>
-                            <input type="text" name="warranty" class="form-control" value="{{ product.warranty }}" required>
-
-                            <label class="form-label">Descripción:</label>
-                            <textarea name="description" class="form-control" rows="3" required>{{ product.description }}</textarea>
-
-                            <label class="form-label">Imagen:</label>
-                            <input type="file" name="image" class="form-control" accept="image/*">
-
-                            <label class="form-label">Cantidad:</label>
-                            <input type="number" name="quantity" class="form-control" value="{{ product.quantity }}" required>
-
-                            <label class="form-label">Tipo:</label>
-                            <input type="text" name="type" class="form-control" value="{{ product.type }}" required>
-
-                            <div class="text-center mt-3">
-                                <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="col-6">
+                  <label class="form-label small">Cantidad</label>
+                  <input type="number" name="quantity" class="form-control form-control-sm" value="{{ product.quantity }}" required>
                 </div>
-            </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small">Marca</label>
+                <input type="text" name="brand" class="form-control form-control-sm" value="{{ product.brand }}">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small">Garantía</label>
+                <input type="text" name="warranty" class="form-control form-control-sm" value="{{ product.warranty }}">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small">Tipo</label>
+                <input type="text" name="type" class="form-control form-control-sm" value="{{ product.type }}">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small">Descripción</label>
+                <textarea name="description" class="form-control form-control-sm" rows="3">{{ product.description }}</textarea>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small">Imagen</label>
+                <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
+              </div>
+
+              <div class="text-end">
+                <button type="submit" class="btn btn-success btn-sm">Guardar cambios</button>
+              </div>
+            </form>
+          </div>
         </div>
-        {% empty %}
-        <p class="text-center">No hay productos disponibles.</p>
-        {% endfor %}
+      </div>
     </div>
+{% empty %}
+    <div class="col-12">
+      <div class="card p-4 rounded-4 text-center text-muted">No hay productos disponibles.</div>
+    </div>
+{% endfor %}
+  </div>
 </div>
+
+<style>
+  .product-card { transition: transform .12s ease, box-shadow .12s ease; }
+  .product-card:hover { transform: translateY(-6px); box-shadow: 0 14px 40px rgba(15,23,42,0.08); }
+  .text-truncate { display:block; max-height: 3.6em; overflow: hidden; }
+  .rounded-4 { border-radius: 12px; }
+  .bg-light-subtle { background-color: #fbfdff; }
+  .btn-outline-success.active { background-color: rgba(16,185,129,0.08); }
+</style>
+
+<script>
+// Búsqueda simple en el cliente para mejorar UX (no sustituye al filtrado en servidor)
+document.getElementById('searchInput')?.addEventListener('input', function(e){
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('#productsGrid .product-card').forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.parentElement.style.display = text.includes(q) ? '' : 'none';
+  });
+});
+</script>
+
 {% endblock %}

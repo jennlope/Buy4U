@@ -1,0 +1,294 @@
+{% extends "pages/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">Historial de búsqueda (UI)</h1>
+    </div>
+    <div>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <form id="filtersForm" class="row g-2 align-items-center">
+        <div class="col-sm-4 col-md-3">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line></svg></span>
+            <input type="text" name="bh_query" id="bh_query" placeholder="Buscar usuario, producto o texto" class="form-control" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="col-auto">
+          <select id="bh_user" name="bh_user" class="form-select form-select-sm">
+            <option value="">Todos los usuarios</option>
+          </select>
+        </div>
+
+        <div class="col-auto">
+          <select id="bh_action" name="bh_action" class="form-select form-select-sm">
+            <option value="">Todas las acciones</option>
+            <option value="search">Búsqueda</option>
+            <option value="product_view">Ver producto</option>
+          </select>
+        </div>
+
+        <div class="col-auto">
+          <input type="date" id="bh_start" name="bh_start" class="form-control form-control-sm" title="Fecha inicio">
+        </div>
+        <div class="col-auto">
+          <input type="date" id="bh_end" name="bh_end" class="form-control form-control-sm" title="Fecha fin">
+        </div>
+
+        <div class="col-auto">
+          <button id="applyFilters" class="btn btn-success btn-sm">Filtrar</button>
+        </div>
+
+        <div class="col-auto">
+          <button id="downloadCsvBtn" class="btn btn-outline-secondary btn-sm">Descargar CSV</button>
+        </div>
+
+        <div class="col ms-auto text-end small text-muted">Registros: <span id="rowsCount">—</span></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive" style="min-height:140px;">
+      <table id="bhTable" class="table table-hover table-sm align-middle mb-0">
+        <thead class="table-light small text-muted">
+          <tr>
+            <th style="width:4rem">#</th>
+            <th>Usuario</th>
+            <th>Acción</th>
+            <th>Producto</th>
+            <th>Path</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="bhTbody">
+          <tr><td colspan="6" class="text-center text-muted py-4">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center small">
+      <div>
+        <button id="copyBtn" class="btn btn-sm btn-outline-secondary">Copiar tabla</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .table-hover tbody tr:hover { background: #fbfdff; }
+  .tag-action { font-weight:600; font-size:.85rem; padding:.18rem .5rem; border-radius:8px; }
+  .tag-search { background:#eef2ff; color:#4338ca; }
+  .tag-view { background:#ecfeff; color:#065f46; }
+  .small-truncate { max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block; }
+</style>
+
+<script>
+(function(){
+  const baseCsvUrl = "/admin_product/?bh_export=csv";
+  const tbody = document.getElementById("bhTbody");
+  const form = document.getElementById("filtersForm");
+  const downloadBtn = document.getElementById("downloadCsvBtn");
+  const rowsCount = document.getElementById('rowsCount');
+  const copyBtn = document.getElementById('copyBtn');
+  const userSelect = document.getElementById('bh_user');
+
+  let allRows = null; // array de objetos { headerName: value, ... }
+
+  function debounce(fn, wait=300){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), wait); }; }
+
+  // parser CSV robusto -> array de arrays (mantiene comillas internas)
+  function parseCSVrows(text){
+    const rows = [];
+    let cur = [];
+    let val = '';
+    let inQuotes = false;
+    for (let i=0;i<text.length;i++){
+      const ch = text[i];
+      const next = text[i+1];
+      if (ch === '"') {
+        if (inQuotes && next === '"') { val += '"'; i++; continue; }
+        inQuotes = !inQuotes;
+        continue;
+      }
+      if (ch === ',' && !inQuotes) { cur.push(val); val=''; continue; }
+      if ((ch === '\n' || ch === '\r') && !inQuotes) {
+        if(val !== '' || cur.length) { cur.push(val); rows.push(cur); cur=[]; val=''; }
+        continue;
+      }
+      val += ch;
+    }
+    if (val !== '' || cur.length) { cur.push(val); rows.push(cur); }
+    return rows.map(r => r.map(c => c.replace(/^\s+|\s+$/g, '').replace(/^"|"$/g,'')));
+  }
+
+  // rows -> objetos usando header normalizado (lower_snake)
+  function rowsToObjects(rows){
+    if(!rows || rows.length === 0) return [];
+    const header = rows[0].map(h => String(h || '').trim().toLowerCase().replace(/\s+/g,'_'));
+    const objs = [];
+    for(let i=1;i<rows.length;i++){
+      const row = rows[i];
+      const obj = {};
+      for(let j=0;j<header.length;j++){
+        obj[header[j]] = (row[j] !== undefined) ? row[j] : '';
+      }
+      objs.push(obj);
+    }
+    return objs;
+  }
+
+  // rellena select de usuarios buscando en múltiples campos posibles
+  function buildUserList(objs){
+    const users = new Set();
+    objs.forEach(o => {
+      const u = o.user || o.username || o.email || o.created_by || '';
+      if(u) users.add(u);
+    });
+    userSelect.querySelectorAll('option:not(:first-child)').forEach(o => o.remove());
+    Array.from(users).sort().forEach(u => {
+      const opt = document.createElement('option'); opt.value = u; opt.textContent = u; userSelect.appendChild(opt);
+    });
+  }
+
+  // aplica filtros sobre objetos ya parseados
+  function applyFiltersToCache(){
+    if(!allRows) return [];
+    const q = document.getElementById('bh_query').value.trim().toLowerCase();
+    const action = document.getElementById('bh_action').value;
+    const user = document.getElementById('bh_user').value;
+    const start = document.getElementById('bh_start').value;
+    const end = document.getElementById('bh_end').value;
+
+    return allRows.filter(o => {
+      const userVal = (o.user || o.username || o.email || o.created_by || '').toLowerCase();
+      const actionVal = (o.action || o.type || '').toLowerCase();
+      const productVal = (o.product || o.product_name || o.product_id || '').toLowerCase();
+      const queryVal = (o.query || o.search_query || o.q || '').toLowerCase();
+      const sessionVal = (o.session || o.session_key || o.sessionid || '').toLowerCase();
+      const createdVal = (o.created_at || o.date || o.timestamp || o.time || '').toString();
+
+      if(action && actionVal !== action) return false;
+      if(user && userVal !== user.toLowerCase()) return false;
+      if(q){
+        // buscar en user, product, query o session (si el CSV tiene esos datos)
+        const matches = (userVal.includes(q) || productVal.includes(q) || queryVal.includes(q) || sessionVal.includes(q));
+        if(!matches) return false;
+      }
+      if(start){
+        const d = new Date(createdVal);
+        const s = new Date(start);
+        if(isNaN(d) || d < s) return false;
+      }
+      if(end){
+        const d = new Date(createdVal);
+        const e = new Date(end); e.setHours(23,59,59,999);
+        if(isNaN(d) || d > e) return false;
+      }
+      return true;
+    });
+  }
+
+  // render: usa varios nombres posibles para cada columna
+function renderRows(objs){
+  tbody.innerHTML = '';
+  if(!objs || objs.length === 0){
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No hay registros</td></tr>';
+    rowsCount.textContent = '0';
+    return;
+  }
+
+  rowsCount.textContent = String(objs.length);
+  objs.forEach((o, i) => {
+    const user = o.user || o.username || o.email || o.created_by || '';
+    const action = (o.action || o.type || '').toLowerCase();
+    const product = o.product || o.product_name || o.product_id || '';
+    const path = o.path || o.url || o.endpoint || ''; // muestra la ruta visitada
+    const created = o.created_at || o.date || o.timestamp || o.time || '';
+
+    const tr = document.createElement('tr');
+    const actionTag = action === 'search'
+      ? `<span class="tag-action tag-search">Búsqueda</span>`
+      : (action === 'product_view'
+          ? `<span class="tag-action tag-view">Ver producto</span>`
+          : escapeHtml(action || ''));
+
+    tr.innerHTML = `
+      <td class="text-muted small">${i + 1}</td>
+      <td class="small">${escapeHtml(user) || '<span class="text-muted">anon</span>'}</td>
+      <td>${actionTag}</td>
+      <td class="small">${escapeHtml(product)}</td>
+      <td class="small"><small>${escapeHtml(path)}</small></td>
+      <td class="text-muted small">${escapeHtml(created)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+
+  // carga inicial: descarga CSV, parsea, genera objetos y cache
+  async function initialLoad(){
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Cargando...</td></tr>';
+    try{
+      const resp = await fetch(baseCsvUrl, {credentials: 'same-origin'});
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+      const txt = await resp.text();
+      const rows = parseCSVrows(txt);
+      if(!rows || rows.length === 0){ throw new Error('CSV vacío'); }
+      const objs = rowsToObjects(rows);
+      allRows = objs;
+      buildUserList(allRows);
+      const filtered = applyFiltersToCache();
+      renderRows(filtered);
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error cargando datos: ${escapeHtml(err.message || String(err))}</td></tr>`;
+      rowsCount.textContent = '0';
+      console.error(err);
+    }
+  }
+
+  // copiar tabla
+  copyBtn.addEventListener('click', async ()=>{
+    try{
+      const rows = Array.from(document.querySelectorAll('#bhTbody tr')).map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim()).join('\t')).join('\n');
+      await navigator.clipboard.writeText(rows);
+      copyBtn.textContent = 'Copiado';
+      setTimeout(()=> copyBtn.textContent = 'Copiar tabla', 1500);
+    }catch(e){ console.warn(e); }
+  });
+
+  // descargar CSV con filtros (servidor)
+  downloadBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    const params = new URLSearchParams();
+    const q = document.getElementById('bh_query').value.trim(); if(q) params.append('bh_query', q);
+    const user = document.getElementById('bh_user').value; if(user) params.append('bh_user', user);
+    const action = document.getElementById('bh_action').value; if(action) params.append('bh_action', action);
+    const start = document.getElementById('bh_start').value; if(start) params.append('bh_start', start);
+    const end = document.getElementById('bh_end').value; if(end) params.append('bh_end', end);
+    params.append('bh_export','csv'); params.append('bh_page','1');
+    window.open('/admin_product/?' + params.toString(), '_blank');
+  });
+
+  // eventos: debounce input y cambios
+  document.getElementById('bh_query').addEventListener('input', debounce(()=>{ const filtered = applyFiltersToCache(); renderRows(filtered); }, 350));
+  ['bh_action','bh_user','bh_start','bh_end'].forEach(id => document.getElementById(id).addEventListener('change', ()=>{ const filtered = applyFiltersToCache(); renderRows(filtered); }));
+  form.addEventListener('submit', function(e){ e.preventDefault(); const filtered = applyFiltersToCache(); renderRows(filtered); });
+
+  // inicio
+  initialLoad();
+
+  function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+})();
+</script>
+
+
+{% endblock %}

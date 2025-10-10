@@ -2,99 +2,240 @@
 {% load static i18n %}
 {% block content %}
 <div class="container py-5">
-  <h1 class="h3">Admin Reports</h1>
-  <p class="text-muted">Tendencias y top productos</p>
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+    </div>
+    <div>
+      <h1 class="h3 mb-1">Informes de administración</h1>
+      <p class="text-muted mb-0">Tendencias y productos más relevantes</p>
+    </div>
 
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="card p-3">
-        <h5>Trends (last {{ days|default:30 }})</h5>
-        <canvas id="trendChart" height="120"></canvas>
+    <div class="d-flex gap-2">
+      <div class="btn-group" role="group" aria-label="periodo">
+        <a href="?days=7" class="btn btn-sm btn-outline-secondary">7d</a>
+        <a href="?days=30" class="btn btn-sm btn-outline-secondary active">30d</a>
+        <a href="?days=90" class="btn btn-sm btn-outline-secondary">90d</a>
+      </div>
+      <a id="exportCsv" href="{% url 'admin_reports_export_csv' %}" class="btn btn-sm btn-outline-primary">Exportar CSV</a>
+    </div>
+  </div>
+
+  <div class="row gy-4 mb-3">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+        <div class="card-header bg-gradient" style="background: linear-gradient(135deg,#6366f1,#60a5fa);">
+          <div class="d-flex justify-content-between align-items-center text-white">
+            <div>
+              <h5 class="mb-0">Tendencias (últimos {{ days|default:30 }})</h5>
+              <small class="opacity-75">Visitas, compras y calificación media</small>
+            </div>
+            <small id="chartStatus" class="opacity-75">Cargando...</small>
+          </div>
+        </div>
+        <div class="card-body bg-light-subtle">
+          <canvas id="trendChart" style="width:100%;height:280px"></canvas>
+          <div id="chartError" class="text-danger small mt-2 d-none">No se pudieron cargar los datos del gráfico.</div>
+        </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card p-3 mb-3">
-        <h6>Top viewed</h6>
-        <ul id="topViewed" class="list-group list-group-flush"></ul>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 mb-3">
+        <div class="card-body">
+          <h6 class="mb-3">Más vistos</h6>
+          <ul id="topViewed" class="list-group list-group-flush"></ul>
+          <div id="viewedEmpty" class="text-center py-2 text-muted d-none">No hay datos</div>
+        </div>
       </div>
-      <div class="card p-3">
-        <h6>Top bought</h6>
-        <ul id="topBought" class="list-group list-group-flush"></ul>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <h6 class="mb-3">Más comprados</h6>
+          <ul id="topBought" class="list-group list-group-flush"></ul>
+          <div id="boughtEmpty" class="text-center py-2 text-muted d-none">No hay datos</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="d-flex gap-2 mb-3">
-    <a id="exportCsv" href="{% url 'admin_reports_export_csv' %}" class="btn btn-outline-secondary btn-sm">Export CSV (last {{ days|default:30 }} days)</a>
-    <a href="?days=7" class="btn btn-sm btn-light">7d</a>
-    <a href="?days=30" class="btn btn-sm btn-light">30d</a>
-    <a href="?days=90" class="btn btn-sm btn-light">90d</a>
-  </div>
-
+  <div class="text-muted small">Última actualización: <span id="lastUpdated">—</span></div>
 </div>
+
+<style>
+  .card-header { border-bottom: none; padding: 1rem 1.25rem; }
+  .list-group-item { border: 0; padding: .6rem .9rem; border-radius: 8px; margin-bottom: .4rem; background:#fff; display:flex; justify-content:space-between; align-items:center; transition:transform .12s ease, box-shadow .12s ease; }
+  .list-group-item:hover{ transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,23,42,.06); }
+  .rank-circle{ width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#f3f4f6;font-weight:600;margin-right:.6rem; }
+  .badge-small{ font-size:.78rem; padding:.35rem .5rem; border-radius:10px; }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  (function(){
-    // days viene del contexto: si no existe, toma 30
-    const days = {{ days|default:30 }};
-    const dataUrl = "{% url 'admin_reports_data_json' %}?days=" + encodeURIComponent(days);
-    const topUrl  = "{% url 'admin_reports_top_json' %}?n=5&days=" + encodeURIComponent(days);
+(function(){
+  const days = {{ days|default:30 }};
+  const dataUrl = "{% url 'admin_reports_data_json' %}?days=" + encodeURIComponent(days);
+  const topUrl  = "{% url 'admin_reports_top_json' %}?n=5&days=" + encodeURIComponent(days);
 
-    // Cargar datos de tendencias
-    fetch(dataUrl).then(r => {
-      if (!r.ok) throw new Error('data fetch failed');
-      return r.json();
-    }).then(d => {
+  const chartStatus = document.getElementById('chartStatus');
+  const chartError = document.getElementById('chartError');
+  const lastUpdated = document.getElementById('lastUpdated');
+
+  // helper: create vertical gradient for dataset
+  function makeGradient(ctx, color1, color2){
+    const grad = ctx.createLinearGradient(0,0,0,300);
+    grad.addColorStop(0, color1);
+    grad.addColorStop(1, color2);
+    return grad;
+  }
+
+  // draw chart
+  async function drawChart(){
+    chartStatus.textContent = 'Cargando...';
+    chartError.classList.add('d-none');
+
+    try{
+      const res = await fetch(dataUrl);
+      if(!res.ok) throw new Error('Fetch failed');
+      const d = await res.json();
+
       const labels = d.labels || [];
+      const visits = d.visits || [];
+      const purchases = d.purchases || [];
+      const ratings = d.avg_ratings || [];
+
       const ctx = document.getElementById('trendChart').getContext('2d');
-      new Chart(ctx, {
+
+      // destroy previous chart if exists
+      if(window._trendChart) window._trendChart.destroy();
+
+      // build gradients
+      const visitsGrad = makeGradient(ctx, 'rgba(99,102,241,0.18)', 'rgba(99,102,241,0)');
+      const purchasesGrad = makeGradient(ctx, 'rgba(37,99,235,0.12)', 'rgba(37,99,235,0)');
+
+      const config = {
         type: 'line',
         data: {
           labels: labels,
           datasets: [
-            { label: 'Visits', data: d.visits || [], fill: false, tension: 0.2, borderWidth:1 },
-            { label: 'Purchases', data: d.purchases || [], fill: false, tension: 0.2, borderWidth:1 },
-            { label: 'Avg rating', data: d.avg_ratings || [], fill: false, tension: 0.2, borderWidth:1, yAxisID: 'rating' },
+            {
+              label: 'Visitas',
+              data: visits,
+              borderColor: '#6366f1',
+              backgroundColor: visitsGrad,
+              fill: true,
+              tension: 0.32,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              borderWidth: 2,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Compras',
+              data: purchases,
+              borderColor: '#2563eb',
+              backgroundColor: purchasesGrad,
+              fill: true,
+              tension: 0.32,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              borderWidth: 2,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Calificación media',
+              data: ratings,
+              borderColor: '#10b981',
+              backgroundColor: 'transparent',
+              fill: false,
+              tension: 0.2,
+              pointStyle: 'rectRounded',
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              borderDash: [6,4],
+              borderWidth: 2,
+              yAxisID: 'rating'
+            }
           ]
         },
         options: {
-          scales: {
-            y: { beginAtZero:true },
-            rating: { position: 'right', suggestedMin:0, suggestedMax:5 }
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth:12, padding:12 } },
+            tooltip: { mode: 'index', intersect: false, padding:10, bodySpacing:6 }
           },
-          interaction: { mode: 'index', intersect: false }
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { display: true, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision:0 } },
+            rating: { type: 'linear', position: 'right', suggestedMin:0, suggestedMax:5, grid: { display: false } }
+          },
+          animation: { duration: 700, easing: 'easeOutQuart' }
         }
-      });
-    }).catch(e=>console.error(e));
+      };
 
-    // Cargar top lists
-    fetch(topUrl).then(r => r.json()).then(d => {
+      window._trendChart = new Chart(ctx, config);
+      chartStatus.textContent = 'Actualizado';
+      lastUpdated.textContent = new Date().toLocaleString();
+
+    }catch(err){
+      console.error(err);
+      chartError.classList.remove('d-none');
+      chartStatus.textContent = 'Error';
+    }
+  }
+
+  // load top lists
+  async function loadTops(){
+    try{
+      const res = await fetch(topUrl);
+      if(!res.ok) throw new Error('Top fetch failed');
+      const d = await res.json();
+
       const tv = document.getElementById('topViewed');
-      (d.top_viewed || []).forEach(item => {
+      const tb = document.getElementById('topBought');
+      tv.innerHTML = '';
+      tb.innerHTML = '';
+
+      const topV = d.top_viewed || [];
+      if(topV.length === 0) document.getElementById('viewedEmpty').classList.remove('d-none');
+      else topV.forEach((item, i) => {
         const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.innerHTML = `<span>${item.product_name || 'Unknown'}</span><span class="badge bg-success">${item.views}</span>`;
+        li.className = 'list-group-item';
+        li.innerHTML = `<div class='d-flex align-items-center'><div class='rank-circle'>${i+1}</div><div class='fw-semibold small'>${escapeHtml(item.product_name || '—')}</div></div><span class='badge badge-small bg-success text-white'>${item.views || 0}</span>`;
         tv.appendChild(li);
       });
-      const tb = document.getElementById('topBought');
-      (d.top_bought || []).forEach(item => {
+
+      const topB = d.top_bought || [];
+      if(topB.length === 0) document.getElementById('boughtEmpty').classList.remove('d-none');
+      else topB.forEach((item, i) => {
         const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.innerHTML = `<span>${item.product_name || 'Unknown'}</span><span class="badge bg-primary">${item.qty}</span>`;
+        li.className = 'list-group-item';
+        li.innerHTML = `<div class='d-flex align-items-center'><div class='rank-circle'>${i+1}</div><div class='fw-semibold small'>${escapeHtml(item.product_name || '—')}</div></div><span class='badge badge-small bg-primary text-white'>${item.qty || 0}</span>`;
         tb.appendChild(li);
       });
-    }).catch(e=>console.error(e));
 
-    // export CSV: añade params days y start si existe today en contexto
-    const exportBtn = document.getElementById('exportCsv');
-    const params = new URLSearchParams();
-    params.set('days', String({{ days|default:30 }}));
-    {% if today %}
-    params.set('start', '{{ today }}');
-    {% endif %}
-    exportBtn.href = exportBtn.href + "?" + params.toString();
+    }catch(err){ console.error(err); }
+  }
 
-  })();
+  // helpers
+  function escapeHtml(str){ if(str==null) return ''; return String(str).replace(/[&<>"'`]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;','`':'&#96;'}[s])); }
+
+  // set export params
+  const exportBtn = document.getElementById('exportCsv');
+  const params = new URLSearchParams();
+  params.set('days', String({{ days|default:30 }}));
+  {% if today %}
+  params.set('start', '{{ today }}');
+  {% endif %}
+  exportBtn.href = exportBtn.href + '?' + params.toString();
+
+  // init
+  drawChart();
+  loadTops();
+
+})();
 </script>
+
 {% endblock %}

@@ -3,56 +3,141 @@
 
 {% block content %}
 <div class="container py-5">
-  <h1 class="h4 mb-4">Rating statistics</h1>
-  <p class="text-muted">Promedio, desviación y conteo de reseñas por producto.</p>
-
-  <div class="mb-3">
-    <label for="topSelect" class="form-label">Top</label>
-    <select id="topSelect" class="form-select" style="max-width:150px;">
-      <option value="5">Top 5</option>
-      <option value="10" selected>Top 10</option>
-      <option value="20">Top 20</option>
-    </select>
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+    </div>
+    <div>
+      <h1 class="h4 mb-1">Estadísticas de valoraciones</h1>
+      <p class="text-muted mb-0">Promedio, desviación y número de reseñas por producto.</p>
+    </div>
+    
+    <div class="d-flex align-items-center gap-3">
+      <label for="topSelect" class="me-2 text-muted small mb-0">Mostrar</label>
+      <select id="topSelect" class="form-select form-select-sm rounded-pill shadow-sm" style="width:120px;">
+        <option value="5">Top 5</option>
+        <option value="10" selected>Top 10</option>
+        <option value="20">Top 20</option>
+      </select>
+    </div>
   </div>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Reviews</th>
-        <th>Avg rating</th>
-        <th>Stddev</th>
-      </tr>
-    </thead>
-    <tbody id="ratingTable">
-      <tr><td colspan="4">Loading...</td></tr>
-    </tbody>
-  </table>
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header bg-gradient" style="background: linear-gradient(135deg,#0ea5a4,#34d399);">
+      <div class="d-flex justify-content-between align-items-center text-white">
+        <div class="fw-semibold">Resumen de valoraciones</div>
+        <small id="lastUpdated" class="opacity-75">Última actualización: —</small>
+      </div>
+    </div>
+
+    <div class="card-body bg-light-subtle">
+      <div id="tableWrap" class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr class="text-muted small">
+              <th style="width:6rem">#</th>
+              <th>Producto</th>
+              <th style="width:9rem">Reseñas</th>
+              <th style="width:11rem">Calificación media</th>
+              <th style="width:11rem">Desviación</th>
+            </tr>
+          </thead>
+          <tbody id="ratingTable">
+            <tr><td colspan="5">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="errorMsg" class="text-danger small mt-2 d-none">No se pudieron cargar los datos.</div>
+    </div>
+  </div>
 </div>
+
+<style>
+  .card-header { border-bottom: none; padding: 1rem 1.25rem; }
+  .table th, .table td { vertical-align: middle; }
+  .rating-badge { font-weight:700; border-radius:10px; padding:0.35rem 0.6rem; }
+  .small-muted { font-size:0.85rem; color:#6b7280; }
+  .skeleton-row { height:14px; width:100%; background:linear-gradient(90deg,#efefef 25%,#f7f7f7 37%,#efefef 63%); background-size:400% 100%; animation: shimmer 1.4s ease infinite; border-radius:6px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  tr.card-like { background: #fff; border-radius: 10px; box-shadow: 0 6px 18px rgba(15,23,42,0.03); }
+</style>
 
 <script>
 (function(){
-  const loadData = () => {
-    const top = document.getElementById('topSelect').value;
-    fetch(`/admin/reports/ratings/data/?top=${top}`)
-      .then(r => r.json())
-      .then(d => {
-        const tbody = document.getElementById('ratingTable');
-        tbody.innerHTML = '';
-        d.rating_stats.forEach(item => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.reviews_count}</td>
-            <td>${item.avg_rating ?? '-'}</td>
-            <td>${item.stddev_rating ?? '-'}</td>
+  const select = document.getElementById('topSelect');
+  const tbody = document.getElementById('ratingTable');
+  const lastUpdated = document.getElementById('lastUpdated');
+  const errorMsg = document.getElementById('errorMsg');
+
+  function showLoading(){
+    tbody.innerHTML = '';
+    for(let i=0;i<6;i++){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="5"><div class=\"skeleton-row\"></div></td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function formatNumber(n){
+    if(n == null) return '-';
+    if(typeof n === 'number') return n.toLocaleString(undefined, {maximumFractionDigits:2});
+    return n;
+  }
+
+  function starSVG(){
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.431L23.5 9.748l-5.75 5.605L19.336 24 12 19.897 4.664 24l1.586-8.647L.5 9.748l7.832-1.73L12 .587z"/></svg>`;
+  }
+
+  function escapeHtml(str){
+    if(str == null) return '';
+    return String(str).replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;','`':'&#96;'}[s]));
+  }
+
+  async function load(){
+    const top = select.value;
+    showLoading();
+    errorMsg.classList.add('d-none');
+
+    try{
+      const res = await fetch(`/admin/reports/ratings/data/?top=${encodeURIComponent(top)}`);
+      if(!res.ok) throw new Error('Error en la petición');
+      const data = await res.json();
+
+      tbody.innerHTML = '';
+
+      if(!Array.isArray(data.rating_stats) || data.rating_stats.length === 0){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="5">No hay datos para mostrar.</td>`;
+        tbody.appendChild(tr);
+      } else {
+        data.rating_stats.forEach((item, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="small-muted">#${i+1}</td>
+            <td class="fw-semibold">${escapeHtml(item.name)}</td>
+            <td><span class="badge bg-light text-dark">${formatNumber(item.reviews_count)}</span></td>
+            <td><span class="rating-badge bg-white border">${item.avg_rating != null ? formatNumber(Number(item.avg_rating).toFixed(2)) + ' ' + starSVG() : '-'}</span></td>
+            <td>${item.stddev_rating != null ? formatNumber(Number(item.stddev_rating).toFixed(2)) : '-'}</td>
           `;
-          tbody.appendChild(row);
+          tbody.appendChild(tr);
         });
-      });
-  };
-  document.getElementById('topSelect').addEventListener('change', loadData);
-  loadData();
+      }
+
+      lastUpdated.textContent = 'Última actualización: ' + new Date().toLocaleString();
+    }catch(err){
+      console.error(err);
+      errorMsg.classList.remove('d-none');
+      tbody.innerHTML = `<tr><td colspan="5">Se produjo un error al cargar los datos.</td></tr>`;
+    }
+  }
+
+  // debounce simple
+  let t;
+  select.addEventListener('change', ()=>{ clearTimeout(t); t = setTimeout(load, 250); });
+
+  load();
 })();
 </script>
+
 {% endblock %}

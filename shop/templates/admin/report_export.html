@@ -1,11 +1,164 @@
 {% extends "pages/base.html" %}
 {% block content %}
 <div class="container py-5">
-  <h2 class="h4 mb-4">Informe Detallado</h2>
-  <p class="text-muted">Descarga un resumen PDF con los principales indicadores.</p>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-gradient" style="background: linear-gradient(135deg,#ef4444,#f97316);">
+          <h2 class="h5 text-white mb-0">Informe Detallado</h2>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">Descarga un resumen PDF con los principales indicadores.</p>
 
-  <a href="{% url 'admin_report_pdf' %}" class="btn btn-danger">
-    Descargar informe PDF
-  </a>
+          <div class="row g-2 align-items-center mb-3">
+            <div class="col-auto">
+              <label for="period" class="small text-muted mb-0">Periodo</label>
+              <select id="period" class="form-select form-select-sm rounded-pill" style="width:110px;">
+                <option value="7">7d</option>
+                <option value="30" selected>30d</option>
+                <option value="90">90d</option>
+              </select>
+            </div>
+
+            <div class="col-auto">
+              <label for="fromDate" class="small text-muted mb-0">Desde</label>
+              <input id="fromDate" type="date" class="form-control form-control-sm">
+            </div>
+            <div class="col-auto">
+              <label for="toDate" class="small text-muted mb-0">Hasta</label>
+              <input id="toDate" type="date" class="form-control form-control-sm">
+            </div>
+
+            <div class="col-auto">
+              <label class="small text-muted mb-0 d-block">Formato</label>
+              <div class="btn-group btn-group-sm" role="group">
+                <input type="radio" class="btn-check" name="format" id="fmtPdf" value="pdf" checked>
+                <label class="btn btn-outline-secondary" for="fmtPdf">PDF</label>
+                <input type="radio" class="btn-check" name="format" id="fmtExcel" value="xlsx">
+                <label class="btn btn-outline-secondary" for="fmtExcel">Excel</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 align-items-center">
+            <button id="downloadBtn" class="btn btn-danger btn-sm rounded-pill">
+              <span id="btnText">Descargar informe</span>
+              <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+            </button>
+
+            <a id="directLink" class="btn btn-outline-secondary btn-sm rounded-pill" href="{% url 'admin_report_pdf' %}" target="_blank">Abrir en nueva pestaña</a>
+
+            <div id="statusMsg" class="text-muted small ms-2">Última generación: <span id="lastGen">—</span></div>
+          </div>
+
+          <hr class="my-3">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card p-3 rounded-3 h-100">
+                <div class="small text-muted">Visitas</div>
+                <div id="statVisits" class="h5 mb-0">—</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card p-3 rounded-3 h-100">
+                <div class="small text-muted">Compras</div>
+                <div id="statPurchases" class="h5 mb-0">—</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card p-3 rounded-3 h-100">
+                <div class="small text-muted">Calificación media</div>
+                <div id="statRating" class="h5 mb-0">—</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<style>
+  .card-header { padding: 0.8rem 1rem; }
+  .card p { margin-bottom: .75rem; }
+  .rounded-pill { border-radius: 999px !important; }
+</style>
+
+<script>
+(function(){
+  const downloadBtn = document.getElementById('downloadBtn');
+  const btnSpinner = document.getElementById('btnSpinner');
+  const btnText = document.getElementById('btnText');
+  const directLink = document.getElementById('directLink');
+  const period = document.getElementById('period');
+  const fromDate = document.getElementById('fromDate');
+  const toDate = document.getElementById('toDate');
+  const lastGen = document.getElementById('lastGen');
+  const statVisits = document.getElementById('statVisits');
+  const statPurchases = document.getElementById('statPurchases');
+  const statRating = document.getElementById('statRating');
+
+  // Build URL with params for download/open
+  function buildUrl(){
+    const params = new URLSearchParams();
+    const days = period.value;
+    params.set('days', days);
+    if(fromDate.value) params.set('from', fromDate.value);
+    if(toDate.value) params.set('to', toDate.value);
+    const fmt = document.querySelector('input[name="format"]:checked').value;
+    params.set('format', fmt);
+    return directLink.href.split('?')[0] + '?' + params.toString();
+  }
+
+  // Fetch quick stats to show on cards (non-blocking)
+  async function loadQuickStats(){
+    try{
+      const params = new URLSearchParams(); params.set('days', period.value);
+      if(fromDate.value) params.set('from', fromDate.value);
+      if(toDate.value) params.set('to', toDate.value);
+      const res = await fetch('{% url "admin_report_quick_stats_json" %}?'+params.toString());
+      if(!res.ok) throw new Error('stats fetch');
+      const d = await res.json();
+      statVisits.textContent = d.visits?.toLocaleString() ?? '—';
+      statPurchases.textContent = d.purchases?.toLocaleString() ?? '—';
+      statRating.textContent = d.avg_rating != null ? Number(d.avg_rating).toFixed(2) : '—';
+    }catch(err){ console.warn(err); }
+  }
+
+  // Click handler: navigate to the generated URL. Show spinner to indicate action.
+  downloadBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    const url = buildUrl();
+    // show spinner and prevent double click
+    btnSpinner.classList.remove('d-none');
+    downloadBtn.disabled = true;
+    btnText.textContent = 'Generando...';
+
+    // open in new tab to keep admin safe; if format is pdf we open directly, otherwise navigate
+    window.open(url, '_blank');
+
+    // restore state after short delay
+    setTimeout(()=>{
+      btnSpinner.classList.add('d-none');
+      downloadBtn.disabled = false;
+      btnText.textContent = 'Descargar informe';
+      lastGen.textContent = new Date().toLocaleString();
+    }, 900);
+  });
+
+  // update direct link when controls change
+  [period, fromDate, toDate].forEach(el => el.addEventListener('change', ()=>{
+    directLink.href = buildUrl();
+    loadQuickStats();
+  }));
+
+  // init
+  directLink.href = buildUrl();
+  loadQuickStats();
+
+})();
+</script>
+
 {% endblock %}
