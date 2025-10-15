@@ -1,11 +1,12 @@
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
-
+from unittest.mock import patch
 from shop.models import Product
 
 
+# ---------- 🔹 Tests de Autenticación ----------
 class LoginTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="tester", password="test1234")
@@ -14,7 +15,7 @@ class LoginTests(TestCase):
         response = self.client.post(
             reverse("login"), {"username": "tester", "password": "test1234"}
         )
-        self.assertEqual(response.status_code, 302)  # Redirige tras login
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("home"))
 
     def test_login_invalido(self):
@@ -22,11 +23,10 @@ class LoginTests(TestCase):
             reverse("login"), {"username": "tester", "password": "wrongpass"}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "<ul", html=False
-        )  # Se muestra la lista de errores
+        self.assertContains(response, "<ul", html=False)
 
 
+# ---------- 🔹 Tests de Registro ----------
 class RegistroTests(TestCase):
     def test_registro_valido(self):
         response = self.client.post(
@@ -55,6 +55,7 @@ class RegistroTests(TestCase):
         self.assertContains(response, "The two password fields didn’t match.")
 
 
+# ---------- 🔹 Tests del Catálogo ----------
 class CatalogoTests(TestCase):
     def setUp(self):
         image = SimpleUploadedFile(
@@ -70,3 +71,30 @@ class CatalogoTests(TestCase):
             type="Electrónica",
             image=image,
         )
+
+    def test_catalogo_muestra_producto(self):
+        response = self.client.get(reverse("shop"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Prueba")
+
+
+# ---------- 🔹 Tests de Vistas Principales ----------
+class ShopViewsTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    @patch("shop.views.WeatherService.get_weather_data")
+    def test_homepage_view(self, mock_weather):
+        mock_weather.return_value = {"temp": 25, "desc": "Clear sky", "icon": ""}
+        response = self.client.get(reverse("home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "pages/home.html")
+        self.assertIn("weather", response.context)
+        self.assertEqual(response.context["weather"]["temp"], 25)
+
+    def test_shop_page_view(self):
+        response = self.client.get(reverse("shop"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "pages/shop.html")
+
+# shop/tests/test_functionalities.py
