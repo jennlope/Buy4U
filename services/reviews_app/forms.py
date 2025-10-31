@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from .models import Review
 
 class ReviewForm(forms.ModelForm):
+    
     text = forms.CharField(
         label=_("Tu reseña"),
         widget=forms.Textarea(

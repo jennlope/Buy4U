@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import CreateView, View
 from django.db.models import F
+from django.utils.translation import gettext_lazy as _  # <-- NUEVO
 from shop.models import Product
 from .forms import ReviewForm
 from .models import Review
@@ -34,23 +35,23 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         # Validar compra
         if not user_purchased_product(self.request.user, self.product):
-            messages.error(self.request, "Solo puedes reseñar productos que has comprado.")
+            messages.error(self.request, _("You can only review products you have purchased."))
             return redirect(self.get_success_url())
 
-        # Evitar duplicado (usuario+producto), útil si el unique_together no está aplicado aún
+        # Evitar duplicado
         if Review.objects.filter(product=self.product, user=self.request.user).exists():
-            messages.info(self.request, "Ya has dejado una reseña para este producto.")
+            messages.info(self.request, _("You have already left a review for this product."))
             return redirect(self.get_success_url())
 
         review = form.save(commit=False)
         review.user = self.request.user
         review.product = self.product
         review.save()
-        messages.success(self.request, "¡Gracias por tu reseña!")
+        messages.success(self.request, _("Thanks for your review!"))  # <-- éxito
         return redirect(self.get_success_url())
 
     def form_invalid(self, form):
-        messages.error(self.request, "Revisa el formulario de reseña.")
+        messages.error(self.request, _("Check your review form."))
         return redirect(self.get_success_url())
 
     def get_success_url(self):
@@ -59,7 +60,6 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 class MarkReviewUsefulView(LoginRequiredMixin, View):
     def post(self, request, pk):
         review = get_object_or_404(Review, pk=pk)
-        # Incremento atómico
         Review.objects.filter(pk=pk).update(useful_count=F("useful_count") + 1)
-        messages.success(request, "¡Gracias por tu feedback!")
+        messages.success(request, _("Thanks for your feedback!"))  # <-- trans
         return redirect(reverse("product_detail", kwargs={"id": review.product_id}))
