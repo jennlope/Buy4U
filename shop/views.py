@@ -122,6 +122,8 @@ class ShopView(View):
         return render(request, self.template_name, view_data)
 
 
+import math
+
 class ProductDetailView(View):
     template_name = "pages/product_detail.html"
 
@@ -147,6 +149,16 @@ class ProductDetailView(View):
         can_review = user_purchased_product(request.user, product)
         review_form = ReviewForm() if can_review else None
 
+        # Calcular promedio y descomponerlo en estrellas completas, medias y vacías
+        avg = product.reviews.aggregate(avg=Avg("rating"), total=Count("id"))
+        avg_rating = avg["avg"] or 0
+        reviews_count = avg["total"] or 0
+        
+        # Calcular estrellas: completas, media, vacías
+        full_stars = int(math.floor(avg_rating))  # Estrellas completas
+        has_half_star = (avg_rating - full_stars) >= 0.3  # Media estrella si decimal >= 0.3
+        empty_stars = 5 - full_stars - (1 if has_half_star else 0)  # Resto vacías
+
         view_data = {
             "title": product.name + _(" - Buy4U"),
             "subtitle": product.name + _(" - Product information"),
@@ -155,11 +167,13 @@ class ProductDetailView(View):
             "can_review": can_review,
             "review_form": review_form,
             "sort": sort,
+            "avg_rating": avg_rating,
+            "reviews_count": reviews_count,
+            "full_stars": full_stars,
+            "has_half_star": has_half_star,
+            "empty_stars": empty_stars,
         }
 
-        avg = product.reviews.aggregate(avg=Avg("rating"), total=Count("id"))
-        view_data["avg_rating"] = avg["avg"] or 0
-        view_data["reviews_count"] = avg["total"] or 0
         return render(request, self.template_name, view_data)
 
 class CartView(View):

@@ -12,17 +12,26 @@
 
   <div class="row g-4">
     <div class="col-md-6">
-      {% if product.image %}
-        <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
-      {% else %}
-        <div class="border rounded d-flex align-items-center justify-content-center" style="height:320px;">
-          <span class="text-muted">{% trans "No image available" %}</span>
+      <div class="position-relative">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+        {% else %}
+          <div class="border rounded d-flex align-items-center justify-content-center" style="height:320px;">
+            <span class="text-muted">{% trans "No image available" %}</span>
+          </div>
+        {% endif %}
+
+        <!-- Si el producto está agotado, mostrar "SOLD OUT" -->
+        {% if product.quantity == 0 %}
+        <div style="position: absolute; top: 1px; left: 2px; width: 200px; opacity: 0.8;">
+          <img src="{% static 'img/sold-out.png' %}" alt="{% trans 'Sold Out' %}" style="width: 100%;">
         </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
 
     <div class="col-md-6">
-      <ul class="list-group">
+      <ul class="list-group mb-3">
         <li class="list-group-item"><strong>{% trans "Name" %}:</strong> {{ product.name }}</li>
         <li class="list-group-item"><strong>{% trans "Price" %}:</strong> ${{ product.price|floatformat:2 }}</li>
         <li class="list-group-item"><strong>{% trans "Brand" %}:</strong> {{ product.brand }}</li>
@@ -31,7 +40,16 @@
         <li class="list-group-item"><strong>{% trans "Type" %}:</strong> {{ product.type }}</li>
         <li class="list-group-item"><strong>{% trans "Description" %}:</strong> {{ product.description }}</li>
       </ul>
-      <a href="#reviews" class="btn btn-success mt-3">{% trans "Read reviews" %}</a>
+
+      <!-- Formulario para agregar al carrito -->
+      <form method="post" action="{% url 'add_cart' product.id %}" class="mb-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary fw-bold fs-5 w-100" style="background-color: #093314; border: none; color: white;" {% if product.quantity == 0 %}disabled{% endif %}>
+          <i class="fas fa-cart-plus"></i> {% trans "Add to Cart" %}
+        </button>
+      </form>
+
+      <a href="#reviews" class="btn btn-outline-success fw-bold fs-5 w-100">{% trans "Read reviews" %}</a>
     </div>
   </div>
 </div>
@@ -46,13 +64,16 @@
     </span>
 
     <div aria-hidden="true" class="me-2">
-      {% with rounded=avg_rating|default:0|floatformat:0 %}
-        {% for _ in "12345" %}
-          <span class="text-warning" style="font-size:1.1rem;">
-            {% if forloop.counter <= rounded %}★{% else %}☆{% endif %}
-          </span>
-        {% endfor %}
-      {% endwith %}
+      <!-- Estrellas completas -->
+      {% for i in "12345" %}
+        {% if forloop.counter <= full_stars %}
+          <span style="font-size:1.5rem; color:#ffc107;">★</span>
+        {% elif forloop.counter == full_stars|add:1 and has_half_star %}
+          <span style="font-size:1.5rem; color:#ffc107;">⯨</span>
+        {% else %}
+          <span style="font-size:1.5rem; color:#ddd;">☆</span>
+        {% endif %}
+      {% endfor %}
     </div>
 
     <small class="text-muted">
@@ -89,14 +110,16 @@
           </div>
 
           <div class="mb-1" aria-label="{% blocktrans %}Rating {{ r.rating }} of 5{% endblocktrans %}">
-            {% for _ in "12345" %}
-              <span class="text-warning">{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}</span>
+            {% for i in "12345" %}
+              <span style="font-size:1.2rem; color: {% if forloop.counter <= r.rating %}#ffc107{% else %}#ddd{% endif %};">
+                ★
+              </span>
             {% endfor %}
           </div>
 
           <div class="mb-2">{{ r.text|linebreaksbr }}</div>
 
-          <!-- Botón “Helpful” -->
+          <!-- Botón "Helpful" -->
           <form action="{% url 'review_useful' pk=r.id %}" method="post" class="d-inline">
             {% csrf_token %}
             <button type="submit" class="btn btn-outline-success btn-sm">
@@ -118,13 +141,11 @@
       <!-- Estrellas -->
       <div class="mb-2">
         <label class="form-label"><strong>{% trans "Rating" %}</strong></label>
-        <div class="star-group" role="radiogroup" aria-label="{% trans 'Rate from 1 to 5' %}">
-          {% for _ in "12345" %}
-            {% with val=forloop.revcounter %}
-              <input class="btn-check" type="radio" name="rating" id="star{{ val }}" value="{{ val }}"
-                     {% if review_form.rating.value|stringformat:"s" == val|stringformat:"s" %}checked{% endif %}>
-              <label for="star{{ val }}" class="star-label" title="{{ val }} {% trans 'stars' %}" aria-label="{{ val }} {% trans 'stars' %}">★</label>
-            {% endwith %}
+        <div class="star-rating" role="radiogroup" aria-label="{% trans 'Rate from 1 to 5' %}">
+          {% for i in "54321" %}
+            <input class="star-input" type="radio" name="rating" id="star{{ i }}" value="{{ i }}"
+                   {% if review_form.rating.value|stringformat:"s" == i|stringformat:"s" %}checked{% endif %}>
+            <label for="star{{ i }}" class="star-label" title="{{ i }} {% trans 'stars' %}" aria-label="{{ i }} {% trans 'stars' %}">★</label>
           {% endfor %}
         </div>
         <div class="form-text">{% trans "Select from 1 to 5 stars." %}</div>
@@ -144,14 +165,28 @@
     </form>
 
     <style>
-      .star-group { direction: rtl; unicode-bidi: bidi-override; }
-      .star-label { font-size: 1.6rem; cursor: pointer; color: #ced4da; padding: 0 .15rem; }
-      .btn-check:checked + .star-label,
+      .star-rating {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+      }
+      
+      .star-input {
+        display: none;
+      }
+      
+      .star-label {
+        font-size: 2rem;
+        cursor: pointer;
+        color: #ddd;
+        transition: color 0.2s;
+      }
+      
+      .star-input:checked ~ .star-label,
       .star-label:hover,
-      .star-label:hover ~ .star-label { color: #198754; }
-      .star-group:hover .btn-check:checked + .star-label { color: #ced4da; }
-      .star-group:hover .star-label:hover,
-      .star-group:hover .star-label:hover ~ .star-label { color: #198754; }
+      .star-label:hover ~ .star-label {
+        color: #ffc107;
+      }
     </style>
   {% else %}
     {% if user.is_authenticated %}

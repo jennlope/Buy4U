@@ -3,5 +3,19 @@ __pycache__/
 *.pyc
 *.pyo
 
+env/
+
+.env
 *.env
+.env.local
+.env.*.local
+
 *.pem
+pem
+
+# Archivos estáticos recopilados
+staticfiles/
+static_root/
+
+# Archivos media (contenido subido por usuarios)
+media/
