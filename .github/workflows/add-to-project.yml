@@ -12,6 +12,10 @@ jobs:
   add-to-project:
     name: Add issue or PR to Buy4U project
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
     steps:
       - uses: actions/add-to-project@v1.0.2
         with:
