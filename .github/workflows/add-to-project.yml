@@ -1,0 +1,24 @@
+name: Add to Buy4U Project
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue or PR to Buy4U project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          # Update with actual Buy4U project URL
+          # Format: https://github.com/users/USER/projects/N
+          # or: https://github.com/orgs/ORG/projects/N
+          project-url: https://github.com/users/jalopezg4/projects/1
+          # Personal Access Token with project permissions
+          # Store as repository secret: ADD_TO_PROJECT_PAT
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
