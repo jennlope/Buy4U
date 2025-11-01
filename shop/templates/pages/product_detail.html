@@ -54,151 +54,322 @@
   </div>
 </div>
 
-<hr>
+<hr class="my-5">
 
-<!-- Calificación promedio + número de reseñas -->
-<div class="container mb-3">
-  <div class="d-flex align-items-center">
-    <span class="badge bg-success-subtle text-success border border-success-subtle me-2">
-      {% if avg_rating %}{{ avg_rating|floatformat:1 }}{% else %}N/A{% endif %}/5
-    </span>
+<!-- SECCIÓN DE RESEÑAS MEJORADA (HU19) -->
+<div class="container py-4">
+  <!-- Header con calificación promedio -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h3 class="h4 mb-2">
+            <i class="fas fa-comments text-success me-2"></i>
+            {% trans "Reviews" %}
+          </h3>
+          <p class="text-muted small mb-0">
+            ({{ reviews_count }} {% trans "reviews" %})
+          </p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+          <div class="d-inline-flex align-items-center gap-3 bg-white px-4 py-2 rounded-pill shadow-sm">
+            <div>
+              <div class="h2 fw-bold text-success mb-0">
+                {% if avg_rating %}{{ avg_rating|floatformat:1 }}{% else %}N/A{% endif %}
+              </div>
+              <small class="text-muted">{% trans "de 5" %}</small>
+            </div>
+            <div style="font-size: 1.5rem; color: #ffc107;">
+              {% for i in "12345" %}
+                {% if forloop.counter <= full_stars %}
+                  ★
+                {% elif forloop.counter == full_stars|add:1 and has_half_star %}
+                  ⯨
+                {% else %}
+                  <span style="color: #e5e7eb;">☆</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <div aria-hidden="true" class="me-2">
-      <!-- Estrellas completas -->
-      {% for i in "12345" %}
-        {% if forloop.counter <= full_stars %}
-          <span style="font-size:1.5rem; color:#ffc107;">★</span>
-        {% elif forloop.counter == full_stars|add:1 and has_half_star %}
-          <span style="font-size:1.5rem; color:#ffc107;">⯨</span>
-        {% else %}
-          <span style="font-size:1.5rem; color:#ddd;">☆</span>
-        {% endif %}
+  <!-- Selector de orden -->
+  <div class="d-flex justify-content-between align-items-center mb-3" id="reviews">
+    <h5 class="h6 text-muted mb-0">{% trans "Customer opinions" %}</h5>
+    <form method="get" class="d-flex align-items-center gap-2">
+      <label for="sort" class="small text-muted mb-0">{% trans "Sort by" %}:</label>
+      <select id="sort" name="sort" class="form-select form-select-sm rounded-pill" style="width: auto;" onchange="this.form.submit()">
+        <option value="recent" {% if sort == 'recent' %}selected{% endif %}>{% trans "Most recent" %}</option>
+        <option value="rating" {% if sort == 'rating' %}selected{% endif %}>{% trans "Highest rating" %}</option>
+        <option value="useful" {% if sort == 'useful' %}selected{% endif %}>{% trans "Most useful" %}</option>
+      </select>
+    </form>
+  </div>
+
+  <!-- Lista de reseñas mejorada -->
+  {% if reviews %}
+    <div class="reviews-list">
+      {% for r in reviews %}
+        <div class="card border-0 shadow-sm rounded-4 mb-3 review-card">
+          <div class="card-body p-4">
+            <!-- Header de la reseña -->
+            <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+              <div class="d-flex align-items-center gap-3">
+                <!-- Avatar -->
+                <div class="avatar-circle">
+                  {{ r.user.username|first|upper }}
+                </div>
+                <div>
+                  <h6 class="mb-0 fw-bold">{{ r.user.username }}</h6>
+                  <small class="text-muted">
+                    <i class="far fa-calendar-alt me-1"></i>
+                    {{ r.created_at|date:"d M Y" }}
+                  </small>
+                </div>
+              </div>
+              
+              <!-- Calificación con estrellas -->
+              <div style="font-size: 1.25rem; color: #ffc107;">
+                {% for i in "12345" %}
+                  <span {% if forloop.counter > r.rating %}style="color: #e5e7eb;"{% endif %}>★</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Contenido de la reseña -->
+            <p class="mb-3 text-dark" style="line-height: 1.7;">{{ r.text|linebreaksbr }}</p>
+
+            <!-- Footer con botón útil -->
+            <div class="d-flex justify-content-between align-items-center pt-2">
+              <div>
+                {% if r.user == user %}
+                  <span class="badge rounded-pill px-3 py-2" style="background-color: rgba(22, 163, 74, 0.1); color: #16a34a;">
+                    <i class="fas fa-check-circle me-1"></i>
+                    {% trans "Your review" %}
+                  </span>
+                {% endif %}
+              </div>
+              
+              <form action="{% url 'review_useful' pk=r.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                  <i class="far fa-thumbs-up me-1"></i>
+                  {% trans "Helpful" %} 
+                  {% if r.useful_count > 0 %}
+                    <span class="badge bg-secondary rounded-pill ms-1">{{ r.useful_count }}</span>
+                  {% endif %}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       {% endfor %}
     </div>
-
-    <small class="text-muted">
-      ({{ reviews_count }} {% trans "reviews" %})
-    </small>
-  </div>
-</div>
-
-<!-- Cabecera reseñas + selector de orden -->
-<div class="container d-flex justify-content-between align-items-center mb-2" id="reviews">
-  <h3 class="h5 text-success mb-0">{% trans "Reviews" %}</h3>
-  <form method="get" class="d-flex align-items-center">
-    <label for="sort" class="me-2 small text-muted">{% trans "Sort by" %}:</label>
-    <select id="sort" name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
-      <option value="recent" {% if sort == 'recent' %}selected{% endif %}>{% trans "Most recent" %}</option>
-      <option value="rating" {% if sort == 'rating' %}selected{% endif %}>{% trans "Highest rating" %}</option>
-      <option value="useful" {% if sort == 'useful' %}selected{% endif %}>{% trans "Most useful" %}</option>
-    </select>
-  </form>
-</div>
-
-<!-- Lista de reseñas -->
-<div class="container">
-  {% if reviews %}
-    <ul class="list-group mb-3">
-      {% for r in reviews %}
-        <li class="list-group-item">
-          <div class="d-flex justify-content-between">
-            <div>
-              <strong>{{ r.user.username }}</strong>
-              <span class="ms-2 small text-muted">({{ r.rating }}/5)</span>
-            </div>
-            <small class="text-muted">{{ r.created_at|date:"Y-m-d H:i" }}</small>
-          </div>
-
-          <div class="mb-1" aria-label="{% blocktrans %}Rating {{ r.rating }} of 5{% endblocktrans %}">
-            {% for i in "12345" %}
-              <span style="font-size:1.2rem; color: {% if forloop.counter <= r.rating %}#ffc107{% else %}#ddd{% endif %};">
-                ★
-              </span>
-            {% endfor %}
-          </div>
-
-          <div class="mb-2">{{ r.text|linebreaksbr }}</div>
-
-          <!-- Botón "Helpful" -->
-          <form action="{% url 'review_useful' pk=r.id %}" method="post" class="d-inline">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-success btn-sm">
-              {% trans "Helpful" %} ({{ r.useful_count }})
-            </button>
-          </form>
-        </li>
-      {% endfor %}
-    </ul>
   {% else %}
-    <p class="text-muted">{% trans "Be the first to review this product." %}</p>
+    <div class="text-center py-5">
+      <i class="fas fa-comment-slash text-muted opacity-25" style="font-size: 4rem;"></i>
+      <p class="text-muted mt-3">{% trans "Be the first to review this product." %}</p>
+    </div>
   {% endif %}
 
-  <!-- Formulario para crear reseña (solo si puede) -->
+  <!-- Formulario de nueva reseña -->
   {% if can_review and review_form %}
-    <form action="{% url 'product_review' id=product.id %}" method="post" class="card card-body border-success-subtle">
-      {% csrf_token %}
-
-      <!-- Estrellas -->
-      <div class="mb-2">
-        <label class="form-label"><strong>{% trans "Rating" %}</strong></label>
-        <div class="star-rating" role="radiogroup" aria-label="{% trans 'Rate from 1 to 5' %}">
-          {% for i in "54321" %}
-            <input class="star-input" type="radio" name="rating" id="star{{ i }}" value="{{ i }}"
-                   {% if review_form.rating.value|stringformat:"s" == i|stringformat:"s" %}checked{% endif %}>
-            <label for="star{{ i }}" class="star-label" title="{{ i }} {% trans 'stars' %}" aria-label="{{ i }} {% trans 'stars' %}">★</label>
-          {% endfor %}
-        </div>
-        <div class="form-text">{% trans "Select from 1 to 5 stars." %}</div>
-        {% for err in review_form.rating.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+      <div class="card-header bg-white border-0 pt-4 pb-0">
+        <h5 class="h6 mb-0">
+          <i class="fas fa-pen text-success me-2"></i>
+          {% trans "Write your review" %}
+        </h5>
       </div>
+      <div class="card-body p-4">
+        <form action="{% url 'product_review' id=product.id %}" method="post">
+          {% csrf_token %}
 
-      <div class="mb-2">
-        {{ review_form.text.label_tag }}
-        {{ review_form.text }}
-        {% if review_form.text.help_text %}
-          <div class="form-text">{{ review_form.text.help_text }}</div>
-        {% endif %}
-        {% for err in review_form.text.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          <!-- Rating con estrellas -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <strong>{% trans "Rating" %}</strong>
+            </label>
+            <div class="star-rating" role="radiogroup" aria-label="{% trans 'Rate from 1 to 5' %}">
+              {% for i in "54321" %}
+                <input class="star-input" type="radio" name="rating" id="star{{ i }}" value="{{ i }}"
+                       {% if review_form.rating.value|stringformat:"s" == i|stringformat:"s" %}checked{% endif %}>
+                <label for="star{{ i }}" class="star-label" title="{{ i }} {% trans 'stars' %}" aria-label="{{ i }} {% trans 'stars' %}">★</label>
+              {% endfor %}
+            </div>
+            <small class="text-muted">{% trans "Select from 1 to 5 stars." %}</small>
+            {% for err in review_form.rating.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+
+          <!-- Texto de la reseña -->
+          <div class="mb-3">
+            {{ review_form.text.label_tag }}
+            <textarea name="{{ review_form.text.name }}" class="form-control rounded-3" rows="5" 
+                      placeholder="{% trans 'Share your experience with this product...' %}" required>{{ review_form.text.value|default:'' }}</textarea>
+            {% if review_form.text.help_text %}
+              <div class="form-text">{{ review_form.text.help_text }}</div>
+            {% endif %}
+            {% for err in review_form.text.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+          </div>
+
+          <button class="btn btn-success btn-lg rounded-pill px-4" type="submit">
+            <i class="fas fa-paper-plane me-2"></i>
+            {% trans "Submit review" %}
+          </button>
+        </form>
       </div>
-
-      <button class="btn btn-success" type="submit">{% trans "Submit review" %}</button>
-    </form>
-
-    <style>
-      .star-rating {
-        display: inline-flex;
-        flex-direction: row-reverse;
-        justify-content: flex-end;
-      }
-      
-      .star-input {
-        display: none;
-      }
-      
-      .star-label {
-        font-size: 2rem;
-        cursor: pointer;
-        color: #ddd;
-        transition: color 0.2s;
-      }
-      
-      .star-input:checked ~ .star-label,
-      .star-label:hover,
-      .star-label:hover ~ .star-label {
-        color: #ffc107;
-      }
-    </style>
+    </div>
   {% else %}
     {% if user.is_authenticated %}
-      <div class="alert alert-warning mt-2">
-        {% trans "You can only review products you have purchased." %}
+      <div class="alert alert-info border-0 rounded-4 mt-4 shadow-sm">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-info-circle fs-4 me-3"></i>
+          <div>
+            <strong>{% trans "Want to leave a review?" %}</strong>
+            <p class="mb-0 small">{% trans "You can only review products you have purchased." %}</p>
+          </div>
+        </div>
       </div>
     {% else %}
-      <div class="alert alert-info mt-2">
-        {% trans "Please sign in to leave a review." %}
+      <div class="alert alert-warning border-0 rounded-4 mt-4 shadow-sm">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-sign-in-alt fs-4 me-3"></i>
+          <div>
+            <strong>{% trans "Sign in to review" %}</strong>
+            <p class="mb-0 small">{% trans "Please sign in to leave a review." %}</p>
+          </div>
+        </div>
       </div>
     {% endif %}
   {% endif %}
 </div>
+
+<style>
+/* === Estilos HU19: Reseñas mejoradas === */
+
+/* Avatar circular */
+.avatar-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+/* Cards de reseñas con hover */
+.review-card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Sistema de rating con estrellas */
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.star-input {
+  display: none;
+}
+
+.star-label {
+  font-size: 2.5rem;
+  cursor: pointer;
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.star-label:hover {
+  transform: scale(1.1);
+}
+
+.star-input:checked ~ .star-label,
+.star-label:hover,
+.star-label:hover ~ .star-label {
+  color: #ffc107;
+}
+
+/* Bordes redondeados */
+.rounded-4 {
+  border-radius: 16px !important;
+}
+
+.rounded-3 {
+  border-radius: 12px !important;
+}
+
+/* Textarea mejorado */
+textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+
+textarea.form-control:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 0.25rem rgba(22, 163, 74, 0.15);
+}
+
+/* Botón con efecto */
+.btn-success {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+}
+
+/* Alertas personalizadas */
+.alert {
+  border-left: 4px solid;
+}
+
+.alert-info {
+  background-color: #f0f9ff;
+  border-left-color: #0ea5e9;
+  color: #0c4a6e;
+}
+
+.alert-warning {
+  background-color: #fffbeb;
+  border-left-color: #f59e0b;
+  color: #78350f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .avatar-circle {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .star-label {
+    font-size: 2rem;
+  }
+}
+</style>
 
 {% endblock %}
