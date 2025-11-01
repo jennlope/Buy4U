@@ -160,11 +160,14 @@ class ProductDetailView(View):
         has_half_star = (avg_rating - full_stars) >= 0.3  # Media estrella si decimal >= 0.3
         empty_stars = 5 - full_stars - (1 if has_half_star else 0)  # Resto vacías
 
+        # 🔴 IMPORTANTE: Convertir QuerySet a lista para asegurar que se evalúe
+        reviews_list = list(reviews_qs)
+        
         view_data = {
             "title": product.name + _(" - Buy4U"),
             "subtitle": product.name + _(" - Product information"),
             "product": product,
-            "reviews": reviews_qs,
+            "reviews": reviews_list,
             "can_review": can_review,
             "review_form": review_form,
             "sort": sort,
@@ -184,13 +187,16 @@ class CartView(View):
         # Extracting from the database the products available
         products = Product.objects.all()
 
-        # Get cart items from session
+        # Get cart items from session - USAR LA MISMA CLAVE
         cart_products = {}
-        cart_products_data = request.session.get("cart_product_data", {})
+        cart_product_data = request.session.get("cart_product_data", {})
 
-        for product_id, quantity in cart_products_data.items():
-            product = get_object_or_404(Product, id=int(product_id))
-            cart_products[product] = quantity
+        for product_id, quantity in cart_product_data.items():
+            try:
+                product = get_object_or_404(Product, id=int(product_id))
+                cart_products[product] = quantity
+            except:
+                continue
 
         # Data for the view
         view_data = {
@@ -204,22 +210,39 @@ class CartView(View):
         try:
             product = get_object_or_404(Product, pk=product_id)
             
+            # Verificar stock
+            if product.quantity <= 0:
+                messages.error(request, _("Este producto no está disponible"))
+                return redirect("shop")
+            
             # Incrementar contador de veces añadido
             Product.objects.filter(pk=product_id).update(times_added_to_cart=F('times_added_to_cart') + 1)
             
-            cart = request.session.get("cart", {})
+            # USAR LA MISMA CLAVE: cart_product_data
+            cart_product_data = request.session.get("cart_product_data", {})
             quantity = int(request.POST.get("quantity", 1))
             
-            if str(product_id) in cart:
-                cart[str(product_id)] += quantity
-            else:
-                cart[str(product_id)] = quantity
+            # Convertir product_id a string para consistencia
+            product_id_str = str(product_id)
             
-            request.session["cart"] = cart
-            messages.success(request, _("Producto añadido al carrito"))
-            return redirect("cart")
+            if product_id_str in cart_product_data:
+                cart_product_data[product_id_str] += quantity
+            else:
+                cart_product_data[product_id_str] = quantity
+            
+            # Guardar en sesión
+            request.session["cart_product_data"] = cart_product_data
+            request.session.modified = True  # Forzar guardado
+            
+            messages.success(request, _("Product added to cart successfully"))
+            return redirect("cart_index")
+            
+        except Product.DoesNotExist:
+            messages.error(request, _("Product not found"))
+            return redirect("shop")
         except Exception as e:
-            messages.error(request, _("Error al añadir producto"))
+            messages.error(request, _("Error adding product to cart"))
+            print(f"Error en CartView.post: {e}")  # Para debug
             return redirect("shop")
 
 class CartUpdateQuantityView(View):
@@ -1027,3 +1050,135 @@ class MostAddedToCartView(View):
         }
         
         return render(request, self.template_name, context)
+
+from django.http import JsonResponse
+from .ai_service import GeminiService
+from django.views.decorators.http import require_http_methods
+import json
+
+# HU18: Recomendación de precios con IA
+@staff_member_required
+@require_http_methods(["POST"])
+def recomendar_precio_producto(request):
+    """
+    Endpoint para recomendar precio usando Gemini AI
+    """
+    try:
+        data = json.loads(request.body)
+        nombre = data.get('nombre', '')
+        marca = data.get('marca', '')
+        tipo = data.get('tipo', '')
+        
+        if not nombre:
+            return JsonResponse({
+                "success": False,
+                "error": "El nombre del producto es requerido"
+            }, status=400)
+        
+        gemini_service = GeminiService()
+        resultado = gemini_service.recomendar_precio(nombre, marca, tipo)
+        
+        return JsonResponse(resultado)
+        
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        }, status=500)
+
+
+# HU17: Comparación de productos con IA
+@login_required
+@require_http_methods(["POST"])
+def comparar_productos_ia(request):
+    """
+    Compara dos productos usando IA
+    """
+    try:
+        data = json.loads(request.body)
+        producto1_id = data.get('producto1_id')
+        producto2_id = data.get('producto2_id')
+        
+        if not producto1_id or not producto2_id:
+            return JsonResponse({
+                "success": False,
+                "error": "Se requieren dos productos para comparar"
+            }, status=400)
+        
+        # Obtener productos
+        try:
+            p1 = Product.objects.get(id=producto1_id)
+            p2 = Product.objects.get(id=producto2_id)
+        except Product.DoesNotExist:
+            return JsonResponse({
+                "success": False,
+                "error": "Uno o ambos productos no existen"
+            }, status=404)
+        
+        # Preparar datos con calificaciones
+        from django.db.models import Avg, Count
+        
+        p1_reviews = p1.reviews.aggregate(avg=Avg('rating'), count=Count('id'))
+        p2_reviews = p2.reviews.aggregate(avg=Avg('rating'), count=Count('id'))
+        
+        producto1_data = {
+            'name': p1.name,
+            'brand': p1.brand,
+            'price': float(p1.price),
+            'type': p1.type,
+            'description': p1.description,
+            'warranty': p1.warranty,
+            'avg_rating': round(p1_reviews['avg'], 2) if p1_reviews['avg'] else 0,
+            'reviews_count': p1_reviews['count']
+        }
+        
+        producto2_data = {
+            'name': p2.name,
+            'brand': p2.brand,
+            'price': float(p2.price),
+            'type': p2.type,
+            'description': p2.description,
+            'warranty': p2.warranty,
+            'avg_rating': round(p2_reviews['avg'], 2) if p2_reviews['avg'] else 0,
+            'reviews_count': p2_reviews['count']
+        }
+        
+        gemini_service = GeminiService()
+        resultado = gemini_service.comparar_productos(producto1_data, producto2_data)
+        
+        # Agregar información básica de productos
+        if resultado['success']:
+            resultado['productos'] = {
+                'producto1': {
+                    'id': p1.id,
+                    'name': p1.name,
+                    'price': float(p1.price),
+                    'image': p1.image.url if p1.image else None
+                },
+                'producto2': {
+                    'id': p2.id,
+                    'name': p2.name,
+                    'price': float(p2.price),
+                    'image': p2.image.url if p2.image else None
+                }
+            }
+        
+        return JsonResponse(resultado)
+        
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        }, status=500)
+
+class CompararProductosView(TemplateView):
+    template_name = "pages/comparar_productos.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['products'] = Product.objects.filter(quantity__gt=0).order_by('name')
+        # Pre-seleccionar producto si viene en query params
+        context['preselected_product1'] = self.request.GET.get('producto1', '')
+        context['preselected_product2'] = self.request.GET.get('producto2', '')
+        
+        return context

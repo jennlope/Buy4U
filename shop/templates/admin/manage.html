@@ -43,10 +43,10 @@
 
         <div class="col-md-6">
           <label class="form-label small">Nombre</label>
-          <input type="text" name="name" class="form-control form-control-sm" required>
-
+          <input type="text" name="name" id="productName" class="form-control form-control-sm" required>
+          
           <label class="form-label small mt-2">Marca</label>
-          <input type="text" name="brand" class="form-control form-control-sm" required>
+          <input type="text" name="brand" id="productBrand" class="form-control form-control-sm" required>
 
           <label class="form-label small mt-2">Cantidad</label>
           <input type="number" name="quantity" class="form-control form-control-sm" required>
@@ -54,13 +54,25 @@
 
         <div class="col-md-6">
           <label class="form-label small">Precio</label>
-          <input type="number" name="price" class="form-control form-control-sm" step="0.01" required>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" name="price" id="productPrice" class="form-control form-control-sm" step="0.01" required>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btnRecomendarPrecio">
+              <i class="fas fa-robot"></i> Recomendar
+            </button>
+          </div>
+          <div id="precioRecomendacion" class="mt-2 d-none">
+            <div class="alert alert-info alert-sm py-2 px-3">
+              <strong>💡 Recomendación IA:</strong>
+              <div id="precioRecomendadoTexto"></div>
+            </div>
+          </div>
 
           <label class="form-label small mt-2">Garantía</label>
           <input type="text" name="warranty" class="form-control form-control-sm">
 
           <label class="form-label small mt-2">Tipo</label>
-          <input type="text" name="type" class="form-control form-control-sm">
+          <input type="text" name="type" id="productType" class="form-control form-control-sm">
         </div>
 
         <div class="col-12">
@@ -216,6 +228,57 @@ document.getElementById('searchInput')?.addEventListener('input', function(e){
     const text = card.innerText.toLowerCase();
     card.parentElement.style.display = text.includes(q) ? '' : 'none';
   });
+});
+
+// Recomendación de precio con IA
+document.getElementById('btnRecomendarPrecio')?.addEventListener('click', async function() {
+  const nombre = document.getElementById('productName').value;
+  const marca = document.getElementById('productBrand').value;
+  const tipo = document.getElementById('productType').value;
+  
+  if (!nombre) {
+    alert('Por favor ingresa el nombre del producto primero');
+    return;
+  }
+  
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Consultando...';
+  
+  try {
+    const response = await fetch('/api/ia/recomendar-precio/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({ nombre, marca, tipo })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      const recomendacion = data.data;
+      document.getElementById('productPrice').value = recomendacion.precio_recomendado.toFixed(2);
+      
+      document.getElementById('precioRecomendadoTexto').innerHTML = `
+        <div class="small">
+          <strong>Precio sugerido:</strong> $${recomendacion.precio_recomendado.toFixed(2)}<br>
+          <strong>Rango:</strong> $${recomendacion.precio_minimo.toFixed(2)} - $${recomendacion.precio_maximo.toFixed(2)}<br>
+          <strong>Confianza:</strong> ${recomendacion.confianza}<br>
+          <em>${recomendacion.justificacion}</em>
+        </div>
+      `;
+      document.getElementById('precioRecomendacion').classList.remove('d-none');
+    } else {
+      alert('Error: ' + data.error);
+    }
+  } catch (err) {
+    alert('Error al consultar recomendación: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-robot"></i> Recomendar';
+  }
 });
 </script>
 
