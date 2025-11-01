@@ -28,6 +28,7 @@ factory_boy==3.3.3
 Faker==35.2.0
 fonttools==4.56.0
 frozenlist==1.5.0
+google-generativeai==0.8.3
 grpclib==0.4.7
 h11==0.14.0
 h2==4.2.0

@@ -6,6 +6,7 @@ from .views import (CartRemoveView, CartUpdateQuantityView, CartView,
 from .views import ReportsOverviewView, reports_data_json, reports_top_json, export_reports_csv, GenerarReporteView
 from .views import MostAddedToCartView
 from django.views.generic import TemplateView
+from .views import recomendar_precio_producto, comparar_productos_ia, CompararProductosView
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
@@ -22,14 +23,8 @@ urlpatterns = [
     path("admin_product/", admin_product_view.as_view(), name="admin_dashboard"),
         # Ruta adicional que acepta sin slash (para evitar 301 en tests que piden /admin_product)
     re_path(r'^admin_product/?$', admin_product_view.as_view(), name='admin_product_noslash'),
-    path(
-        "admin_product/generar_reporte/<str:tipo>/",
-        GenerarReporteView.as_view(),
-        name="generar_reporte",
-    ),
-    path(
-        "productos-aliados/", ProductosAliadosView.as_view(), name="productos_aliados"
-    ),
+    path("admin_product/generar_reporte/<str:tipo>/",GenerarReporteView.as_view(), name="generar_reporte"),
+    path("productos-aliados/", ProductosAliadosView.as_view(), name="productos_aliados"),
 ]
 
 urlpatterns += [
@@ -44,4 +39,8 @@ urlpatterns += [
     path('admin/reports/export/', GenerarReporteView.as_view(), name='admin_reports_export'),
     path("admin/browsing-history-ui/", TemplateView.as_view(template_name="admin/browsing_history.html"), name="admin_browsing_history_ui"),
     path("admin/most-added-to-cart/", MostAddedToCartView.as_view(), name="most_added_to_cart"),
+    # IA endpoints
+    path('api/ia/recomendar-precio/', recomendar_precio_producto, name='ia_recomendar_precio'),
+    path('api/ia/comparar-productos/', comparar_productos_ia, name='ia_comparar_productos'),
+    path('comparar-productos/', CompararProductosView.as_view(), name='comparar_productos'),
 ]

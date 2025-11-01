@@ -49,6 +49,11 @@
         </button>
       </form>
 
+      <!-- Después del botón "Add to Cart", agrega: -->
+      <a href="{% url 'comparar_productos' %}?producto1={{ product.id }}" class="btn btn-outline-primary fw-bold fs-5 w-100 mt-2">
+          <i class="fas fa-balance-scale"></i> {% trans "Compare with other products" %}
+      </a>
+
       <a href="#reviews" class="btn btn-outline-success fw-bold fs-5 w-100">{% trans "Read reviews" %}</a>
     </div>
   </div>
@@ -120,10 +125,24 @@
               <div class="d-flex align-items-center gap-3">
                 <!-- Avatar -->
                 <div class="avatar-circle">
-                  {{ r.user.username|first|upper }}
+                  {% if r.user %}
+                    {{ r.user.username|first|upper }}
+                  {% elif r.user_name %}
+                    {{ r.user_name|first|upper }}
+                  {% else %}
+                    ?
+                  {% endif %}
                 </div>
                 <div>
-                  <h6 class="mb-0 fw-bold">{{ r.user.username }}</h6>
+                  <h6 class="mb-0 fw-bold">
+                    {% if r.user_name %}
+                      {{ r.user_name }}
+                    {% elif r.user %}
+                      {{ r.user.username }}
+                    {% else %}
+                      {% trans "Anonymous" %}
+                    {% endif %}
+                  </h6>
                   <small class="text-muted">
                     <i class="far fa-calendar-alt me-1"></i>
                     {{ r.created_at|date:"d M Y" }}
@@ -140,7 +159,11 @@
             </div>
 
             <!-- Contenido de la reseña -->
-            <p class="mb-3 text-dark" style="line-height: 1.7;">{{ r.text|linebreaksbr }}</p>
+            {% if r.comment %}
+              <p class="mb-3 text-dark" style="line-height: 1.7;">{{ r.comment|linebreaksbr }}</p>
+            {% else %}
+              <p class="mb-3 text-muted fst-italic">{% trans "No comment provided" %}</p>
+            {% endif %}
 
             <!-- Footer con botón útil -->
             <div class="d-flex justify-content-between align-items-center pt-2">
@@ -204,15 +227,17 @@
             {% for err in review_form.rating.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
 
-          <!-- Texto de la reseña -->
+          <!-- Texto de la reseña - CAMBIAR 'text' a 'comment' -->
           <div class="mb-3">
-            {{ review_form.text.label_tag }}
-            <textarea name="{{ review_form.text.name }}" class="form-control rounded-3" rows="5" 
-                      placeholder="{% trans 'Share your experience with this product...' %}" required>{{ review_form.text.value|default:'' }}</textarea>
-            {% if review_form.text.help_text %}
-              <div class="form-text">{{ review_form.text.help_text }}</div>
+            <label for="id_comment" class="form-label fw-semibold">
+              <strong>{% trans "Your review" %}</strong>
+            </label>
+            <textarea name="comment" id="id_comment" class="form-control rounded-3" rows="5" 
+                      placeholder="{% trans 'Share your experience with this product...' %}" required>{% if review_form.comment.value %}{{ review_form.comment.value }}{% endif %}</textarea>
+            {% if review_form.comment.help_text %}
+              <div class="form-text">{{ review_form.comment.help_text }}</div>
             {% endif %}
-            {% for err in review_form.text.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+            {% for err in review_form.comment.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
 
           <button class="btn btn-success btn-lg rounded-pill px-4" type="submit">
