@@ -1,6 +1,7 @@
 import requests
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView, TemplateView
-from django.db.models import Avg, Count 
+from django.db.models import Avg, Count, F
 from services.reviews_app.forms import ReviewForm
 from services.reviews_app.utils import user_purchased_product
 from services.browsing_app.models import BrowsingHistory
@@ -200,21 +201,26 @@ class CartView(View):
         return render(request, self.template_name, view_data)
 
     def post(self, request, product_id):
-        if not request.user.is_authenticated:
-            return redirect("login")
-
-        cart_product_data = request.session.get("cart_product_data", {})
-
-        quantity = int(request.POST.get("quantity", 1))
-
-        if str(product_id) in cart_product_data:
-            cart_product_data[str(product_id)] += quantity
-        else:
-            cart_product_data[str(product_id)] = quantity
-
-        request.session["cart_product_data"] = cart_product_data
-        return redirect("cart_index")
-
+        try:
+            product = get_object_or_404(Product, pk=product_id)
+            
+            # Incrementar contador de veces añadido
+            Product.objects.filter(pk=product_id).update(times_added_to_cart=F('times_added_to_cart') + 1)
+            
+            cart = request.session.get("cart", {})
+            quantity = int(request.POST.get("quantity", 1))
+            
+            if str(product_id) in cart:
+                cart[str(product_id)] += quantity
+            else:
+                cart[str(product_id)] = quantity
+            
+            request.session["cart"] = cart
+            messages.success(request, _("Producto añadido al carrito"))
+            return redirect("cart")
+        except Exception as e:
+            messages.error(request, _("Error al añadir producto"))
+            return redirect("shop")
 
 class CartUpdateQuantityView(View):
     def post(self, request, product_id):
@@ -990,3 +996,34 @@ class GenerarReporteView(View):
             'top_views': list(top_views),
             'top_bought': list(top_bought),
         })
+
+@method_decorator(staff_member_required, name='dispatch')
+class MostAddedToCartView(View):
+    """HU15: Productos más añadidos al carrito"""
+    template_name = "admin/most_added_to_cart.html"
+    
+    def get(self, request):
+        # Obtener productos ordenados por veces añadidos
+        products = Product.objects.filter(
+            times_added_to_cart__gt=0
+        ).order_by('-times_added_to_cart')[:20]
+        
+        # Calcular porcentaje del más añadido
+        max_count = products.first().times_added_to_cart if products else 1
+        
+        products_data = []
+        for product in products:
+            percentage = (product.times_added_to_cart / max_count * 100) if max_count > 0 else 0
+            products_data.append({
+                'product': product,
+                'count': product.times_added_to_cart,
+                'percentage': percentage
+            })
+        
+        context = {
+            'title': _('Productos más añadidos al carrito'),
+            'products_data': products_data,
+            'total_products': products.count()
+        }
+        
+        return render(request, self.template_name, context)

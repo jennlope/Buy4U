@@ -4,6 +4,7 @@ from .views import (CartRemoveView, CartUpdateQuantityView, CartView,
                     GenerarReporteView, HomePageView, ProductDetailView,
                     ProductosAliadosView, ShopView, admin_product_view)
 from .views import ReportsOverviewView, reports_data_json, reports_top_json, export_reports_csv, GenerarReporteView
+from .views import MostAddedToCartView
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -42,6 +43,5 @@ urlpatterns += [
     path("admin/reports/top-products/data/", views.top_products_json, name="admin_top_products_json"),
     path('admin/reports/export/', GenerarReporteView.as_view(), name='admin_reports_export'),
     path("admin/browsing-history-ui/", TemplateView.as_view(template_name="admin/browsing_history.html"), name="admin_browsing_history_ui"),
-
-
+    path("admin/most-added-to-cart/", MostAddedToCartView.as_view(), name="most_added_to_cart"),
 ]

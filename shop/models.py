@@ -12,6 +12,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products/", null=True, blank=True)
     quantity = models.IntegerField(default=0)
     type = models.CharField(max_length=255, default="Electrónico")
+    times_added_to_cart = models.PositiveIntegerField(default=0, verbose_name=_("Veces añadido al carrito"))
 
     def __str__(self):
         return self.name
