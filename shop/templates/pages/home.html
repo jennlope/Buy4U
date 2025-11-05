@@ -8,9 +8,9 @@
         <div class="w-100 pt-1 mb-5 text-right">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
         </div>
-        <form action="" method="get" class="modal-content modal-body border-0 p-0">
+        <form action="{% url 'shop' %}" method="get" class="modal-content modal-body border-0 p-0">
             <div class="input-group mb-2">
-                <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="{% trans 'Search ...' %}">
+                <input type="text" class="form-control" id="inputModalSearch" name="search" placeholder="{% trans 'Search products...' %}">
                 <button type="submit" class="input-group-text bg-success text-light">
                     <i class="fa fa-fw fa-search text-white"></i>
                 </button>
@@ -19,6 +19,7 @@
     </div>
 </div>
 
+<!-- Hero Carousel -->
 <div id="template-mo-zay-hero-carousel" class="carousel slide" data-bs-ride="carousel">
     <ol class="carousel-indicators">
         <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="0" class="active"></li>
@@ -34,11 +35,12 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left align-self-center">
-                            <h1 class="h1 text-success"><b>Buy4U</b> {% trans 'eCommerce' %}</h1>
+                            <h1 class="h1 text-success"><b>Buy4U</b> eCommerce</h1>
                             <h3 class="h2">{% trans 'Buy quickly and safely' %}</h3>
                             <p>
-                                {% trans 'Buy4U It is an eCommerce web platform focused on the sale of electronic devices, offering an easy, fast, and secure shopping experience.' %}
+                                Buy4U is an eCommerce web platform focused on the sale of electronic devices, offering an easy, fast, and secure shopping experience.
                             </p>
+                            <a href="{% url 'shop' %}" class="btn btn-success btn-lg">Go Shop</a>
                         </div>
                     </div>
                 </div>
@@ -52,8 +54,16 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left">
-                            <h1 class="h1">{% trans 'iPhone 16' %}</h1>
+                            <h1 class="h1">
+                                {% if smartphone_count %}
+                                    Latest Smartphones ({{ smartphone_count }})
+                                {% else %}
+                                    Latest Smartphones
+                                {% endif %}
+                            </h1>
                             <h3 class="h2">{% trans 'Innovation and Power at its Best' %}</h3>
+                            <p>Discover the newest smartphone models with cutting-edge technology and amazing features.</p>
+                            <a href="{% url 'shop' %}?type=Smartphones" class="btn btn-success btn-lg">Go Shop</a>
                         </div>
                     </div>
                 </div>
@@ -67,8 +77,16 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left">
-                            <h1 class="h1">{% trans 'Nokia 3310' %}</h1>
-                            <h3 class="h2">{% trans 'The Indestructible Classic' %}</h3>
+                            <h1 class="h1">
+                                {% if product_count %}
+                                    From the Latest Collection ({{ product_count }} Items)
+                                {% else %}
+                                    From the Latest Collection
+                                {% endif %}
+                            </h1>
+                            <h3 class="h2">{% trans 'Classic & Modern' %}</h3>
+                            <p>From legendary classics to the latest models, find the perfect device for you.</p>
+                            <a href="{% url 'shop' %}" class="btn btn-success btn-lg">Go Shop</a>
                         </div>
                     </div>
                 </div>
@@ -84,119 +102,77 @@
 </div>
 
 
-<section class="container py-5">
-    <div class="row text-center pt-3">
-        <div class="col-lg-6 m-auto">
-            <h1 class="h1">{% trans 'Categories of The Month' %}</h1>
-            <p>
-                {% trans 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.' %}
-            </p>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-md-4 p-5 mt-3">
-            <a href="{% url 'shop' %}"><img src="{% static 'img/smartphone.png' %}" class="rounded-circle img-fluid border"></a>
-            <h5 class="text-center mt-3 mb-3">{% trans 'Smartphones' %}</h5>
-            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">{% trans 'Go Shop' %}</a></p>
-        </div>
-        <div class="col-12 col-md-4 p-5 mt-3">
-            <a href="{% url 'shop' %}"><img src="{% static 'img/laptop_cm.png' %}" class="rounded-circle img-fluid border"></a>
-            <h2 class="h5 text-center mt-3 mb-3">{% trans 'Laptops' %}</h2>
-            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">{% trans 'Go Shop' %}</a></p>
-        </div>
-        <div class="col-12 col-md-4 p-5 mt-3">
-            <a href="{% url 'shop' %}"><img src="{% static 'img/tablet_cm.png' %}" class="rounded-circle img-fluid border"></a>
-            <h2 class="h5 text-center mt-3 mb-3">{% trans 'Tablets' %}</h2>
-            <p class="text-center"><a class="btn btn-success" href="{% url 'shop' %}">{% trans 'Go Shop' %}</a></p>
-        </div>
-    </div>
-</section>
-
-
+<!-- Featured Products -->
 <section class="bg-light">
     <div class="container py-5">
         <div class="row text-center py-3">
             <div class="col-lg-6 m-auto">
-                <h1 class="h1">{% trans 'Featured Product' %}</h1>
-                <p>
-                    {% trans 'Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.' %}
-                </p>
+                <h1 class="h1">{% trans 'Featured Products' %}</h1>
             </div>
         </div>
         <div class="row">
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                    <a href="{% url 'shop' %}">
-                        <img src="/media/products/laptop.jpg" class="card-img-top" alt="...">
-                    </a>
+            {% for product in featured_products %}
+            <div class="col-12 col-md-4 p-5">
+                <div class="card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: contain; padding: 20px; background: #f8f9fa;">
+                    {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
                     <div class="card-body">
-                        <ul class="list-unstyled d-flex justify-content-between">
-                            <li>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
+                        <ul class="list-unstyled d-flex justify-content-between mb-0">
+                            <li class="d-flex align-items-center">
+                                <!-- ESTRELLAS CON MEDIA ESTRELLA -->
+                                <div style="font-size: 1.25rem; color: #ffc107; letter-spacing: 2px;">
+                                    {% if product.avg_rating %}
+                                        {% with rating=product.avg_rating %}
+                                            <!-- Estrella 1 -->
+                                            {% if rating >= 1 %}<span>★</span>{% elif rating >= 0.5 %}<span>⯨</span>{% else %}<span style="color: #e5e7eb;">☆</span>{% endif %}
+                                            <!-- Estrella 2 -->
+                                            {% if rating >= 2 %}<span>★</span>{% elif rating >= 1.5 %}<span>⯨</span>{% else %}<span style="color: #e5e7eb;">☆</span>{% endif %}
+                                            <!-- Estrella 3 -->
+                                            {% if rating >= 3 %}<span>★</span>{% elif rating >= 2.5 %}<span>⯨</span>{% else %}<span style="color: #e5e7eb;">☆</span>{% endif %}
+                                            <!-- Estrella 4 -->
+                                            {% if rating >= 4 %}<span>★</span>{% elif rating >= 3.5 %}<span>⯨</span>{% else %}<span style="color: #e5e7eb;">☆</span>{% endif %}
+                                            <!-- Estrella 5 -->
+                                            {% if rating >= 5 %}<span>★</span>{% elif rating >= 4.5 %}<span>⯨</span>{% else %}<span style="color: #e5e7eb;">☆</span>{% endif %}
+                                        {% endwith %}
+                                    {% else %}
+                                        <span style="color: #e5e7eb;">☆☆☆☆☆</span>
+                                    {% endif %}
+                                </div>
+                                <span class="ms-2 fw-bold" style="color: #16a34a;">{{ product.avg_rating|default:0|floatformat:1 }}/5</span>
                             </li>
-                            <li class="text-muted text-right">$1299.00</li>
+                            <li class="text-muted text-right">
+                                <span class="fw-bold text-success">${{ product.price|floatformat:2 }}</span>
+                            </li>
                         </ul>
-                        <a href="" class="h2 text-decoration-none text-dark">{% trans 'Laptop' %}</a>
+                        <a href="{% url 'product_detail' product.id %}" class="h2 text-decoration-none text-dark">
+                            {{ product.name }}
+                        </a>
                         <p class="card-text">
-                            {% trans 'A powerful laptop for professionals.' %}
+                            {{ product.description|truncatewords:15 }}
                         </p>
-                        <p class="text-muted">{% trans 'Reviews (24)' %}</p>
+                        <p class="text-muted">
+                            {% if product.reviews_count > 0 %}
+                                <i class="fas fa-comment-dots text-success me-1"></i>Reviews ({{ product.reviews_count }})
+                            {% else %}
+                                <i class="fas fa-comment-slash text-muted me-1"></i>No reviews yet
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                    <a href="{% url 'shop' %}">
-                        <img src="/media/products/smartphone.jpg" class="card-img-top" alt="...">
-                    </a>
-                    <div class="card-body">
-                        <ul class="list-unstyled d-flex justify-content-between">
-                            <li>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-muted fa fa-star"></i>
-                            </li>
-                            <li class="text-muted text-right">$599.99</li>
-                        </ul>
-                        <a href="{% url 'shop' %}" class="h2 text-decoration-none text-dark">{% trans 'Smartphone' %}</a>
-                        <p class="card-text">
-                            {% trans 'A high-end smartphone with great features.' %}
-                        </p>
-                        <p class="text-muted">{% trans 'Reviews (48)' %}</p>
-                    </div>
-                </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No featured products available at the moment</p>
+                <a href="{% url 'shop' %}" class="btn btn-success">Browse Products</a>
             </div>
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                    <a href="#">
-                        <img src="/media/products/tablet.jpg" class="card-img-top" alt="...">
-                    </a>
-                    <div class="card-body">
-                        <ul class="list-unstyled d-flex justify-content-between">
-                            <li>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-warning fa fa-star"></i>
-                                <i class="text-muted fa fa-star"></i>
-                            </li>
-                            <li class="text-muted text-right">$799.99</li>
-                        </ul>
-                        <a href="#" class="h2 text-decoration-none text-dark">{% trans 'Tablet pro' %}</a>
-                        <p class="card-text">
-                            {% trans 'A perfect tablet for creatives and professionals, with a Retina display and compatible Apple Pencil.' %}
-                        </p>
-                        <p class="text-muted">{% trans 'Reviews (74)' %}</p>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
+
 {% endblock %}

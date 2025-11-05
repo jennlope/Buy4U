@@ -3,21 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Buy4U v1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-16 06:38-0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2025-11-05 10:00-0500\n"
+"PO-Revision-Date: 2025-11-05 10:00-0500\n"
+"Last-Translator: Buy4U Team\n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
-"1 : 2;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: .\accounts\templates\login.html:10
 msgid "Usuario"
@@ -72,10 +70,8 @@ msgid "Username OR password is incorrect"
 msgstr "El nombre de usuario o la contraseña son incorrectos"
 
 #: .\accounts\views.py:49
-#, fuzzy
-#| msgid "Login - Online Store"
 msgid "Register - Online Store"
-msgstr "Iniciar sesión - Tienda en línea"
+msgstr "Registrarse - Tienda en línea"
 
 #: .\accounts\views.py:58
 #, python-format
@@ -149,11 +145,11 @@ msgstr "Continuar comprando"
 
 #: .\orders\templates\pages\payment_gateway.html:7
 msgid "Basic Payment Gateway"
-msgstr "Pasarela de pago básica"
+msgstr "Pasarela de pago"
 
 #: .\orders\templates\pages\payment_gateway.html:8
 msgid "Think carefully about whether you really want these products, bro."
-msgstr "Piensa bien si realmente quieres estos productos, amigo."
+msgstr "Piensa bien si realmente quieres estos productos."
 
 #: .\orders\templates\pages\payment_gateway.html:16
 msgid "Product"
@@ -213,7 +209,7 @@ msgid ""
 "one, bro."
 msgstr ""
 "¿Cómo llegaste aquí? De todos modos, tu ID de pedido no es válido. Intenta "
-"con otro, amigo."
+"con otro."
 
 #: .\shop\models.py:6 .\shop\templates\pages\product_detail.html:21
 #: .\shop\views.py:32
@@ -226,7 +222,7 @@ msgstr "Descripción"
 
 #: .\shop\templates\pages\base.html:8
 msgid "Buy4U eCommerce"
-msgstr "Buy4U Comercio Electrónico"
+msgstr "Buy4U - Tienda Electrónica"
 
 #: .\shop\templates\pages\base.html:27
 msgid "Weather icon"
@@ -258,11 +254,15 @@ msgstr "Órdenes"
 
 #: .\shop\templates\pages\base.html:65
 msgid "Cart"
-msgstr ""
+msgstr "Carrito"
 
 #: .\shop\templates\pages\base.html:72
 msgid "Logout"
 msgstr "Cerrar sesión"
+
+#: .\shop\templates\pages\base.html:77
+msgid "Purchase history"
+msgstr "Historial de compras"
 
 #: .\shop\templates\pages\base.html:83
 msgid "Register"
@@ -271,6 +271,11 @@ msgstr "Registrarse"
 #: .\shop\templates\pages\base.html:91
 msgid "Administrator"
 msgstr "Administrador"
+
+#: .\shop\templates\pages\base.html:97
+msgid "Compare Products"
+msgstr "Comparar productos"
+
 
 #: .\shop\templates\pages\base.html:107 .\shop\templates\pages\home.html:13
 msgid "Search ..."
@@ -286,7 +291,7 @@ msgstr "Tienda Buy4U"
 
 #: .\shop\templates\pages\base.html:143
 msgid "123 Consectetur at ligula 10660"
-msgstr "123 Consectetur en Ligula 10660"
+msgstr "Calle 123, Medellín, Colombia"
 
 #: .\shop\templates\pages\base.html:150
 msgid "Products"
@@ -329,145 +334,37 @@ msgid ""
 "Buy4U It is an eCommerce web platform focused on the sale of electronic "
 "devices, offering an easy, fast, and secure shopping experience."
 msgstr ""
-"Buy4U es un comercio electrónico, una plataforma web enfocada en la venta de "
+"Buy4U es una plataforma web de comercio electrónico enfocada en la venta de "
 "dispositivos electrónicos, ofreciendo una experiencia de compra fácil, "
 "rápida y segura."
 
 #: .\shop\templates\pages\home.html:55
-msgid "iPhone 16"
-msgstr "iPhone 16"
-
-#: .\shop\templates\pages\home.html:56
 msgid "Innovation and Power at its Best"
 msgstr "Innovación y potencia en su máxima expresión"
 
+#: .\shop\templates\pages\home.html:56
+msgid "Latest Smartphones"
+msgstr "Últimos Teléfonos Inteligentes"
+
 #: .\shop\templates\pages\home.html:70
-msgid "Nokia 3310"
-msgstr "Nokia 3310"
+msgid "From the Latest Collection"
+msgstr "De la Colección Más Reciente"
 
 #: .\shop\templates\pages\home.html:71
-msgid "The Indestructible Classic"
-msgstr "El clásico indestructible"
+msgid "Classic & Modern"
+msgstr "Clásico y Moderno"
 
 #: .\shop\templates\pages\home.html:90
-msgid "Categories of The Month"
-msgstr "Categorías del mes"
+msgid "Featured Products"
+msgstr "Productos Destacados"
 
 #: .\shop\templates\pages\home.html:92
 msgid ""
-"Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
-"deserunt mollit anim id est laborum."
+"Discover our most popular and best-rated products chosen by our customers. "
+"These items are constantly updated based on demand."
 msgstr ""
-"Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
-"deserunt mollit anim id est laborum."
-
-#: .\shop\templates\pages\home.html:99
-msgid "Smartphones"
-msgstr "Teléfonos inteligentes"
-
-#: .\shop\templates\pages\home.html:100 .\shop\templates\pages\home.html:105
-#: .\shop\templates\pages\home.html:110
-msgid "Go Shop"
-msgstr "Ir a la tienda"
-
-#: .\shop\templates\pages\home.html:104
-msgid "Laptops"
-msgstr "Portátiles"
-
-#: .\shop\templates\pages\home.html:109
-msgid "Tablets"
-msgstr "Tabletas"
-
-#: .\shop\templates\pages\home.html:120
-msgid "Featured Product"
-msgstr "Producto destacado"
-
-#: .\shop\templates\pages\home.html:122
-msgid ""
-"Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
-"pariatur. Excepteur sint occaecat cupidatat non proident."
-msgstr ""
-"Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
-"pariatur. Excepteur sint occaecat cupidatat non proident."
-
-#: .\shop\templates\pages\home.html:143
-msgid "Laptop"
-msgstr "Portátil"
-
-#: .\shop\templates\pages\home.html:145
-msgid "A powerful laptop for professionals."
-msgstr "Un portátil potente para profesionales."
-
-#: .\shop\templates\pages\home.html:147
-msgid "Reviews (24)"
-msgstr "Reseñas (24)"
-
-#: .\shop\templates\pages\home.html:167
-msgid "Smartphone"
-msgstr "Teléfono inteligente"
-
-#: .\shop\templates\pages\home.html:169
-msgid "A high-end smartphone with great features."
-msgstr "Un teléfono inteligente de alta gama con excelentes características."
-
-#: .\shop\templates\pages\home.html:171
-msgid "Reviews (48)"
-msgstr "Reseñas (48)"
-
-#: .\shop\templates\pages\home.html:191
-msgid "Tablet pro"
-msgstr "Tablet Pro"
-
-#: .\shop\templates\pages\home.html:193
-msgid ""
-"A perfect tablet for creatives and professionals, with a Retina display and "
-"compatible Apple Pencil."
-msgstr ""
-"Una tablet perfecta para creativos y profesionales, con pantalla Retina y "
-"compatible con Apple Pencil."
-
-#: .\shop\templates\pages\home.html:195
-msgid "Reviews (74)"
-msgstr "Reseñas (74)"
-
-#: .\shop\templates\pages\product_detail.html:23
-#: .\shop\templates\pages\productos_aliados.html:24 .\shop\views.py:35
-msgid "Brand"
-msgstr "Marca"
-
-#: .\shop\templates\pages\product_detail.html:24
-#: .\shop\templates\pages\productos_aliados.html:25
-msgid "Warranty"
-msgstr "Garantía"
-
-#: .\shop\templates\pages\product_detail.html:26
-#: .\shop\templates\pages\productos_aliados.html:26 .\shop\views.py:38
-msgid "Type"
-msgstr "Tipo"
-
-#: .\shop\templates\pages\productos_aliados.html:9
-#, fuzzy
-#| msgid "Products"
-msgid "Allied Products"
-msgstr "Productos aliados"
-
-#: .\shop\templates\pages\productos_aliados.html:10
-msgid "Discover high-quality products from our partner providers."
-msgstr "Descubra productos de alta calidad de nuestros proveedores asociados."
-
-#: .\shop\templates\pages\productos_aliados.html:28
-msgid "Available quantity:"
-msgstr "Cantidad disponible"
-
-#: .\shop\templates\pages\productos_aliados.html:32
-#, fuzzy
-#| msgid "Shop"
-msgid "Shop Now"
-msgstr "Tienda"
-
-#: .\shop\templates\pages\productos_aliados.html:40
-msgid "No allied products found."
-msgstr "Ningún producto aliado encontrado"
+"Descubre nuestros productos más populares y mejor calificados elegidos por "
+"nuestros clientes. Estos artículos se actualizan constantemente según la demanda."
 
 #: .\shop\templates\pages\shop.html:33
 msgid "Search"
@@ -488,6 +385,65 @@ msgstr "Agregar al carrito"
 #: .\shop\templates\pages\shop.html:76
 msgid "No products available."
 msgstr "No hay productos disponibles."
+
+#: .\shop\templates\pages\shop.html:100
+msgid "Filter by price"
+msgstr "Filtrar por precio"
+
+#: .\shop\templates\pages\shop.html:110
+msgid "Filter by category"
+msgstr "Filtrar por categoría"
+
+#: .\shop\templates\pages\product_detail.html:23
+#: .\shop\templates\pages\productos_aliados.html:24 .\shop\views.py:35
+msgid "Brand"
+msgstr "Marca"
+
+#: .\shop\templates\pages\product_detail.html:24
+#: .\shop\templates\pages\productos_aliados.html:25
+msgid "Warranty"
+msgstr "Garantía"
+
+#: .\shop\templates\pages\product_detail.html:26
+#: .\shop\templates\pages\productos_aliados.html:26 .\shop\views.py:38
+msgid "Type"
+msgstr "Tipo"
+
+#: .\shop\templates\pages\product_detail.html:30
+msgid "Stock Available"
+msgstr "Stock disponible"
+
+#: .\shop\templates\pages\product_detail.html:35
+msgid "Add to cart"
+msgstr "Añadir al carrito"
+
+#: .\shop\templates\pages\product_detail.html:40
+msgid "Customer Reviews"
+msgstr "Reseñas de clientes"
+
+#: .\shop\templates\pages\product_detail.html:45
+msgid "No reviews yet. Be the first to review this product!"
+msgstr "Sin reseñas aún. ¡Sé el primero en reseñar este producto!"
+
+#: .\shop\templates\pages\productos_aliados.html:9
+msgid "Allied Products"
+msgstr "Productos Aliados"
+
+#: .\shop\templates\pages\productos_aliados.html:10
+msgid "Discover high-quality products from our partner providers."
+msgstr "Descubra productos de alta calidad de nuestros proveedores asociados."
+
+#: .\shop\templates\pages\productos_aliados.html:28
+msgid "Available quantity:"
+msgstr "Cantidad disponible:"
+
+#: .\shop\templates\pages\productos_aliados.html:32
+msgid "Shop Now"
+msgstr "Comprar ahora"
+
+#: .\shop\templates\pages\productos_aliados.html:40
+msgid "No allied products found."
+msgstr "Ningún producto aliado encontrado."
 
 #: .\shop\views.py:32
 msgid "Search product"
@@ -551,7 +507,7 @@ msgstr "Gestionar productos"
 
 #: .\shop\views.py:232
 msgid "Medellin,CO"
-msgstr "Medellín,CO"
+msgstr "Medellín, CO"
 
 #: .\shop\views.py:251
 msgid "Clear sky"
@@ -567,7 +523,7 @@ msgstr "Nubes dispersas"
 
 #: .\shop\views.py:254
 msgid "Broken clouds"
-msgstr "Nubes rotas"
+msgstr "Cielo nublado"
 
 #: .\shop\views.py:255
 msgid "Shower rain"
@@ -594,21 +550,185 @@ msgid "Drizzle"
 msgstr "Llovizna"
 
 #: .\shop\views.py:261
-#, fuzzy
-#| msgid "Scattered clouds"
 msgid "Overcast clouds"
-msgstr "Nubes dispersas"
+msgstr "Nublado"
 
 #: .\shop\views.py:275
 msgid "Unavailable"
 msgstr "No disponible"
 
 #: .\shop\views.py:290
-#, fuzzy
-#| msgid "The products could not be loaded {e}"
 msgid "The products could not be loaded"
 msgstr "Los productos no pudieron ser cargados"
 
 #: .\shop\views.py:304
 msgid "Invalid report type"
 msgstr "Tipo de informe no válido"
+
+#: .\shop\views.py:250
+msgid "Order History"
+msgstr "Historial de órdenes"
+
+#: .\shop\views.py:251
+msgid "View your past orders and their status."
+msgstr "Ver tus órdenes anteriores y su estado."
+
+#: .\shop\views.html:1
+msgid "Go Shop"
+msgstr "Ir a la tienda"
+
+#: .\shop\templates\pages\home.html:99
+msgid "Smartphones"
+msgstr "Teléfonos inteligentes"
+
+#: .\shop\templates\pages\home.html:104
+msgid "Laptops"
+msgstr "Portátiles"
+
+#: .\shop\templates\pages\home.html:109
+msgid "Tablets"
+msgstr "Tabletas"
+
+#: messages
+msgid "No reviews yet"
+msgstr "Sin reseñas aún"
+
+#: messages
+msgid "Compare Products"
+msgstr "Comparar productos"
+
+#: messages
+msgid "Add to Favorites"
+msgstr "Agregar a favoritos"
+
+#: messages
+msgid "In Stock"
+msgstr "En stock"
+
+#: messages
+msgid "Out of Stock"
+msgstr "Agotado"
+
+#: messages
+msgid "Rating"
+msgstr "Calificación"
+
+#: messages
+msgid "Reviews"
+msgstr "Reseñas"
+
+#: messages
+msgid "Average Rating"
+msgstr "Calificación promedio"
+
+#: messages
+msgid "Write a Review"
+msgstr "Escribir una reseña"
+
+#: messages
+msgid "Submit Review"
+msgstr "Enviar reseña"
+
+#: messages
+msgid "Sort By"
+msgstr "Ordenar por"
+
+#: messages
+msgid "Newest"
+msgstr "Más nuevo"
+
+#: messages
+msgid "Price: Low to High"
+msgstr "Precio: Menor a Mayor"
+
+#: messages
+msgid "Price: High to Low"
+msgstr "Precio: Mayor a Menor"
+
+#: messages
+msgid "Most Popular"
+msgstr "Más popular"
+
+#: messages
+msgid "Best Rated"
+msgstr "Mejor calificado"
+
+#: messages
+msgid "Remove from Cart"
+msgstr "Eliminar del carrito"
+
+#: messages
+msgid "Update Quantity"
+msgstr "Actualizar cantidad"
+
+#: messages
+msgid "Checkout"
+msgstr "Pagar"
+
+#: messages
+msgid "Empty Cart"
+msgstr "Carrito vacío"
+
+#: messages
+msgid "Save for Later"
+msgstr "Guardar para más tarde"
+
+#: messages
+msgid "Share Product"
+msgstr "Compartir producto"
+
+#: messages
+msgid "Product Added"
+msgstr "Producto añadido"
+
+#: messages
+msgid "Product Removed"
+msgstr "Producto eliminado"
+
+#: messages
+msgid "Order Confirmed"
+msgstr "Orden confirmada"
+
+#: messages
+msgid "Thank you for your order!"
+msgstr "¡Gracias por tu orden!"
+
+#: messages
+msgid "Track Order"
+msgstr "Rastrear orden"
+
+#: messages
+msgid "Download Invoice"
+msgstr "Descargar factura"
+
+#: messages
+msgid "Help & Support"
+msgstr "Ayuda y soporte"
+
+#: messages
+msgid "Contact Us"
+msgstr "Contáctanos"
+
+#: messages
+msgid "Privacy Policy"
+msgstr "Política de privacidad"
+
+#: messages
+msgid "Terms & Conditions"
+msgstr "Términos y condiciones"
+
+#: messages
+msgid "Return Policy"
+msgstr "Política de devolución"
+
+#: messages
+msgid "Shipping Info"
+msgstr "Información de envío"
+
+#: messages
+msgid "Payment Methods"
+msgstr "Métodos de pago"
+
+#: messages
+msgid "Security"
+msgstr "Seguridad"
