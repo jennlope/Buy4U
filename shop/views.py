@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView, TemplateView
-from django.db.models import Avg, Count, F
+from django.db.models import Avg, Count, F, Q
 from services.reviews_app.forms import ReviewForm
 from services.reviews_app.utils import user_purchased_product
 from services.browsing_app.models import BrowsingHistory
@@ -24,11 +24,78 @@ from .models import Product
 # Create your views here.
 class HomePageView(TemplateView):
     template_name = "pages/home.html"
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        weather = WeatherService(api_key=settings.WEATHER_API_KEY).get_weather_data()
-        context["weather"] = weather
+        
+        # Total de productos
+        context['product_count'] = Product.objects.filter(quantity__gt=0).count()
+        
+        # Productos por tipo
+        smartphones = Product.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            reviews_count=Count('reviews', distinct=True)
+        ).filter(type="Smartphones", quantity__gt=0).order_by('-id')
+        
+        laptops = Product.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            reviews_count=Count('reviews', distinct=True)
+        ).filter(type="Laptops", quantity__gt=0).order_by('-id')
+        
+        tablets = Product.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            reviews_count=Count('reviews', distinct=True)
+        ).filter(type="Tablets", quantity__gt=0).order_by('-id')
+        
+        # Contar productos por categoría
+        context['smartphone_count'] = smartphones.count()
+        context['laptop_count'] = laptops.count()
+        context['tablet_count'] = tablets.count()
+        
+        # Rango de precios por categoría
+        if smartphones.exists():
+            smartphone_prices = smartphones.aggregate(min_price=Min('price'), max_price=Max('price'))
+            context['smartphone_min_price'] = smartphone_prices['min_price']
+            context['smartphone_max_price'] = smartphone_prices['max_price']
+        else:
+            context['smartphone_min_price'] = None
+            context['smartphone_max_price'] = None
+        
+        if laptops.exists():
+            laptop_prices = laptops.aggregate(min_price=Min('price'), max_price=Max('price'))
+            context['laptop_min_price'] = laptop_prices['min_price']
+            context['laptop_max_price'] = laptop_prices['max_price']
+        else:
+            context['laptop_min_price'] = None
+            context['laptop_max_price'] = None
+        
+        if tablets.exists():
+            tablet_prices = tablets.aggregate(min_price=Min('price'), max_price=Max('price'))
+            context['tablet_min_price'] = tablet_prices['min_price']
+            context['tablet_max_price'] = tablet_prices['max_price']
+        else:
+            context['tablet_min_price'] = None
+            context['tablet_max_price'] = None
+        
+        # Productos destacados (con mejor rating y reviews)
+        featured_products = Product.objects.annotate(
+            avg_rating=Avg('reviews__rating'),
+            reviews_count=Count('reviews', distinct=True)
+        ).filter(
+            quantity__gt=0,
+            reviews_count__gt=0
+        ).order_by('-avg_rating', '-reviews_count')[:3]
+        
+        # Si no hay productos con reviews, mostrar los más recientes
+        if not featured_products.exists():
+            featured_products = Product.objects.annotate(
+                avg_rating=Avg('reviews__rating'),
+                reviews_count=Count('reviews', distinct=True)
+            ).filter(quantity__gt=0).order_by('-id')[:3]
+        
+        context['featured_products'] = featured_products
+        context['title'] = "Buy4U - Your Electronic Devices Store"
+        
         return context
 
 
@@ -1182,3 +1249,20 @@ class CompararProductosView(TemplateView):
         context['preselected_product2'] = self.request.GET.get('producto2', '')
         
         return context
+
+from django import template
+
+from django import template
+
+register = template.Library()
+
+@register.filter
+def star_width(rating):
+    """Calcula el ancho del overlay de estrellas"""
+    try:
+        rating = float(rating)
+        # Cada estrella ocupa el 20% del ancho (100% / 5 estrellas)
+        width_percent = (rating / 5) * 100
+        return f"{width_percent}%"
+    except (ValueError, TypeError):
+        return "0%"

@@ -13,11 +13,11 @@
 
     <div class="d-flex gap-2">
       <div class="btn-group" role="group" aria-label="periodo">
-        <a href="?days=7" class="btn btn-sm btn-outline-secondary">7d</a>
-        <a href="?days=30" class="btn btn-sm btn-outline-secondary active">30d</a>
-        <a href="?days=90" class="btn btn-sm btn-outline-secondary">90d</a>
+        <a href="?days=7" class="btn btn-sm btn-outline-secondary {% if days == 7 %}active{% endif %}">7d</a>
+        <a href="?days=30" class="btn btn-sm btn-outline-secondary {% if days == 30 %}active{% endif %}">30d</a>
+        <a href="?days=90" class="btn btn-sm btn-outline-secondary {% if days == 90 %}active{% endif %}">90d</a>
       </div>
-      <a id="exportCsv" href="{% url 'admin_reports_export_csv' %}" class="btn btn-sm btn-outline-primary">Exportar CSV</a>
+      <a id="exportCsv" href="{% url 'admin_reports_export_csv' %}" class="btn btn-sm btn-outline-primary">{% trans 'Export CSV' %}</a>
     </div>
   </div>
 
