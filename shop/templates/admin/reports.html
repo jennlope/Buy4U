@@ -4,15 +4,15 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
-      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← {% trans "Back" %}</a>
     </div>
     <div>
-      <h1 class="h3 mb-1">Informes de administración</h1>
-      <p class="text-muted mb-0">Tendencias y productos más relevantes</p>
+      <h1 class="h3 mb-1">{% trans "Administration reports" %}</h1>
+      <p class="text-muted mb-0">{% trans "Trends and most relevant products" %}</p>
     </div>
 
     <div class="d-flex gap-2">
-      <div class="btn-group" role="group" aria-label="periodo">
+      <div class="btn-group" role="group" aria-label="{% trans 'period' %}">
         <a href="?days=7" class="btn btn-sm btn-outline-secondary {% if days == 7 %}active{% endif %}">7d</a>
         <a href="?days=30" class="btn btn-sm btn-outline-secondary {% if days == 30 %}active{% endif %}">30d</a>
         <a href="?days=90" class="btn btn-sm btn-outline-secondary {% if days == 90 %}active{% endif %}">90d</a>
@@ -27,15 +27,15 @@
         <div class="card-header bg-gradient" style="background: linear-gradient(135deg,#6366f1,#60a5fa);">
           <div class="d-flex justify-content-between align-items-center text-white">
             <div>
-              <h5 class="mb-0">Tendencias (últimos {{ days|default:30 }})</h5>
-              <small class="opacity-75">Visitas, compras y calificación media</small>
+              <h5 class="mb-0">{% trans "Trends" %} ({% trans "last" %} {{ days|default:30 }})</h5>
+              <small class="opacity-75">{% trans "Visits, purchases and average rating" %}</small>
             </div>
-            <small id="chartStatus" class="opacity-75">Cargando...</small>
+            <small id="chartStatus" class="opacity-75">{% trans "Loading..." %}</small>
           </div>
         </div>
         <div class="card-body bg-light-subtle">
           <canvas id="trendChart" style="width:100%;height:280px"></canvas>
-          <div id="chartError" class="text-danger small mt-2 d-none">No se pudieron cargar los datos del gráfico.</div>
+          <div id="chartError" class="text-danger small mt-2 d-none">{% trans "Could not load chart data." %}</div>
         </div>
       </div>
     </div>
@@ -43,23 +43,23 @@
     <div class="col-lg-4">
       <div class="card border-0 shadow-sm rounded-4 mb-3">
         <div class="card-body">
-          <h6 class="mb-3">Más vistos</h6>
+          <h6 class="mb-3">{% trans "Most viewed" %}</h6>
           <ul id="topViewed" class="list-group list-group-flush"></ul>
-          <div id="viewedEmpty" class="text-center py-2 text-muted d-none">No hay datos</div>
+          <div id="viewedEmpty" class="text-center py-2 text-muted d-none">{% trans "No data" %}</div>
         </div>
       </div>
 
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body">
-          <h6 class="mb-3">Más comprados</h6>
+          <h6 class="mb-3">{% trans "Most purchased" %}</h6>
           <ul id="topBought" class="list-group list-group-flush"></ul>
-          <div id="boughtEmpty" class="text-center py-2 text-muted d-none">No hay datos</div>
+          <div id="boughtEmpty" class="text-center py-2 text-muted d-none">{% trans "No data" %}</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="text-muted small">Última actualización: <span id="lastUpdated">—</span></div>
+  <div class="text-muted small">{% trans "Last updated:" %} <span id="lastUpdated">—</span></div>
 </div>
 
 <style>
@@ -91,12 +91,12 @@
 
   // draw chart
   async function drawChart(){
-    chartStatus.textContent = 'Cargando...';
+    chartStatus.textContent = '{% trans "Loading..." %}';
     chartError.classList.add('d-none');
 
     try{
       const res = await fetch(dataUrl);
-      if(!res.ok) throw new Error('Fetch failed');
+      if(!res.ok) throw new Error('{% trans "Fetch failed" %}');
       const d = await res.json();
 
       const labels = d.labels || [];
@@ -119,7 +119,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Visitas',
+              label: '{% trans "Visits" %}',
               data: visits,
               borderColor: '#6366f1',
               backgroundColor: visitsGrad,
@@ -131,7 +131,7 @@
               yAxisID: 'y'
             },
             {
-              label: 'Compras',
+              label: '{% trans "Purchases" %}',
               data: purchases,
               borderColor: '#2563eb',
               backgroundColor: purchasesGrad,
@@ -143,7 +143,7 @@
               yAxisID: 'y'
             },
             {
-              label: 'Calificación media',
+              label: '{% trans "Average rating" %}',
               data: ratings,
               borderColor: '#10b981',
               backgroundColor: 'transparent',
@@ -176,13 +176,13 @@
       };
 
       window._trendChart = new Chart(ctx, config);
-      chartStatus.textContent = 'Actualizado';
+      chartStatus.textContent = '{% trans "Updated" %}';
       lastUpdated.textContent = new Date().toLocaleString();
 
     }catch(err){
       console.error(err);
       chartError.classList.remove('d-none');
-      chartStatus.textContent = 'Error';
+      chartStatus.textContent = '{% trans "Error" %}';
     }
   }
 
@@ -190,7 +190,7 @@
   async function loadTops(){
     try{
       const res = await fetch(topUrl);
-      if(!res.ok) throw new Error('Top fetch failed');
+      if(!res.ok) throw new Error('{% trans "Top fetch failed" %}');
       const d = await res.json();
 
       const tv = document.getElementById('topViewed');

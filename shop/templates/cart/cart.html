@@ -1,56 +1,378 @@
 {% extends 'pages/base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="container py-5">
     {% if messages %}
-        <div class="alert-messages">
+        <div class="alert-messages mb-4">
             {% for message in messages %}
-                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
                     {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="fas fa-shopping-cart text-primary me-2"></i>
+                        {% trans "Shopping Cart" %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <span id="cart-count">{{ cart_products|length }}</span> 
+                        {% if cart_products|length == 1 %}
+                            {% trans "item in your cart" %}
+                        {% else %}
+                            {% trans "items in your cart" %}
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{% url 'shop' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "Continue Shopping" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if cart_products %}
     <div class="row">
-        {% for product, quantity in cart_products.items %}
-        <div class="col-md-4 col-lg-3 mb-2">
-            <div class="card">
-                <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+        <!-- Cart Items -->
+        <div class="col-lg-8 mb-4">
+            {% for product, quantity in cart_products.items %}
+            <div class="card border-0 shadow-sm mb-3 cart-item-card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <!-- Product Image -->
+                        <div class="col-md-3 col-4">
+                            <div class="position-relative">
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" class="img-fluid rounded-3" alt="{{ product.name }}" style="max-height: 150px; object-fit: cover; width: 100%;">
+                                {% else %}
+                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 150px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="col-md-5 col-8">
+                            <h5 class="fw-bold mb-2">{{ product.name }}</h5>
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-tag me-1"></i>{{ product.brand }}
+                            </p>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-success-subtle text-success">
+                                    <i class="fas fa-check-circle me-1"></i>{% trans "In Stock" %}
+                                </span>
+                                {% if product.warranty %}
+                                <span class="badge bg-info-subtle text-info">
+                                    <i class="fas fa-shield-alt me-1"></i>{{ product.warranty }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>{% trans "View Details" %}
+                            </a>
+                        </div>
+
+                        <!-- Quantity & Price -->
+                        <div class="col-md-4 mt-3 mt-md-0">
+                            <div class="text-center text-md-end">
+                                <div class="mb-3">
+                                    <h4 class="text-primary fw-bold mb-0">${{ product.price|floatformat:2 }}</h4>
+                                    <small class="text-muted">{% trans "per unit" %}</small>
+                                </div>
+
+                                <!-- Quantity Controls -->
+                                <form method="post" action="{% url 'cart_update_quantity' product.id %}" class="quantity-form mb-3">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-sm justify-content-center justify-content-md-end">
+                                        <button type="button" class="btn btn-outline-secondary qty-btn" data-action="decrease" data-product-id="{{ product.id }}">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" name="quantity" id="quantity_{{ product.id }}"
+                                               value="{{ quantity }}" min="1" max="{{ product.quantity }}"
+                                               class="form-control text-center qty-input" style="max-width: 70px;"
+                                               readonly>
+                                        <button type="button" class="btn btn-outline-secondary qty-btn" data-action="increase" data-product-id="{{ product.id }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <!-- Subtotal -->
+                                <div class="mb-2">
+                                    <strong>{% trans "Subtotal:" %}</strong>
+                                    <h5 class="text-success fw-bold mb-0" id="subtotal_{{ product.id }}">
+                                        $<span class="subtotal-value">{{ product.price|floatformat:2 }}</span>
+                                    </h5>
+                                </div>
+
+                                <!-- Remove Button -->
+                                <form method="post" action="{% url 'remove_cart' product.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans 'Remove this item from cart?' %}')">
+                                        <i class="fas fa-trash-alt me-1"></i>{% trans "Remove" %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>{% trans "Order Summary" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{% trans "Subtotal" %}</span>
+                        <span class="fw-bold" id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{% trans "Tax" %} (0%)</span>
+                        <span class="fw-bold">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{% trans "Shipping" %}</span>
+                        <span class="text-success fw-bold">{% trans "FREE" %}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5 class="mb-0">{% trans "Total" %}</h5>
+                        <h4 class="text-primary fw-bold mb-0" id="cart-total">$0.00</h4>
+                    </div>
+
+                    <a href="{% url 'payment_gateway' %}" class="btn btn-primary w-100 btn-lg mb-2">
+                        <i class="fas fa-lock me-2"></i>{% trans "Proceed to Checkout" %}
+                    </a>
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>{% trans "Secure checkout" %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Badges -->
+            <div class="card border-0 shadow-sm mt-3">
                 <div class="card-body text-center">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text">${{ product.price }}</p>
-
-                    <!-- Formulario para actualizar cantidad -->
-                    <form method="post" action="{% url 'cart_update_quantity' product.id %}">
-                        {% csrf_token %}
-                        <label for="quantity_{{ product.id }}">Quantity:</label>
-                        <input type="number" name="quantity" id="quantity_{{ product.id }}"
-                               value="{{ quantity }}" min="1" class="form-control mb-2"
-                               onchange="this.form.submit()">
-                    </form>
-
-                    <!-- Botón para ver detalles -->
-                    <a href="{% url 'product_detail' product.id %}" class="btn btn-success fw-bold fs-5 w-100">View Details</a>
-
-                    <!-- Formulario para quitar del carrito -->
-                    <form method="post" action="{% url 'remove_cart' product.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger fw-bold fs-5 w-100 mt-3">Remove</button>
-                    </form>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <i class="fas fa-truck fa-2x text-primary mb-2"></i>
+                            <p class="small mb-0">{% trans "Fast Delivery" %}</p>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-undo fa-2x text-success mb-2"></i>
+                            <p class="small mb-0">{% trans "Easy Returns" %}</p>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-shield-alt fa-2x text-info mb-2"></i>
+                            <p class="small mb-0">{% trans "Secure Payment" %}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <p>No products added to the cart.</p>  <!-- ← Esto mostrará en caso de no haber agregado nada al carro -->
-        {% endfor %}
     </div>
-
-    <!-- Botón para proceder al pago -->
+    {% else %}
+    <!-- Empty Cart -->
     <div class="row">
-        <div class="col-lg-12 text-end">
-            <a href="{% url 'payment_gateway' %}" class="btn btn-success fw-bold fs-5 w-100">Proceed to Payment</a>
+        <div class="col-12">
+            <div class="card border-0 shadow-sm text-center py-5">
+                <div class="card-body">
+                    <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                    <h3 class="mb-3">{% trans "Your cart is empty" %}</h3>
+                    <p class="text-muted mb-4">{% trans "Add some products to get started!" %}</p>
+                    <a href="{% url 'shop' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag me-2"></i>{% trans "Start Shopping" %}
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+    {% endif %}
 </div>
+
+<style>
+.cart-item-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.qty-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-input {
+    font-weight: 600;
+    border-left: 0;
+    border-right: 0;
+}
+
+.sticky-top {
+    position: sticky;
+}
+
+.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.bg-info-subtle {
+    background-color: rgba(13, 202, 240, 0.1);
+}
+
+.alert-messages .alert {
+    border-radius: 10px;
+    border: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Store product prices
+    const productPrices = {};
+    
+    // Initialize prices and calculate initial subtotals
+    document.querySelectorAll('[id^="quantity_"]').forEach(input => {
+        const productId = input.id.replace('quantity_', '');
+        const priceElement = input.closest('.row').querySelector('.col-md-4 h4');
+        const priceText = priceElement.textContent.trim().replace('$', '');
+        const price = parseFloat(priceText);
+        productPrices[productId] = price;
+        
+        // Calculate and set initial subtotal
+        const quantity = parseInt(input.value);
+        const subtotal = price * quantity;
+        const subtotalEl = document.querySelector('#subtotal_' + productId + ' .subtotal-value');
+        if (subtotalEl) {
+            subtotalEl.textContent = subtotal.toFixed(2);
+        }
+    });
+    
+    // Calculate totals
+    function calculateTotals() {
+        let total = 0;
+        document.querySelectorAll('.subtotal-value').forEach(el => {
+            const valueText = el.textContent.trim().replace('$', '');
+            const value = parseFloat(valueText);
+            if (!isNaN(value)) {
+                total += value;
+            }
+        });
+        
+        const subtotalEl = document.getElementById('cart-subtotal');
+        const totalEl = document.getElementById('cart-total');
+        
+        if (subtotalEl) subtotalEl.textContent = '$' + total.toFixed(2);
+        if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
+    }
+
+    // Show alert message
+    function showAlert(message, type = 'warning') {
+        const alertContainer = document.querySelector('.alert-messages');
+        if (!alertContainer) {
+            const container = document.createElement('div');
+            container.className = 'alert-messages mb-4';
+            document.querySelector('.container').insertBefore(container, document.querySelector('.container').firstChild);
+        }
+        
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        const container = document.querySelector('.alert-messages');
+        container.appendChild(alert);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
+        
+        // Scroll to alert
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Quantity buttons
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const productId = this.dataset.productId;
+            const input = document.getElementById('quantity_' + productId);
+            const form = this.closest('form');
+            let currentQty = parseInt(input.value);
+            const maxQty = parseInt(input.max);
+            const action = this.dataset.action;
+            
+            // Get product name for alert
+            const productName = this.closest('.row').querySelector('h5').textContent.trim();
+            
+            // Handle increase
+            if (action === 'increase') {
+                if (currentQty >= maxQty) {
+                    showAlert(`{% trans "Maximum stock reached for" %} "${productName}". {% trans "Only" %} ${maxQty} {% trans "units available in stock." %}`, 'warning');
+                    return;
+                }
+                input.value = currentQty + 1;
+            } 
+            // Handle decrease
+            else if (action === 'decrease') {
+                if (currentQty <= 1) {
+                    return;
+                }
+                input.value = currentQty - 1;
+            }
+            
+            // Update subtotal
+            const newQty = parseInt(input.value);
+            const pricePerUnit = productPrices[productId];
+            const newSubtotal = pricePerUnit * newQty;
+            const subtotalEl = document.querySelector('#subtotal_' + productId + ' .subtotal-value');
+            if (subtotalEl) {
+                subtotalEl.textContent = newSubtotal.toFixed(2);
+            }
+            
+            // Recalculate totals
+            calculateTotals();
+            
+            // Submit form
+            setTimeout(() => {
+                form.submit();
+            }, 300);
+        });
+    });
+
+    // Initial calculation
+    calculateTotals();
+});
+</script>
 {% endblock %}

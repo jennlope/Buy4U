@@ -12,9 +12,13 @@
 
   <div class="row g-4">
     <div class="col-md-6">
-      <div class="position-relative">
+      <div class="position-relative product-image-container">
         {% if product.image %}
-          <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}">
+          <img src="{{ product.image.url }}" 
+               class="card-img-top img-fluid lazy-load rounded shadow" 
+               alt="{{ product.name }}"
+               loading="lazy"
+               data-src="{{ product.image.url }}">
         {% else %}
           <div class="border rounded d-flex align-items-center justify-content-center" style="height:320px;">
             <span class="text-muted">{% trans "No image available" %}</span>
@@ -42,19 +46,26 @@
       </ul>
 
       <!-- Formulario para agregar al carrito -->
-      <form method="post" action="{% url 'add_cart' product.id %}" class="mb-3">
+      <form method="post" action="{% url 'add_cart' product.id %}" class="mb-3 add-to-cart-form">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary fw-bold fs-5 w-100" style="background-color: #093314; border: none; color: white;" {% if product.quantity == 0 %}disabled{% endif %}>
-          <i class="fas fa-cart-plus"></i> {% trans "Add to Cart" %}
+        <button type="submit" class="btn btn-primary-custom btn-lg fw-bold fs-5 w-100 rounded-pill add-to-cart-btn" {% if product.quantity == 0 %}disabled{% endif %}>
+          <span class="btn-text">
+            <i class="fas fa-cart-plus me-2"></i> {% trans "Add to Cart" %}
+          </span>
+          <span class="btn-success-text" style="display: none;">
+            <i class="fas fa-check me-2"></i> {% trans "Added!" %}
+          </span>
         </button>
       </form>
 
-      <!-- Después del botón "Add to Cart", agrega: -->
-      <a href="{% url 'comparar_productos' %}?producto1={{ product.id }}" class="btn btn-outline-primary fw-bold fs-5 w-100 mt-2">
-          <i class="fas fa-balance-scale"></i> {% trans "Compare with other products" %}
+      <!-- Botones de acción: comparar y ver reseñas -->
+      <a href="{% url 'comparar_productos' %}?producto1={{ product.id }}" class="btn btn-compare fw-bold fs-5 w-100 mt-2 rounded-pill" aria-label="{% trans 'Compare with other products' %}">
+          <i class="fas fa-balance-scale me-2"></i> {% trans "Compare with other products" %}
       </a>
 
-      <a href="#reviews" class="btn btn-outline-success fw-bold fs-5 w-100">{% trans "Read reviews" %}</a>
+      <a href="#reviews" class="btn btn-readreviews fw-bold fs-5 w-100 mt-2 rounded-pill smooth-scroll" aria-label="{% trans 'Read reviews' %}">
+        <i class="fas fa-comments me-2"></i> {% trans "Read reviews" %}
+      </a>
     </div>
   </div>
 </div>
@@ -275,6 +286,96 @@
 <style>
 /* === Estilos HU19: Reseñas mejoradas === */
 
+/* === Botones personalizados para detalle de producto === */
+.btn-primary-custom {
+  background: linear-gradient(135deg, #064d33 0%, #093314 100%);
+  color: #ffffff;
+  border: none;
+  padding: .7rem .9rem;
+  box-shadow: 0 6px 18px rgba(9, 51, 20, 0.18);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.btn-primary-custom:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(9, 51, 20, 0.22);
+  background: linear-gradient(135deg, #083e2c 0%, #0b4a2f 100%);
+}
+.btn-primary-custom:active { transform: translateY(-1px); }
+.btn-primary-custom[disabled], .btn-primary-custom:disabled {
+  opacity: .65;
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
+.btn-outline-custom {
+  background: transparent;
+  color: #093314;
+  border: 2px solid rgba(9, 51, 20, 0.08);
+  padding: .65rem .9rem;
+  transition: all .16s ease;
+}
+.btn-outline-custom:hover {
+  background: rgba(9, 51, 20, 0.03);
+  transform: translateY(-2px);
+  border-color: rgba(9, 51, 20, 0.16);
+}
+
+.btn-ghost-custom {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fff7 100%);
+  color: #065f2e;
+  border: 1px solid rgba(6, 95, 46, 0.06);
+  padding: .65rem .9rem;
+  transition: all .16s ease;
+}
+.btn-ghost-custom:hover {
+  background: #f0fdf4;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(6, 95, 46, 0.06);
+}
+
+/* === Botón de comparar (destacado en naranja/ámbar) === */
+.btn-compare {
+  /* Cambio a un degradado más suave teal/cian para ser agradable a la vista */
+  background: linear-gradient(135deg, #06b6d4 0%, #0ea5a4 100%);
+  color: #ffffff;
+  border: none;
+  padding: .7rem .9rem;
+  box-shadow: 0 8px 22px rgba(6, 182, 180, 0.14);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.btn-compare:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 36px rgba(6, 182, 180, 0.18);
+  background: linear-gradient(135deg, #0891b2 0%, #0b9b94 100%);
+}
+.btn-compare:focus {
+  outline: 3px solid rgba(6, 182, 180, 0.14);
+  outline-offset: 2px;
+}
+
+/* === Botón 'Read reviews' (verde suave, más tranquilo pero claro) === */
+.btn-readreviews {
+  background: linear-gradient(135deg, #e6fff0 0%, #f0fff5 100%);
+  color: #0f5132;
+  border: 1px solid rgba(16, 77, 48, 0.08);
+  padding: .65rem .9rem;
+  box-shadow: 0 6px 18px rgba(16, 77, 48, 0.04);
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+.btn-readreviews:hover {
+  background: linear-gradient(135deg, #f0fff4 0%, #e8fff0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(16, 77, 48, 0.06);
+}
+.btn-readreviews:focus {
+  outline: 3px solid rgba(34, 197, 94, 0.12);
+  outline-offset: 2px;
+}
+
+/* Icon tweak for contrast */
+.btn-compare i, .btn-readreviews i { font-size: 1.05rem; }
+
 /* Avatar circular */
 .avatar-circle {
   width: 50px;
@@ -383,6 +484,98 @@ textarea.form-control:focus {
   color: #78350f;
 }
 
+/* Breadcrumb Styles */
+.breadcrumb {
+  background-color: #f8f9fa;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 0;
+}
+
+.breadcrumb-item a {
+  color: #11998e;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+  color: #0d7a70;
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  color: #6b7280;
+}
+
+/* Lazy Load Images */
+.lazy-load {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.lazy-load.loaded {
+  opacity: 1;
+  animation: none;
+  background: none;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Product Image Container */
+.product-image-container {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Add to Cart Button Animation */
+.add-to-cart-btn {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.add-to-cart-btn.success {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+}
+
+.add-to-cart-btn.success .btn-text {
+  display: none !important;
+}
+
+.add-to-cart-btn.success .btn-success-text {
+  display: inline !important;
+  animation: successPop 0.5s ease;
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .avatar-circle {
@@ -394,7 +587,67 @@ textarea.form-control:focus {
   .star-label {
     font-size: 2rem;
   }
+  
+  .breadcrumb {
+    font-size: 0.875rem;
+  }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Lazy Loading Images
+  const lazyImages = document.querySelectorAll('.lazy-load');
+  
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        if (img.dataset.src) {
+          img.src = img.dataset.src;
+        }
+        img.classList.add('loaded');
+        observer.unobserve(img);
+      }
+    });
+  });
+  
+  lazyImages.forEach(img => imageObserver.observe(img));
+
+  // Add to Cart Animation
+  const addToCartForm = document.querySelector('.add-to-cart-form');
+  
+  if (addToCartForm) {
+    addToCartForm.addEventListener('submit', function(e) {
+      const button = this.querySelector('.add-to-cart-btn');
+      
+      if (!button.disabled && !button.classList.contains('success')) {
+        button.classList.add('success');
+        
+        // Reset after animation
+        setTimeout(() => {
+          button.classList.remove('success');
+        }, 2500);
+      }
+    });
+  }
+
+  // Smooth Scroll for Review Link
+  document.querySelectorAll('.smooth-scroll').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+});
+</script>
 
 {% endblock %}

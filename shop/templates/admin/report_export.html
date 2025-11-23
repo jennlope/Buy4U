@@ -5,14 +5,14 @@
     <div class="col-lg-8">
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-header bg-gradient" style="background: linear-gradient(135deg,#ef4444,#f97316);">
-          <h2 class="h5 text-white mb-0">Informe Detallado</h2>
+          <h2 class="h5 text-white mb-0">{% trans "Detailed Report" %}</h2>
         </div>
         <div class="card-body">
-          <p class="text-muted">Descarga un resumen PDF con los principales indicadores.</p>
+          <p class="text-muted">{% trans "Download a PDF summary with key indicators." %}</p>
 
           <div class="row g-2 align-items-center mb-3">
             <div class="col-auto">
-              <label for="period" class="small text-muted mb-0">Periodo</label>
+              <label for="period" class="small text-muted mb-0">{% trans "Period" %}</label>
               <select id="period" class="form-select form-select-sm rounded-pill" style="width:110px;">
                 <option value="7">7d</option>
                 <option value="30" selected>30d</option>
@@ -21,16 +21,16 @@
             </div>
 
             <div class="col-auto">
-              <label for="fromDate" class="small text-muted mb-0">Desde</label>
+              <label for="fromDate" class="small text-muted mb-0">{% trans "From" %}</label>
               <input id="fromDate" type="date" class="form-control form-control-sm">
             </div>
             <div class="col-auto">
-              <label for="toDate" class="small text-muted mb-0">Hasta</label>
+              <label for="toDate" class="small text-muted mb-0">{% trans "To" %}</label>
               <input id="toDate" type="date" class="form-control form-control-sm">
             </div>
 
             <div class="col-auto">
-              <label class="small text-muted mb-0 d-block">Formato</label>
+              <label class="small text-muted mb-0 d-block">{% trans "Format" %}</label>
               <div class="btn-group btn-group-sm" role="group">
                 <input type="radio" class="btn-check" name="format" id="fmtPdf" value="pdf" checked>
                 <label class="btn btn-outline-secondary" for="fmtPdf">PDF</label>
@@ -42,13 +42,13 @@
 
           <div class="d-flex gap-2 align-items-center">
             <button id="downloadBtn" class="btn btn-danger btn-sm rounded-pill">
-              <span id="btnText">Descargar informe</span>
+              <span id="btnText">{% trans "Download report" %}</span>
               <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
             </button>
 
-            <a id="directLink" class="btn btn-outline-secondary btn-sm rounded-pill" href="{% url 'admin_report_pdf' %}" target="_blank">Abrir en nueva pestaña</a>
+            <a id="directLink" class="btn btn-outline-secondary btn-sm rounded-pill" href="{% url 'admin_report_pdf' %}" target="_blank">{% trans "Open in new tab" %}</a>
 
-            <div id="statusMsg" class="text-muted small ms-2">Última generación: <span id="lastGen">—</span></div>
+            <div id="statusMsg" class="text-muted small ms-2">{% trans "Last generation:" %} <span id="lastGen">—</span></div>
           </div>
 
           <hr class="my-3">
@@ -56,19 +56,19 @@
           <div class="row g-3">
             <div class="col-md-4">
               <div class="card p-3 rounded-3 h-100">
-                <div class="small text-muted">Visitas</div>
+                <div class="small text-muted">{% trans "Visits" %}</div>
                 <div id="statVisits" class="h5 mb-0">—</div>
               </div>
             </div>
             <div class="col-md-4">
               <div class="card p-3 rounded-3 h-100">
-                <div class="small text-muted">Compras</div>
+                <div class="small text-muted">{% trans "Purchases" %}</div>
                 <div id="statPurchases" class="h5 mb-0">—</div>
               </div>
             </div>
             <div class="col-md-4">
               <div class="card p-3 rounded-3 h-100">
-                <div class="small text-muted">Calificación media</div>
+                <div class="small text-muted">{% trans "Average rating" %}</div>
                 <div id="statRating" class="h5 mb-0">—</div>
               </div>
             </div>
@@ -134,7 +134,7 @@
     // show spinner and prevent double click
     btnSpinner.classList.remove('d-none');
     downloadBtn.disabled = true;
-    btnText.textContent = 'Generando...';
+    btnText.textContent = '{% trans "Generating..." %}';
 
     // open in new tab to keep admin safe; if format is pdf we open directly, otherwise navigate
     window.open(url, '_blank');
@@ -143,7 +143,7 @@
     setTimeout(()=>{
       btnSpinner.classList.add('d-none');
       downloadBtn.disabled = false;
-      btnText.textContent = 'Descargar informe';
+      btnText.textContent = '{% trans "Download report" %}';
       lastGen.textContent = new Date().toLocaleString();
     }, 900);
   });

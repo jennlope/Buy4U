@@ -525,7 +525,9 @@ class admin_product_view(View):
             product.brand = brand
             product.warranty = warranty
             product.description = description
-            product.image = image
+            # Solo actualizar imagen si se subió una nueva
+            if image:
+                product.image = image
             product.quantity = quantity
             product.type = type
             product.save()
@@ -1111,7 +1113,7 @@ class MostAddedToCartView(View):
             })
         
         context = {
-            'title': _('Productos más añadidos al carrito'),
+            'title': _('Most Added to Cart Products'),
             'products_data': products_data,
             'total_products': products.count()
         }

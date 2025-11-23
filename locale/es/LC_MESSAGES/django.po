@@ -497,6 +497,138 @@ msgstr "Carrito - Buy4U"
 msgid "Shopping cart"
 msgstr "Carrito de compras"
 
+msgid "Shopping Cart"
+msgstr "Carrito de Compras"
+
+msgid "item in your cart"
+msgstr "artículo en tu carrito"
+
+msgid "items in your cart"
+msgstr "artículos en tu carrito"
+
+msgid "Continue Shopping"
+msgstr "Continuar Comprando"
+
+msgid "In Stock"
+msgstr "En Stock"
+
+msgid "per unit"
+msgstr "por unidad"
+
+msgid "Subtotal:"
+msgstr "Subtotal:"
+
+msgid "Remove this item from cart?"
+msgstr "¿Eliminar este artículo del carrito?"
+
+msgid "Order Summary"
+msgstr "Resumen del Pedido"
+
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgid "Tax"
+msgstr "Impuesto"
+
+msgid "Shipping"
+msgstr "Envío"
+
+msgid "FREE"
+msgstr "GRATIS"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Proceed to Checkout"
+msgstr "Proceder al Pago"
+
+msgid "Secure checkout"
+msgstr "Pago seguro"
+
+msgid "Fast Delivery"
+msgstr "Entrega Rápida"
+
+msgid "Easy Returns"
+msgstr "Devoluciones Fáciles"
+
+msgid "Secure Payment"
+msgstr "Pago Seguro"
+
+msgid "Your cart is empty"
+msgstr "Tu carrito está vacío"
+
+msgid "Add some products to get started!"
+msgstr "¡Agrega algunos productos para comenzar!"
+
+msgid "Start Shopping"
+msgstr "Comenzar a Comprar"
+
+msgid "Maximum stock reached for"
+msgstr "Stock máximo alcanzado para"
+
+msgid "Only"
+msgstr "Solo"
+
+msgid "units available in stock."
+msgstr "unidades disponibles en stock."
+
+msgid "Cart"
+msgstr "Carrito"
+
+msgid "Payment"
+msgstr "Pago"
+
+msgid "Confirmation"
+msgstr "Confirmación"
+
+msgid "Review your order before payment"
+msgstr "Revisa tu pedido antes del pago"
+
+msgid "Discount"
+msgstr "Descuento"
+
+msgid "Total Amount"
+msgstr "Monto Total"
+
+msgid "Select Payment Method"
+msgstr "Selecciona Método de Pago"
+
+msgid "Credit/Debit Card"
+msgstr "Tarjeta de Crédito/Débito"
+
+msgid "PayPal"
+msgstr "PayPal"
+
+msgid "Bank Transfer"
+msgstr "Transferencia Bancaria"
+
+msgid "Complete Payment"
+msgstr "Completar Pago"
+
+msgid "Back to Cart"
+msgstr "Volver al Carrito"
+
+msgid "Your payment information is secure and encrypted"
+msgstr "Tu información de pago es segura y está encriptada"
+
+msgid "SSL Encrypted"
+msgstr "Cifrado SSL"
+
+msgid "Buyer Protection"
+msgstr "Protección al Comprador"
+
+msgid "Money Back Guarantee"
+msgstr "Garantía de Devolución"
+
+msgid "24/7 Support"
+msgstr "Soporte 24/7"
+
+msgid "Always Here to Help"
+msgstr "Siempre Aquí para Ayudar"
+
+msgid "Processing..."
+msgstr "Procesando..."
+
 #: .\shop\views.py:179
 msgid "Admin - Buy4U"
 msgstr "Administrador - Buy4U"
@@ -732,3 +864,1038 @@ msgstr "Métodos de pago"
 #: messages
 msgid "Security"
 msgstr "Seguridad"
+
+#: .\shop\templates\pages\product_detail.html:20
+msgid "No image available"
+msgstr "Sin imagen disponible"
+
+#: .\shop\templates\pages\product_detail.html:54
+msgid "Compare with other products"
+msgstr "Comparar con otros productos"
+
+#: .\shop\templates\pages\product_detail.html:58
+msgid "Read reviews"
+msgstr "Leer reseñas"
+
+#: .\shop\templates\pages\product_detail.html:75
+msgid "Reviews"
+msgstr "Reseñas"
+
+#: .\shop\templates\pages\product_detail.html:78
+msgid "reviews"
+msgstr "reseñas"
+
+#: .\shop\templates\pages\product_detail.html:87
+msgid "de 5"
+msgstr "de 5"
+
+#: .\shop\templates\pages\product_detail.html:108
+msgid "Customer opinions"
+msgstr "Opiniones de clientes"
+
+#: .\shop\templates\pages\product_detail.html:110
+msgid "Sort by"
+msgstr "Ordenar por"
+
+#: .\shop\templates\pages\product_detail.html:112
+msgid "Most recent"
+msgstr "Más recientes"
+
+#: .\shop\templates\pages\product_detail.html:113
+msgid "Highest rating"
+msgstr "Mayor calificación"
+
+#: .\shop\templates\pages\product_detail.html:114
+msgid "Most useful"
+msgstr "Más útiles"
+
+#: .\shop\templates\pages\product_detail.html:176
+msgid "Your review"
+msgstr "Tu reseña"
+
+#: .\shop\templates\pages\product_detail.html:185
+msgid "Helpful"
+msgstr "Útil"
+
+#: .\shop\templates\pages\product_detail.html:209
+msgid "Write your review"
+msgstr "Escribe tu reseña"
+
+#: .\shop\templates\pages\product_detail.html:217
+msgid "Rating"
+msgstr "Calificación"
+
+#: .\shop\templates\pages\product_detail.html:220
+msgid "Rate from 1 to 5"
+msgstr "Califica de 1 a 5"
+
+#: .\shop\templates\pages\product_detail.html:223
+msgid "stars"
+msgstr "estrellas"
+
+#: .\shop\templates\pages\product_detail.html:226
+msgid "Select from 1 to 5 stars."
+msgstr "Selecciona de 1 a 5 estrellas."
+
+#: .\shop\templates\pages\product_detail.html:247
+msgid "Submit review"
+msgstr "Enviar reseña"
+
+#: .\shop\templates\pages\product_detail.html:255
+msgid "Want to leave a review?"
+msgstr "¿Quieres dejar una reseña?"
+
+#: .\shop\templates\pages\product_detail.html:256
+msgid "You can only review products you have purchased."
+msgstr "Solo puedes reseñar productos que hayas comprado."
+
+#: .\shop\templates\pages\product_detail.html:262
+msgid "Sign in to review"
+msgstr "Inicia sesión para reseñar"
+
+#: .\shop\templates\pages\product_detail.html:263
+msgid "Please sign in to leave a review."
+msgstr "Por favor, inicia sesión para dejar una reseña."
+
+#: .\shop\templates\pages\product_detail.html:158
+msgid "No comment provided"
+msgstr "Sin comentario"
+
+#: .\shop\templates\pages\product_detail.html:203
+msgid "Be the first to review this product."
+msgstr "Sé el primero en reseñar este producto."
+
+#: .\shop\templates\pages\product_detail.html:236
+msgid "Share your experience with this product..."
+msgstr "Comparte tu experiencia con este producto..."
+
+#: .\shop\templates\pages\product_detail.html:148
+msgid "Anonymous"
+msgstr "Anónimo"
+
+#: .\orders\templates\pages\history.html:369
+msgid "Órdenes totales"
+msgstr "Órdenes totales"
+
+#: .\orders\templates\pages\history.html:375
+msgid "Valor total"
+msgstr "Valor total"
+
+#: .\orders\templates\pages\history.html:381
+msgid "Este mes"
+msgstr "Este mes"
+
+#: .\shop\templates\pages\comparar_productos.html:12
+msgid "Select two products to compare with AI"
+msgstr "Selecciona dos productos para comparar con IA"
+
+#: .\shop\templates\pages\comparar_productos.html:23
+msgid "Product 1"
+msgstr "Producto 1"
+
+#: .\shop\templates\pages\comparar_productos.html:28
+msgid "Select a product..."
+msgstr "Selecciona un producto..."
+
+#: .\shop\templates\pages\comparar_productos.html:61
+msgid "Product 2"
+msgstr "Producto 2"
+
+#: .\shop\templates\pages\comparar_productos.html:99
+msgid "Compare with AI"
+msgstr "Comparar con IA"
+
+#: .\shop\templates\pages\comparar_productos.html:106
+msgid "Loading..."
+msgstr "Cargando..."
+
+#: .\shop\templates\pages\comparar_productos.html:110
+msgid "AI is analyzing the products..."
+msgstr "La IA está analizando los productos..."
+
+#: .\shop\templates\pages\comparar_productos.html:120
+msgid "AI Comparison Results"
+msgstr "Resultados de comparación de IA"
+
+#: .\shop\templates\pages\comparar_productos.html:128
+msgid "Summary"
+msgstr "Resumen"
+
+#: .\shop\templates\pages\comparar_productos.html:143
+msgid "Advantages"
+msgstr "Ventajas"
+
+#: .\shop\templates\pages\comparar_productos.html:170
+msgid "Best Value for Money"
+msgstr "Mejor relación calidad-precio"
+
+#: .\shop\templates\pages\comparar_productos.html:179
+msgid "AI Recommendation"
+msgstr "Recomendación de IA"
+
+#: .\shop\templates\pages\comparar_productos.html:188
+msgid "Final Verdict"
+msgstr "Veredicto final"
+
+#: .\shop\templates\pages\comparar_productos.html:197
+msgid "Price difference"
+msgstr "Diferencia de precio"
+
+#: .\shop\templates\pages\comparar_productos.html:290
+msgid "Please select two products"
+msgstr "Por favor, selecciona dos productos"
+
+#: .\shop\templates\pages\comparar_productos.html:295
+msgid "Please select two different products"
+msgstr "Por favor, selecciona dos productos diferentes"
+
+#: .\shop\templates\pages\comparar_productos.html:323
+msgid "Error comparing products"
+msgstr "Error al comparar productos"
+
+#: .\shop\templates\pages\comparar_productos.html:327
+msgid "Connection error. Please try again."
+msgstr "Error de conexión. Por favor, inténtalo de nuevo."
+
+#: .\shop\views.py:282
+msgid "Este producto no está disponible"
+msgstr "Este producto no está disponible"
+
+#: .\shop\views.py:304
+msgid "Product added to cart successfully"
+msgstr "Producto agregado al carrito exitosamente"
+
+#: .\shop\views.py:308
+msgid "Product not found"
+msgstr "Producto no encontrado"
+
+#: .\shop\views.py:311
+msgid "Error adding product to cart"
+msgstr "Error al agregar producto al carrito"
+
+#: .\shop\views.py:1114
+msgid "Productos más añadidos al carrito"
+msgstr "Productos más añadidos al carrito"
+
+#: .\shop\models.py:15
+msgid "Veces añadido al carrito"
+msgstr "Veces añadido al carrito"
+
+#: .\shop\templates\pages\home.html:13
+msgid "Search products..."
+msgstr "Buscar productos..."
+
+#: .\shop\templates\pages\home.html:39
+msgid "Buy quickly and safely"
+msgstr "Compra de forma rápida y segura"
+
+#: .\shop\templates\pages\home.html:64
+msgid "Innovation and Power at its Best"
+msgstr "Innovación y potencia en su máxima expresión"
+
+#: .\shop\templates\pages\home.html:87
+msgid "Classic & Modern"
+msgstr "Clásico y Moderno"
+
+#: .\shop\templates\pages\home.html:110
+msgid "Featured Products"
+msgstr "Productos Destacados"
+
+#: .\orders\templates\pages\history.html:361
+msgid "Purchase History"
+msgstr "Historial de Compras"
+
+#: .\orders\templates\pages\history.html:364
+msgid "New Purchase"
+msgstr "Nueva compra"
+
+#: .\orders\templates\pages\history.html:372
+msgid "Total Orders"
+msgstr "Órdenes totales"
+
+#: .\orders\templates\pages\history.html:378
+msgid "Total Value"
+msgstr "Valor total"
+
+#: .\orders\templates\pages\history.html:384
+msgid "This Month"
+msgstr "Este mes"
+
+#: .\orders\templates\pages\history.html:393
+msgid "Order"
+msgstr "Orden"
+
+#: .\orders\templates\pages\history.html:407
+msgid "Products"
+msgstr "Productos"
+
+#: .\orders\templates\pages\history.html:419
+msgid "No associated products"
+msgstr "Sin productos asociados"
+
+#: .\orders\templates\pages\history.html:427
+msgid "Total"
+msgstr "Total"
+
+#: .\orders\templates\pages\history.html:440
+msgid "Previous"
+msgstr "Anterior"
+
+#: .\orders\templates\pages\history.html:445
+msgid "Page"
+msgstr "Página"
+
+#: .\orders\templates\pages\history.html:445
+msgid "of"
+msgstr "de"
+
+#: .\orders\templates\pages\history.html:450
+msgid "Next"
+msgstr "Siguiente"
+
+#: .\orders\templates\pages\history.html:458
+msgid "You don't have any purchases yet"
+msgstr "Aún no tienes compras"
+
+#: .\orders\templates\pages\history.html:460
+msgid "When you place your first order, it will appear here with all the details."
+msgstr "Cuando realices tu primera orden, aparecerá aquí con todos los detalles."
+
+#: .\orders\templates\pages\history.html:464
+msgid "Explore Products"
+msgstr "Explorar productos"
+
+#: .\shop\templates\cart\cart.html:27
+msgid "Remove"
+msgstr "Quitar"
+
+#: .\shop\templates\cart\cart.html:47
+msgid "No products added to the cart."
+msgstr "No hay productos agregados al carrito."
+
+#: .\shop\templates\cart\cart.html:54
+msgid "Proceed to Payment"
+msgstr "Proceder al pago"
+
+#: .\shop\templates\pages\home.html:42
+msgid "Buy4U is an eCommerce web platform focused on the sale of electronic devices, offering an easy, fast, and secure shopping experience."
+msgstr "Buy4U es una plataforma web de comercio electrónico centrada en la venta de dispositivos electrónicos, ofreciendo una experiencia de compra fácil, rápida y segura."
+
+#: .\shop\templates\pages\home.html:60
+#, python-format
+msgid "Latest Smartphones (%(count)s)"
+msgstr "Últimos Smartphones (%(count)s)"
+
+#: .\shop\templates\pages\home.html:66
+msgid "Discover the newest smartphone models with cutting-edge technology and amazing features."
+msgstr "Descubre los modelos de smartphone más nuevos con tecnología de punta y características increíbles."
+
+#: .\shop\templates\pages\home.html:81
+#, python-format
+msgid "From the Latest Collection (%(count)s Items)"
+msgstr "De la última colección (%(count)s artículos)"
+
+#: .\shop\templates\pages\home.html:86
+msgid "From legendary classics to the latest models, find the perfect device for you."
+msgstr "Desde clásicos legendarios hasta los últimos modelos, encuentra el dispositivo perfecto para ti."
+
+#: .\shop\templates\pages\home.html:149
+#, python-format
+msgid "Reviews (%(count)s)"
+msgstr "Reseñas (%(count)s)"
+
+#: .\shop\templates\pages\home.html:151
+msgid "No reviews yet"
+msgstr "Sin reseñas aún"
+
+# Admin templates translations
+#: .\shop\templates\admin\browsing_history.html
+msgid "Historial de búsqueda (UI)"
+msgstr "Search History (UI)"
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "Buscar producto..."
+msgstr "Search product..."
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "Buscar"
+msgstr "Search"
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "No hay registros"
+msgstr "No records"
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "Búsqueda"
+msgstr "Search"
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "Cargando..."
+msgstr "Loading..."
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "CSV vacío"
+msgstr "Empty CSV"
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "Error cargando datos:"
+msgstr "Error loading data:"
+
+#: .\shop\templates\admin\browsing_history.html
+msgid "Copiar tabla"
+msgstr "Copy table"
+
+#: .\shop\templates\admin\manage.html
+msgid "Acciones rápidas"
+msgstr "Quick actions"
+
+#: .\shop\templates\admin\manage.html
+msgid "Productos más añadidos al carrito"
+msgstr "Most added to cart products"
+
+#: .\shop\templates\admin\manage.html
+msgid "Accesos rápidos a reportes y herramientas administrativas"
+msgstr "Quick access to reports and administrative tools"
+
+#: .\shop\templates\admin\manage.html
+msgid "Agregar producto"
+msgstr "Add product"
+
+#: .\shop\templates\admin\manage.html
+msgid "Rellena los datos y pulsa"
+msgstr "Fill in the data and press"
+
+#: .\shop\templates\admin\manage.html
+msgid "Agregar"
+msgstr "Add"
+
+#: .\shop\templates\admin\manage.html
+msgid "Nombre"
+msgstr "Name"
+
+#: .\shop\templates\admin\manage.html
+msgid "Marca"
+msgstr "Brand"
+
+#: .\shop\templates\admin\manage.html
+msgid "Cantidad"
+msgstr "Quantity"
+
+#: .\shop\templates\admin\manage.html
+msgid "Precio"
+msgstr "Price"
+
+#: .\shop\templates\admin\manage.html
+msgid "Recomendar"
+msgstr "Recommend"
+
+#: .\shop\templates\admin\manage.html
+msgid "Recomendación IA:"
+msgstr "AI Recommendation:"
+
+#: .\shop\templates\admin\manage.html
+msgid "Garantía"
+msgstr "Warranty"
+
+#: .\shop\templates\admin\manage.html
+msgid "Tipo"
+msgstr "Type"
+
+#: .\shop\templates\admin\manage.html
+msgid "Descripción"
+msgstr "Description"
+
+#: .\shop\templates\admin\manage.html
+msgid "Imagen"
+msgstr "Image"
+
+#: .\shop\templates\admin\manage.html
+msgid "Descargar Excel"
+msgstr "Download Excel"
+
+#: .\shop\templates\admin\manage.html
+msgid "Descargar PDF"
+msgstr "Download PDF"
+
+#: .\shop\templates\admin\manage.html
+msgid "Sin imagen"
+msgstr "No image"
+
+#: .\shop\templates\admin\manage.html
+msgid "No hay productos disponibles."
+msgstr "No products available."
+
+#: .\shop\templates\admin\manage.html
+msgid "Por favor ingresa el nombre del producto primero"
+msgstr "Please enter the product name first"
+
+#: .\shop\templates\admin\manage.html
+msgid "Consultando..."
+msgstr "Querying..."
+
+#: .\shop\templates\admin\manage.html
+msgid "Precio sugerido:"
+msgstr "Suggested price:"
+
+#: .\shop\templates\admin\manage.html
+msgid "Rango:"
+msgstr "Range:"
+
+#: .\shop\templates\admin\manage.html
+msgid "Confianza:"
+msgstr "Confidence:"
+
+#: .\shop\templates\admin\manage.html
+msgid "Error:"
+msgstr "Error:"
+
+#: .\shop\templates\admin\manage.html
+msgid "Error al consultar recomendación:"
+msgstr "Error querying recommendation:"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Estadísticas de valoraciones"
+msgstr "Rating Statistics"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Promedio, desviación y número de reseñas por producto."
+msgstr "Average, deviation and number of reviews per product."
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Mostrar"
+msgstr "Show"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Resumen de valoraciones"
+msgstr "Rating Summary"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Última actualización:"
+msgstr "Last update:"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Producto"
+msgstr "Product"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Reseñas"
+msgstr "Reviews"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Calificación media"
+msgstr "Average Rating"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Desviación"
+msgstr "Deviation"
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "No hay datos para mostrar."
+msgstr "No data to display."
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "No se pudieron cargar los datos."
+msgstr "Could not load data."
+
+#: .\shop\templates\admin\rating_stats.html
+msgid "Se produjo un error al cargar los datos."
+msgstr "An error occurred while loading data."
+
+#: .\shop\templates\admin\top_products.html
+msgid "Top productos"
+msgstr "Top Products"
+
+#: .\shop\templates\admin\top_products.html
+msgid "Visualiza los productos más vistos y más comprados."
+msgstr "View the most viewed and most purchased products."
+
+#: .\shop\templates\admin\top_products.html
+msgid "Más vistos"
+msgstr "Most Viewed"
+
+#: .\shop\templates\admin\top_products.html
+msgid "Últimas 24 horas"
+msgstr "Last 24 hours"
+
+#: .\shop\templates\admin\top_products.html
+msgid "Más comprados"
+msgstr "Most Purchased"
+
+#: .\shop\templates\admin\top_products.html
+msgid "Periodo configurable"
+msgstr "Configurable period"
+
+#: .\shop\templates\admin\top_products.html
+msgid "Error en la petición"
+msgstr "Request error"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Informe Detallado"
+msgstr "Detailed Report"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Descarga un resumen PDF con los principales indicadores."
+msgstr "Download a PDF summary with the main indicators."
+
+#: .\shop\templates\admin\report_export.html
+msgid "Periodo"
+msgstr "Period"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Desde"
+msgstr "From"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Hasta"
+msgstr "Until"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Formato"
+msgstr "Format"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Descargar informe"
+msgstr "Download report"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Abrir en nueva pestaña"
+msgstr "Open in new tab"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Última generación:"
+msgstr "Last generated:"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Visitas"
+msgstr "Visits"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Compras"
+msgstr "Purchases"
+
+#: .\shop\templates\admin\report_export.html
+msgid "Generando..."
+msgstr "Generating..."
+
+#: .\shop\templates\admin\reports.html
+msgid "Informes de administración"
+msgstr "Administration Reports"
+
+#: .\shop\templates\admin\reports.html
+msgid "Tendencias y productos más relevantes"
+msgstr "Trends and most relevant products"
+
+#: .\shop\templates\admin\reports.html
+msgid "periodo"
+msgstr "period"
+
+#: .\shop\templates\admin\reports.html
+msgid "Tendencias"
+msgstr "Trends"
+
+#: .\shop\templates\admin\reports.html
+msgid "últimos"
+msgstr "last"
+
+#: .\shop\templates\admin\reports.html
+msgid "Visitas, compras y calificación media"
+msgstr "Visits, purchases and average rating"
+
+#: .\shop\templates\admin\reports.html
+msgid "No se pudieron cargar los datos del gráfico."
+msgstr "Could not load chart data."
+
+#: .\shop\templates\admin\reports.html
+msgid "No hay datos"
+msgstr "No data"
+
+#: .\shop\templates\admin\reports.html
+msgid "Fetch failed"
+msgstr "Fetch failed"
+
+#: .\shop\templates\admin\reports.html
+msgid "Actualizado"
+msgstr "Updated"
+
+#: .\shop\templates\admin\reports.html
+msgid "Error"
+msgstr "Error"
+
+#: .\shop\templates\admin\reports.html
+msgid "Top fetch failed"
+msgstr "Top fetch failed"
+
+#: .\shop\templates\admin\most_added_to_cart.html
+msgid "Ranking de productos más populares según cantidad de veces añadidos al carrito"
+msgstr "Ranking of most popular products by times added to cart"
+
+#: .\shop\templates\admin\most_added_to_cart.html
+msgid "Veces añadido"
+msgstr "Times added"
+
+#: .\shop\templates\admin\most_added_to_cart.html
+msgid "Total de productos únicos añadidos:"
+msgstr "Total unique products added:"
+
+#: .\shop\templates\admin\most_added_to_cart.html
+msgid "No hay datos disponibles aún. Los productos aparecerán cuando los usuarios los añadan al carrito."
+msgstr "No data available yet. Products will appear when users add them to cart."
+
+msgid "Most Added to Cart Products"
+msgstr "Productos más añadidos al carrito"
+
+# Admin template translations
+
+msgid "Search History (UI)"
+msgstr "Historial de búsqueda (UI)"
+
+msgid "Back"
+msgstr "Volver"
+
+msgid "No records"
+msgstr "No hay registros"
+
+msgid "Empty CSV"
+msgstr "CSV vacío"
+
+msgid "Error loading data:"
+msgstr "Error cargando datos:"
+
+msgid "Copy table"
+msgstr "Copiar tabla"
+
+msgid "Search user, product or text"
+msgstr "Buscar usuario, producto o texto"
+
+msgid "All users"
+msgstr "Todos los usuarios"
+
+msgid "All actions"
+msgstr "Todas las acciones"
+
+msgid "View product"
+msgstr "Ver producto"
+
+msgid "Start date"
+msgstr "Fecha inicio"
+
+msgid "End date"
+msgstr "Fecha fin"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "Download CSV"
+msgstr "Descargar CSV"
+
+msgid "Records:"
+msgstr "Registros:"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "Path"
+msgstr "Ruta"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Copied"
+msgstr "Copiado"
+
+msgid "Search product..."
+msgstr "Buscar producto..."
+
+msgid "Quick actions"
+msgstr "Acciones rápidas"
+
+msgid "Most added to cart products"
+msgstr "Productos más añadidos al carrito"
+
+msgid "Quick access to reports and administrative tools"
+msgstr "Accesos rápidos a reportes y herramientas administrativas"
+
+msgid "Add product"
+msgstr "Agregar producto"
+
+msgid "Fill in the data and press"
+msgstr "Rellena los datos y pulsa"
+
+msgid "Add"
+msgstr "Agregar"
+
+msgid "Recommend"
+msgstr "Recomendar"
+
+msgid "AI Recommendation:"
+msgstr "Recomendación IA:"
+
+msgid "Image"
+msgstr "Imagen"
+
+msgid "Stock"
+msgstr "Stock"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Are you sure you want to delete this product?"
+msgstr "¿Seguro que quieres eliminar este producto?"
+
+msgid "Edit product"
+msgstr "Editar producto"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Save changes"
+msgstr "Guardar cambios"
+
+msgid "Current image:"
+msgstr "Imagen actual:"
+
+msgid "Leave empty to keep current image"
+msgstr "Dejar vacío para mantener la imagen actual"
+
+msgid "Download Excel"
+msgstr "Descargar Excel"
+
+msgid "Download PDF"
+msgstr "Descargar PDF"
+
+msgid "No image"
+msgstr "Sin imagen"
+
+msgid "Please enter the product name first"
+msgstr "Por favor ingresa el nombre del producto primero"
+
+msgid "Querying..."
+msgstr "Consultando..."
+
+msgid "Suggested price:"
+msgstr "Precio sugerido:"
+
+msgid "Range:"
+msgstr "Rango:"
+
+msgid "Confidence:"
+msgstr "Confianza:"
+
+msgid "Error querying recommendation:"
+msgstr "Error al consultar recomendación:"
+
+msgid "Rating statistics"
+msgstr "Estadísticas de valoraciones"
+
+msgid "Average, deviation and number of reviews per product."
+msgstr "Promedio, desviación y número de reseñas por producto."
+
+msgid "Show"
+msgstr "Mostrar"
+
+msgid "Rating summary"
+msgstr "Resumen de valoraciones"
+
+msgid "Last updated:"
+msgstr "Última actualización:"
+
+msgid "Average rating"
+msgstr "Calificación media"
+
+msgid "Deviation"
+msgstr "Desviación"
+
+msgid "Could not load data."
+msgstr "No se pudieron cargar los datos."
+
+msgid "No data to display."
+msgstr "No hay datos para mostrar."
+
+msgid "An error occurred while loading data."
+msgstr "Se produjo un error al cargar los datos."
+
+msgid "Top products"
+msgstr "Top productos"
+
+msgid "View the most viewed and most purchased products."
+msgstr "Visualiza los productos más vistos y más comprados."
+
+msgid "Most viewed"
+msgstr "Más vistos"
+
+msgid "Last 24 hours"
+msgstr "Últimas 24 horas"
+
+msgid "Most purchased"
+msgstr "Más comprados"
+
+msgid "Configurable period"
+msgstr "Periodo configurable"
+
+msgid "No data"
+msgstr "No hay datos"
+
+# Order Confirmation Page
+msgid "Order Placed Successfully!"
+msgstr "¡Pedido Realizado Exitosamente!"
+
+msgid "Thank you for your purchase! Your order has been confirmed."
+msgstr "¡Gracias por tu compra! Tu pedido ha sido confirmado."
+
+msgid "Order Details"
+msgstr "Detalles del Pedido"
+
+msgid "Keep this information for your records"
+msgstr "Guarda esta información para tus registros"
+
+msgid "Order Number"
+msgstr "Número de Pedido"
+
+msgid "Order Date"
+msgstr "Fecha del Pedido"
+
+msgid "Customer"
+msgstr "Cliente"
+
+msgid "Total Amount"
+msgstr "Monto Total"
+
+msgid "What happens next?"
+msgstr "¿Qué sigue?"
+
+msgid "Order Confirmed"
+msgstr "Pedido Confirmado"
+
+msgid "Your order has been received and is being processed"
+msgstr "Tu pedido ha sido recibido y está siendo procesado"
+
+msgid "Preparing for Shipment"
+msgstr "Preparando para Envío"
+
+msgid "We'll pack your items with care"
+msgstr "Empacaremos tus artículos con cuidado"
+
+msgid "On the Way"
+msgstr "En Camino"
+
+msgid "Your order will be shipped soon"
+msgstr "Tu pedido será enviado pronto"
+
+msgid "Delivered"
+msgstr "Entregado"
+
+msgid "Enjoy your purchase!"
+msgstr "¡Disfruta tu compra!"
+
+msgid "Track Your Order"
+msgstr "Rastrear tu Pedido"
+
+msgid "Email Confirmation"
+msgstr "Confirmación por Email"
+
+msgid "Check your inbox for order details"
+msgstr "Revisa tu bandeja de entrada para los detalles del pedido"
+
+msgid "Need Help?"
+msgstr "¿Necesitas Ayuda?"
+
+msgid "Contact our support team anytime"
+msgstr "Contacta a nuestro equipo de soporte en cualquier momento"
+
+msgid "Easy Returns"
+msgstr "Devoluciones Fáciles"
+
+msgid "30-day return policy available"
+msgstr "Política de devolución de 30 días disponible"
+
+# UX Improvements
+msgid "Home"
+msgstr "Inicio"
+
+msgid "Shop"
+msgstr "Tienda"
+
+msgid "Added!"
+msgstr "¡Añadido!"
+
+
+msgid "Request error"
+msgstr "Error en la petición"
+
+msgid "Detailed Report"
+msgstr "Informe Detallado"
+
+msgid "Download a PDF summary with key indicators."
+msgstr "Descarga un resumen PDF con los principales indicadores."
+
+msgid "Period"
+msgstr "Periodo"
+
+msgid "From"
+msgstr "Desde"
+
+msgid "To"
+msgstr "Hasta"
+
+msgid "Format"
+msgstr "Formato"
+
+msgid "Download report"
+msgstr "Descargar informe"
+
+msgid "Open in new tab"
+msgstr "Abrir en nueva pestaña"
+
+msgid "Last generation:"
+msgstr "Última generación:"
+
+msgid "Visits"
+msgstr "Visitas"
+
+msgid "Purchases"
+msgstr "Compras"
+
+msgid "Generating..."
+msgstr "Generando..."
+
+msgid "Administration reports"
+msgstr "Informes de administración"
+
+msgid "Trends and most relevant products"
+msgstr "Tendencias y productos más relevantes"
+
+msgid "period"
+msgstr "periodo"
+
+msgid "Trends"
+msgstr "Tendencias"
+
+msgid "last"
+msgstr "últimos"
+
+msgid "Visits, purchases and average rating"
+msgstr "Visitas, compras y calificación media"
+
+msgid "Could not load chart data."
+msgstr "No se pudieron cargar los datos del gráfico."
+
+msgid "Updated"
+msgstr "Actualizado"
+
+msgid "Ranking of most popular products based on number of times added to cart"
+msgstr "Ranking de productos más populares según cantidad de veces añadidos al carrito"
+
+msgid "Times added"
+msgstr "Veces añadido"
+
+msgid "Total unique products added:"
+msgstr "Total de productos únicos añadidos:"
+
+msgid "No data available yet. Products will appear when users add them to cart."
+msgstr "No hay datos disponibles aún. Los productos aparecerán cuando los usuarios los añadan al carrito."

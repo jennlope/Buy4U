@@ -174,3 +174,32 @@ class PurchaseHistoryView(LoginRequiredMixin, ListView):
             )
             .order_by("-created_at", "-order_id")
         )
+
+    def get_context_data(self, **kwargs):
+        """Añadir estadísticas al contexto: total de órdenes, valor total y órdenes del mes actual."""
+        context = super().get_context_data(**kwargs)
+
+        qs = self.get_queryset()
+
+        # Total de órdenes
+        total_orders = qs.count()
+
+        # Valor total sumando la propiedad `total` de cada orden (manejar None)
+        # Aprovechamos el prefetch para evitar queries N+1
+        total_value = sum((o.total or 0) for o in qs)
+
+        # Órdenes del mes actual
+        from django.utils import timezone
+
+        now = timezone.now()
+        orders_this_month = qs.filter(created_at__year=now.year, created_at__month=now.month).count()
+
+        context.update(
+            {
+                "total_orders_count": total_orders,
+                "total_value": total_value,
+                "orders_this_month_count": orders_this_month,
+            }
+        )
+
+        return context

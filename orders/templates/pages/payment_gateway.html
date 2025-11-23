@@ -4,50 +4,421 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-success">{% trans "Basic Payment Gateway" %}</h2>
-    <p>{% trans "Think carefully about whether you really want these products, bro." %}</p>
-
-    <!-- Lista de productos en el carrito -->
-    <div class="row">
-        <div class="col-lg-12">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>{% trans "Product" %}</th>
-                        <th>{% trans "Quantity" %}</th>
-                        <th>{% trans "Price" %}</th>
-                        <th>{% trans "Subtotal" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in products %}
-                    <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>${{ item.product.price }}</td>
-                        <td>${{ item.subtotal }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Progress Steps -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="progress-steps">
+                <div class="step completed">
+                    <div class="step-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="step-label">{% trans "Cart" %}</div>
+                </div>
+                <div class="step-line completed"></div>
+                <div class="step active">
+                    <div class="step-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="step-label">{% trans "Payment" %}</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="step-label">{% trans "Confirmation" %}</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Total a pagar -->
     <div class="row">
-        <div class="col-lg-12 text-end">
-            <h4>{% trans "Total" %}: ${{ total }}</h4>
-        </div>
-    </div>
+        <!-- Order Summary Section -->
+        <div class="col-lg-7 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shopping-bag text-primary me-2"></i>
+                        {% trans "Order Summary" %}
+                    </h4>
+                    <p class="text-muted small mb-0 mt-1">{% trans "Review your order before payment" %}</p>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 modern-table">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "Product" %}</th>
+                                    <th class="text-center">{% trans "Quantity" %}</th>
+                                    <th class="text-end">{% trans "Price" %}</th>
+                                    <th class="text-end">{% trans "Subtotal" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in products %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="product-mini-icon me-2">
+                                                <i class="fas fa-box"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold">{{ item.product.name }}</div>
+                                                <small class="text-muted">{{ item.product.brand }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <span class="badge bg-light text-dark px-3 py-2">{{ item.quantity }}</span>
+                                    </td>
+                                    <td class="text-end align-middle">${{ item.product.price|floatformat:2 }}</td>
+                                    <td class="text-end align-middle">
+                                        <strong class="text-primary">${{ item.subtotal|floatformat:2 }}</strong>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Botón para simular el pago -->
-    <div class="row">
-        <div class="col-lg-12 text-end">
-            <form method="post" action="{% url 'process_payment' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success">{% trans "Proceed to Checkout" %}</button>
-            </form>
+            <!-- Security Badges -->
+            <div class="row mt-4 g-3">
+                <div class="col-md-4">
+                    <div class="security-badge">
+                        <i class="fas fa-lock fa-2x text-success mb-2"></i>
+                        <h6 class="mb-1">{% trans "Secure Payment" %}</h6>
+                        <small class="text-muted">{% trans "SSL Encrypted" %}</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
+                        <h6 class="mb-1">{% trans "Buyer Protection" %}</h6>
+                        <small class="text-muted">{% trans "Money Back Guarantee" %}</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="security-badge">
+                        <i class="fas fa-headset fa-2x text-info mb-2"></i>
+                        <h6 class="mb-1">{% trans "24/7 Support" %}</h6>
+                        <small class="text-muted">{% trans "Always Here to Help" %}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-lg sticky-payment">
+                <div class="card-header bg-gradient text-white py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card me-2"></i>
+                        {% trans "Payment Details" %}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Price Breakdown -->
+                    <div class="price-breakdown mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">{% trans "Subtotal" %}</span>
+                            <span class="fw-semibold">${{ total|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">{% trans "Shipping" %}</span>
+                            <span class="text-success fw-semibold">{% trans "FREE" %}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">{% trans "Tax" %} (0%)</span>
+                            <span class="fw-semibold">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">{% trans "Discount" %}</span>
+                            <span class="fw-semibold">$0.00</span>
+                        </div>
+                        <hr class="my-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{% trans "Total Amount" %}</h5>
+                            <h3 class="text-primary mb-0 fw-bold">${{ total|floatformat:2 }}</h3>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selection -->
+                    <div class="payment-methods mb-4">
+                        <label class="form-label fw-semibold mb-3">{% trans "Select Payment Method" %}</label>
+                        <div class="payment-option active">
+                            <input type="radio" name="payment_method" id="credit_card" value="credit_card" checked>
+                            <label for="credit_card">
+                                <i class="fas fa-credit-card me-2"></i>
+                                {% trans "Credit/Debit Card" %}
+                                <span class="float-end">
+                                    <i class="fab fa-cc-visa"></i>
+                                    <i class="fab fa-cc-mastercard"></i>
+                                    <i class="fab fa-cc-amex"></i>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" id="paypal" value="paypal">
+                            <label for="paypal">
+                                <i class="fab fa-paypal me-2"></i>
+                                {% trans "PayPal" %}
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" id="bank_transfer" value="bank_transfer">
+                            <label for="bank_transfer">
+                                <i class="fas fa-university me-2"></i>
+                                {% trans "Bank Transfer" %}
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <form method="post" action="{% url 'process_payment' %}" id="payment-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3 checkout-btn">
+                            <i class="fas fa-lock me-2"></i>
+                            {% trans "Complete Payment" %}
+                            <span class="float-end">${{ total|floatformat:2 }}</span>
+                        </button>
+                    </form>
+
+                    <a href="{% url 'cart_index' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        {% trans "Back to Cart" %}
+                    </a>
+
+                    <!-- Trust Message -->
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {% trans "Your payment information is secure and encrypted" %}
+                        </small>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Progress Steps */
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.step-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.step.completed .step-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.step.active .step-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.step.completed .step-label,
+.step.active .step-label {
+    color: #667eea;
+}
+
+.step-line {
+    width: 100px;
+    height: 3px;
+    background: #e9ecef;
+    margin: 0 20px;
+}
+
+.step-line.completed {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Modern Table */
+.modern-table thead th {
+    background: #f8f9fa;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    padding: 1rem;
+}
+
+.modern-table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.modern-table tbody td {
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+}
+
+.product-mini-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+}
+
+/* Security Badges */
+.security-badge {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.security-badge:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+/* Payment Card */
+.sticky-payment {
+    position: sticky;
+    top: 100px;
+}
+
+.price-breakdown {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+/* Payment Options */
+.payment-option {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+    border-color: #667eea;
+    background: #f8f9fa;
+}
+
+.payment-option.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.payment-option label {
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+    font-weight: 500;
+}
+
+/* Checkout Button */
+.checkout-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .step-line {
+        width: 50px;
+        margin: 0 10px;
+    }
+    
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Payment method selection
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+    
+    // Form validation
+    document.getElementById('payment-form').addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>{% trans "Processing..." %}';
+        btn.disabled = true;
+    });
+});
+</script>
 {% endblock %}

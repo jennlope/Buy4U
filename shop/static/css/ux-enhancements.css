@@ -1,0 +1,605 @@
+/**
+ * UX Enhancements CSS
+ * Implementa patrones de diseño modernos para mejorar la experiencia de usuario
+ * Basado en Nielsen Norman Group, Material Design y WCAG 2.1
+ */
+
+/* ============================================
+   1. SKELETON SCREENS
+   ============================================ */
+
+.skeleton-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.skeleton-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-body {
+    padding: 20px;
+}
+
+.skeleton-title,
+.skeleton-price,
+.skeleton-button,
+.skeleton-text {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.skeleton-title {
+    height: 24px;
+    width: 80%;
+}
+
+.skeleton-price {
+    height: 32px;
+    width: 60%;
+    margin: 0 auto 15px;
+}
+
+.skeleton-button {
+    height: 44px;
+    margin-bottom: 10px;
+}
+
+.skeleton-text {
+    height: 16px;
+    width: 100%;
+}
+
+.skeleton-text:last-child {
+    width: 60%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============================================
+   2. LAZY LOADING
+   ============================================ */
+
+.lazy-load {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+.lazy-load.loaded {
+    opacity: 1;
+    animation: none;
+    background: none;
+}
+
+/* ============================================
+   3. BREADCRUMBS
+   ============================================ */
+
+.breadcrumb {
+    background-color: #f8f9fa;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.breadcrumb-item {
+    font-size: 0.95rem;
+}
+
+.breadcrumb-item a {
+    color: #11998e;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d7a70;
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: #9ca3af;
+}
+
+/* ============================================
+   4. MICROINTERACCIONES
+   ============================================ */
+
+/* Hover Lift Effect */
+.hover-lift {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Button Ripple Effect */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-ripple:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Add to Cart Success Animation */
+.add-to-cart-btn {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn.success {
+    background-color: #10b981 !important;
+    border-color: #10b981 !important;
+}
+
+.add-to-cart-btn.success .btn-text {
+    display: none !important;
+}
+
+.add-to-cart-btn.success .btn-success-text {
+    display: inline !important;
+    animation: success-pop 0.5s ease;
+}
+
+@keyframes success-pop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Pulse Animation for Notifications */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* ============================================
+   5. SMOOTH SCROLLING
+   ============================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4);
+}
+
+/* ============================================
+   6. LOADING STATES
+   ============================================ */
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-dots::after {
+    content: '';
+    animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+    0%, 20% {
+        content: '.';
+    }
+    40% {
+        content: '..';
+    }
+    60%, 100% {
+        content: '...';
+    }
+}
+
+/* ============================================
+   7. CARDS & CONTAINERS
+   ============================================ */
+
+.card-modern {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card-modern:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card-gradient {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+/* ============================================
+   8. ANIMATIONS
+   ============================================ */
+
+/* Fade In Up */
+.fade-in-up {
+    animation: fade-in-up 0.6s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade In */
+.fade-in {
+    animation: fade-in 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide In Right */
+.slide-in-right {
+    animation: slide-in-right 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scale In */
+.scale-in {
+    animation: scale-in 0.4s ease forwards;
+    opacity: 0;
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Stagger Delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+.stagger-7 { animation-delay: 0.7s; }
+.stagger-8 { animation-delay: 0.8s; }
+
+/* ============================================
+   9. FOCUS STATES (ACCESIBILIDAD)
+   ============================================ */
+
+*:focus-visible {
+    outline: 3px solid #11998e;
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid #11998e;
+    outline-offset: 2px;
+}
+
+/* ============================================
+   10. TOOLTIPS
+   ============================================ */
+
+.tooltip-custom {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-custom::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    padding: 8px 12px;
+    background: #1f2937;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.tooltip-custom:hover::after {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+}
+
+/* ============================================
+   11. PROGRESS BARS
+   ============================================ */
+
+.progress-modern {
+    height: 8px;
+    border-radius: 10px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.progress-modern .progress-bar {
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* ============================================
+   12. BADGES
+   ============================================ */
+
+.badge-modern {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.badge-success-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color: white;
+}
+
+.badge-primary-gradient {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+/* ============================================
+   13. ALERTS
+   ============================================ */
+
+.alert-modern {
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid;
+}
+
+.alert-modern.alert-success {
+    background: #f0fdf4;
+    border-left-color: #10b981;
+    color: #065f46;
+}
+
+.alert-modern.alert-info {
+    background: #f0f9ff;
+    border-left-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+.alert-modern.alert-warning {
+    background: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #78350f;
+}
+
+.alert-modern.alert-danger {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+    color: #991b1b;
+}
+
+/* ============================================
+   14. RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .breadcrumb {
+        font-size: 0.875rem;
+        padding: 10px 15px;
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-4px);
+    }
+    
+    .scroll-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+    }
+}
+
+@media (max-width: 576px) {
+    .skeleton-image {
+        height: 200px;
+    }
+    
+    .breadcrumb-item {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============================================
+   15. PRINT STYLES
+   ============================================ */
+
+@media print {
+    .breadcrumb,
+    .scroll-to-top,
+    .hover-lift {
+        display: none !important;
+    }
+    
+    .lazy-load {
+        opacity: 1 !important;
+    }
+}
+
+/* ============================================
+   16. DARK MODE SUPPORT (Opcional)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+    .breadcrumb {
+        background-color: #1f2937;
+    }
+    
+    .breadcrumb-item a {
+        color: #38ef7d;
+    }
+    
+    .breadcrumb-item.active {
+        color: #9ca3af;
+    }
+}
+
+/* ============================================
+   17. REDUCED MOTION (ACCESIBILIDAD)
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    html {
+        scroll-behavior: auto;
+    }
+}

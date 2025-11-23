@@ -1,5 +1,6 @@
 {% extends "pages/base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <style>
@@ -353,10 +354,10 @@
 
 <div class="page-wrap">
   <div class="header">
-    <h1 class="title">📦 Historial de Compras</h1>
+    <h1 class="title">📦 {% trans "Purchase History" %}</h1>
     {% if user.is_authenticated %}
       <a class="btn btn-success" href="{% url 'shop' %}">
-        🛍️ Nueva compra
+        🛍️ {% trans "New Purchase" %}
       </a>
     {% endif %}
   </div>
@@ -365,24 +366,20 @@
     <!-- Stats Bar -->
     <div class="stats-bar">
       <div class="stat-item">
-        <span class="stat-value">{{ orders|length }}</span>
-        <span class="stat-label">Órdenes totales</span>
+        <span class="stat-value">{{ total_orders_count }}</span>
+        <span class="stat-label">{% trans "Total Orders" %}</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">
-          {% if orders %}
-            ${% widthratio orders|length 1 1000 %}K+
-          {% else %}
-            $0
-          {% endif %}
+          ${{ total_value|floatformat:2 }}
         </span>
-        <span class="stat-label">Valor total</span>
+        <span class="stat-label">{% trans "Total Value" %}</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">
-          {{ orders|length|add:"-1"|add:1 }}
+          {{ orders_this_month_count }}
         </span>
-        <span class="stat-label">Este mes</span>
+        <span class="stat-label">{% trans "This Month" %}</span>
       </div>
     </div>
 
@@ -391,7 +388,7 @@
         <div class="card">
           <div class="card-head">
             <div>
-              <div class="order-id">Orden #{{ order.order_id }}</div>
+              <div class="order-id">{% trans "Order" %} #{{ order.order_id }}</div>
               <div class="muted">{{ order.created_at|date:"d/m/Y H:i" }}</div>
             </div>
             <div>
@@ -404,7 +401,7 @@
           </div>
 
           <div class="products-section">
-            <div class="section-title">🛒 Productos</div>
+            <div class="section-title">🛒 {% trans "Products" %}</div>
             <ul class="list">
               {% for po in order.product_orders.all %}
                 <li>
@@ -417,14 +414,14 @@
                 </li>
               {% empty %}
                 <li style="justify-content: center; opacity: 0.6;">
-                  <em>Sin productos asociados</em>
+                  <em>{% trans "No associated products" %}</em>
                 </li>
               {% endfor %}
             </ul>
 
             {% if order.total %}
               <div class="tot">
-                <span>Total</span>
+                <span>{% trans "Total" %}</span>
                 <span>${{ order.total|floatformat:2 }}</span>
               </div>
             {% endif %}
@@ -437,17 +434,17 @@
       <div class="pagination">
         {% if page_obj.has_previous %}
           <a class="btn btn-outline" href="?page={{ page_obj.previous_page_number }}">
-            ← Anterior
+            ← {% trans "Previous" %}
           </a>
         {% endif %}
         
         <span class="page-info">
-          Página {{ page_obj.number }} de {{ paginator.num_pages }}
+          {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ paginator.num_pages }}
         </span>
         
         {% if page_obj.has_next %}
           <a class="btn btn-outline" href="?page={{ page_obj.next_page_number }}">
-            Siguiente →
+            {% trans "Next" %} →
           </a>
         {% endif %}
       </div>
@@ -455,13 +452,13 @@
   {% else %}
     <div class="empty">
       <div class="empty-icon">🛒</div>
-      <div class="empty-title">Aún no tienes compras</div>
+      <div class="empty-title">{% trans "You don't have any purchases yet" %}</div>
       <div class="empty-text">
-        Cuando realices tu primera orden, aparecerá aquí con todos los detalles.
+        {% trans "When you place your first order, it will appear here with all the details." %}
       </div>
       {% if user.is_authenticated %}
         <a class="btn btn-success" href="{% url 'shop' %}">
-          ✨ Explorar productos
+          ✨ {% trans "Explore Products" %}
         </a>
       {% endif %}
     </div>

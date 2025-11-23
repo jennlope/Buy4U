@@ -4,15 +4,15 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
-      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← {% trans "Back" %}</a>
     </div>
     <div>
-      <h2 class="h4 mb-1">Top productos</h2>
-      <p class="text-muted mb-0">Visualiza los productos más vistos y más comprados.</p>
+      <h2 class="h4 mb-1">{% trans "Top products" %}</h2>
+      <p class="text-muted mb-0">{% trans "View the most viewed and most purchased products." %}</p>
     </div>
 
     <div class="d-flex align-items-center gap-3">
-      <label for="topSelect" class="me-2 text-muted small mb-0">Mostrar</label>
+      <label for="topSelect" class="me-2 text-muted small mb-0">{% trans "Show" %}</label>
       <select id="topSelect" class="form-select form-select-sm rounded-pill shadow-sm" style="width:120px;">
         <option value="5">Top 5</option>
         <option value="10" selected>Top 10</option>
@@ -26,13 +26,13 @@
       <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
         <div class="card-header bg-gradient text-white py-3" style="background: linear-gradient(135deg, #16a34a, #4ade80);">
           <div class="d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 fw-semibold">Más vistos</h6>
-            <small class="opacity-75">Últimas 24 horas</small>
+            <h6 class="mb-0 fw-semibold">{% trans "Most viewed" %}</h6>
+            <small class="opacity-75">{% trans "Last 24 hours" %}</small>
           </div>
         </div>
         <div class="card-body bg-light-subtle">
           <ul id="topViewed" class="list-group list-group-flush"></ul>
-          <div id="viewedEmpty" class="text-center py-3 d-none text-muted">No hay datos para mostrar.</div>
+          <div id="viewedEmpty" class="text-center py-3 d-none text-muted">{% trans "No data to display." %}</div>
         </div>
       </div>
     </div>
@@ -41,20 +41,20 @@
       <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
         <div class="card-header bg-gradient text-white py-3" style="background: linear-gradient(135deg, #2563eb, #60a5fa);">
           <div class="d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 fw-semibold">Más comprados</h6>
-            <small class="opacity-75">Periodo configurable</small>
+            <h6 class="mb-0 fw-semibold">{% trans "Most purchased" %}</h6>
+            <small class="opacity-75">{% trans "Configurable period" %}</small>
           </div>
         </div>
         <div class="card-body bg-light-subtle">
           <ul id="topBought" class="list-group list-group-flush"></ul>
-          <div id="boughtEmpty" class="text-center py-3 d-none text-muted">No hay datos para mostrar.</div>
+          <div id="boughtEmpty" class="text-center py-3 d-none text-muted">{% trans "No data to display." %}</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="d-flex justify-content-between align-items-center mt-4">
-    <div id="lastUpdated" class="text-muted small">Última actualización: —</div>
+    <div id="lastUpdated" class="text-muted small">{% trans "Last updated:" %} —</div>
     <div class="d-flex align-items-center gap-2">
       <div id="spinner" class="spinner-border spinner-border-sm text-primary d-none" role="status" aria-hidden="true"></div>
       <div id="errorMsg" class="text-danger small d-none"></div>
@@ -134,7 +134,7 @@
 
     try{
       const res = await fetch(`/admin/reports/top-products/data/?n=${encodeURIComponent(n)}`);
-      if(!res.ok) throw new Error('Error en la petición');
+      if(!res.ok) throw new Error('{% trans "Request error" %}');
       const data = await res.json();
 
       tv.innerHTML = '';
@@ -170,10 +170,10 @@
         });
       } else boughtEmpty.classList.remove('d-none');
 
-      lastUpdated.textContent = 'Última actualización: ' + new Date().toLocaleString();
+      lastUpdated.textContent = '{% trans "Last updated:" %} ' + new Date().toLocaleString();
     }catch(err){
       console.error(err);
-      errorMsg.textContent = 'No se pudieron cargar los datos.';
+      errorMsg.textContent = '{% trans "Could not load data." %}';
       errorMsg.classList.remove('d-none');
     }finally{
       showLoading(false);
