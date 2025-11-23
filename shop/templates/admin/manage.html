@@ -1,5 +1,5 @@
 {% extends "pages/base.html" %}
-{% load static i18n %}
+{% load static i18n l10n %}
 
 {% block content %}
 <div class="container py-5">
@@ -13,19 +13,19 @@
       <div class="d-flex gap-2 mb-2">
         <div class="input-group input-group-sm" style="width:220px">
           <span class="input-group-text bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line></svg></span>
-          <input id="searchInput" class="form-control form-control-sm" placeholder="Buscar producto..." aria-label="Buscar">
+          <input id="searchInput" class="form-control form-control-sm" placeholder="{% trans 'Search product...' %}" aria-label="{% trans 'Search' %}">
         </div>
 
-        <div class="btn-group btn-group-sm" role="group" aria-label="Acciones rápidas">
+        <div class="btn-group btn-group-sm" role="group" aria-label="{% trans 'Quick actions' %}">
           <a href="{% url 'admin_reports_overview' %}" class="btn btn-outline-success">📊</a>
           <a href="{% url 'admin_top_products' %}" class="btn btn-outline-primary">🔥</a>
           <a href="{% url 'admin_reports_ratings' %}" class="btn btn-outline-warning">⭐</a>
-          <a href="{% url 'most_added_to_cart' %}" class="btn btn-outline-success" title="Productos más añadidos al carrito">🛒</a>
+          <a href="{% url 'most_added_to_cart' %}" class="btn btn-outline-success" title="{% trans 'Most added to cart products' %}">🛒</a>
           <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">🏷️</a>
           <a href="{% url 'admin_browsing_history_ui' %}" class="btn btn-outline-info">🔎</a>
         </div>
       </div>
-      <div class="small text-muted">Accesos rápidos a reportes y herramientas administrativas</div>
+      <div class="small text-muted">{% trans "Quick access to reports and administrative tools" %}</div>
     </div>
   </div>
 
@@ -33,8 +33,8 @@
   <div class="card border-0 shadow-sm rounded-4 mb-4">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="h5 mb-0">Agregar producto</h3>
-        <small class="text-muted">Rellena los datos y pulsa <strong>Agregar</strong></small>
+        <h3 class="h5 mb-0">{% trans "Add product" %}</h3>
+        <small class="text-muted">{% trans "Fill in the data and press" %} <strong>{% trans "Add" %}</strong></small>
       </div>
 
       <form method="POST" enctype="multipart/form-data" class="row g-3">
@@ -42,59 +42,59 @@
         <input type="hidden" name="add" value="1">
 
         <div class="col-md-6">
-          <label class="form-label small">Nombre</label>
+          <label class="form-label small">{% trans "Name" %}</label>
           <input type="text" name="name" id="productName" class="form-control form-control-sm" required>
           
-          <label class="form-label small mt-2">Marca</label>
+          <label class="form-label small mt-2">{% trans "Brand" %}</label>
           <input type="text" name="brand" id="productBrand" class="form-control form-control-sm" required>
 
-          <label class="form-label small mt-2">Cantidad</label>
+          <label class="form-label small mt-2">{% trans "Quantity" %}</label>
           <input type="number" name="quantity" class="form-control form-control-sm" required>
         </div>
 
         <div class="col-md-6">
-          <label class="form-label small">Precio</label>
+          <label class="form-label small">{% trans "Price" %}</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" name="price" id="productPrice" class="form-control form-control-sm" step="0.01" required>
             <button type="button" class="btn btn-outline-primary btn-sm" id="btnRecomendarPrecio">
-              <i class="fas fa-robot"></i> Recomendar
+              <i class="fas fa-robot"></i> {% trans "Recommend" %}
             </button>
           </div>
           <div id="precioRecomendacion" class="mt-2 d-none">
             <div class="alert alert-info alert-sm py-2 px-3">
-              <strong>💡 Recomendación IA:</strong>
+              <strong>💡 {% trans "AI Recommendation:" %}</strong>
               <div id="precioRecomendadoTexto"></div>
             </div>
           </div>
 
-          <label class="form-label small mt-2">Garantía</label>
+          <label class="form-label small mt-2">{% trans "Warranty" %}</label>
           <input type="text" name="warranty" class="form-control form-control-sm">
 
-          <label class="form-label small mt-2">Tipo</label>
+          <label class="form-label small mt-2">{% trans "Type" %}</label>
           <input type="text" name="type" id="productType" class="form-control form-control-sm">
         </div>
 
         <div class="col-12">
-          <label class="form-label small">Descripción</label>
+          <label class="form-label small">{% trans "Description" %}</label>
           <textarea name="description" rows="2" class="form-control form-control-sm" required></textarea>
         </div>
 
         <div class="col-md-6">
-          <label class="form-label small">Imagen</label>
+          <label class="form-label small">{% trans "Image" %}</label>
           <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
         </div>
 
         <div class="col-md-6 d-flex align-items-end justify-content-end">
-          <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Agregar producto</button>
+          <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">{% trans "Add product" %}</button>
         </div>
       </form>
     </div>
   </div>
 
   <div class="d-flex justify-content-end mb-3 gap-2">
-    <a href="{% url 'generar_reporte' 'excel' %}" class="btn btn-outline-success btn-sm">Descargar Excel</a>
-    <a href="{% url 'generar_reporte' 'pdf' %}" class="btn btn-outline-danger btn-sm">Descargar PDF</a>
+    <a href="{% url 'generar_reporte' 'excel' %}" class="btn btn-outline-success btn-sm">{% trans "Download Excel" %}</a>
+    <a href="{% url 'generar_reporte' 'pdf' %}" class="btn btn-outline-danger btn-sm">{% trans "Download PDF" %}</a>
   </div>
 
   <!-- Grid de productos -->
@@ -106,7 +106,7 @@
           {% if product.image %}
             <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height:140px; object-fit:contain;">
           {% else %}
-            <div class="text-muted text-center">Sin imagen</div>
+            <div class="text-muted text-center">{% trans "No image" %}</div>
           {% endif %}
         </div>
 
@@ -123,18 +123,18 @@
 
           <div class="d-flex justify-content-between align-items-center mt-3">
             <div>
-              <span class="small text-muted">Stock</span>
+              <span class="small text-muted">{% trans "Stock" %}</span>
               <div class="fw-semibold">{{ product.quantity }}</div>
             </div>
 
             <div class="d-flex gap-2">
-              <form method="POST" onsubmit="return confirm('¿Seguro que quieres eliminar este producto?');">
+              <form method="POST" onsubmit="return confirm('{% trans 'Are you sure you want to delete this product?' %}');">
                 {% csrf_token %}
                 <input type="hidden" name="delete" value="{{ product.pk }}">
-                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                <button type="submit" class="btn btn-sm btn-outline-danger">{% trans "Delete" %}</button>
               </form>
 
-              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal{{ product.pk }}">Editar</button>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editProductModal{{ product.pk }}">{% trans "Edit" %}</button>
             </div>
           </div>
         </div>
@@ -146,8 +146,8 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Editar producto</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <h5 class="modal-title">{% trans "Edit product" %}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
           </div>
           <div class="modal-body">
             <form method="POST" enctype="multipart/form-data">
@@ -155,48 +155,57 @@
               <input type="hidden" name="edit" value="{{ product.pk }}">
 
               <div class="mb-2">
-                <label class="form-label small">Nombre</label>
+                <label class="form-label small">{% trans "Name" %}</label>
                 <input type="text" name="name" class="form-control form-control-sm" value="{{ product.name }}" required>
               </div>
 
               <div class="mb-2 row">
                 <div class="col-6">
-                  <label class="form-label small">Precio</label>
-                  <input type="number" name="price" class="form-control form-control-sm" value="{{ product.price }}" step="0.01" required>
+                  <label class="form-label small">{% trans "Price" %}</label>
+                  <input type="number" name="price" class="form-control form-control-sm" value="{{ product.price|unlocalize }}" step="0.01" required>
                 </div>
                 <div class="col-6">
-                  <label class="form-label small">Cantidad</label>
+                  <label class="form-label small">{% trans "Quantity" %}</label>
                   <input type="number" name="quantity" class="form-control form-control-sm" value="{{ product.quantity }}" required>
                 </div>
               </div>
 
               <div class="mb-2">
-                <label class="form-label small">Marca</label>
+                <label class="form-label small">{% trans "Brand" %}</label>
                 <input type="text" name="brand" class="form-control form-control-sm" value="{{ product.brand }}">
               </div>
 
               <div class="mb-2">
-                <label class="form-label small">Garantía</label>
+                <label class="form-label small">{% trans "Warranty" %}</label>
                 <input type="text" name="warranty" class="form-control form-control-sm" value="{{ product.warranty }}">
               </div>
 
               <div class="mb-2">
-                <label class="form-label small">Tipo</label>
+                <label class="form-label small">{% trans "Type" %}</label>
                 <input type="text" name="type" class="form-control form-control-sm" value="{{ product.type }}">
               </div>
 
               <div class="mb-2">
-                <label class="form-label small">Descripción</label>
+                <label class="form-label small">{% trans "Description" %}</label>
                 <textarea name="description" class="form-control form-control-sm" rows="3">{{ product.description }}</textarea>
               </div>
 
               <div class="mb-3">
-                <label class="form-label small">Imagen</label>
+                <label class="form-label small">{% trans "Image" %}</label>
+                {% if product.image %}
+                  <div class="mb-2">
+                    <small class="text-muted d-block mb-1">{% trans "Current image:" %}</small>
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                  </div>
+                {% endif %}
                 <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
+                {% if product.image %}
+                  <small class="form-text text-muted">{% trans "Leave empty to keep current image" %}</small>
+                {% endif %}
               </div>
 
               <div class="text-end">
-                <button type="submit" class="btn btn-success btn-sm">Guardar cambios</button>
+                <button type="submit" class="btn btn-success btn-sm">{% trans "Save changes" %}</button>
               </div>
             </form>
           </div>
@@ -205,7 +214,7 @@
     </div>
 {% empty %}
     <div class="col-12">
-      <div class="card p-4 rounded-4 text-center text-muted">No hay productos disponibles.</div>
+      <div class="card p-4 rounded-4 text-center text-muted">{% trans "No products available." %}</div>
     </div>
 {% endfor %}
   </div>
@@ -237,13 +246,13 @@ document.getElementById('btnRecomendarPrecio')?.addEventListener('click', async 
   const tipo = document.getElementById('productType').value;
   
   if (!nombre) {
-    alert('Por favor ingresa el nombre del producto primero');
+    alert('{% trans "Please enter the product name first" %}');
     return;
   }
   
   const btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Consultando...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% trans "Querying..." %}';
   
   try {
     const response = await fetch('/api/ia/recomendar-precio/', {
@@ -263,21 +272,21 @@ document.getElementById('btnRecomendarPrecio')?.addEventListener('click', async 
       
       document.getElementById('precioRecomendadoTexto').innerHTML = `
         <div class="small">
-          <strong>Precio sugerido:</strong> $${recomendacion.precio_recomendado.toFixed(2)}<br>
-          <strong>Rango:</strong> $${recomendacion.precio_minimo.toFixed(2)} - $${recomendacion.precio_maximo.toFixed(2)}<br>
-          <strong>Confianza:</strong> ${recomendacion.confianza}<br>
+          <strong>{% trans "Suggested price:" %}</strong> $${recomendacion.precio_recomendado.toFixed(2)}<br>
+          <strong>{% trans "Range:" %}</strong> $${recomendacion.precio_minimo.toFixed(2)} - $${recomendacion.precio_maximo.toFixed(2)}<br>
+          <strong>{% trans "Confidence:" %}</strong> ${recomendacion.confianza}<br>
           <em>${recomendacion.justificacion}</em>
         </div>
       `;
       document.getElementById('precioRecomendacion').classList.remove('d-none');
     } else {
-      alert('Error: ' + data.error);
+      alert('{% trans "Error:" %} ' + data.error);
     }
   } catch (err) {
-    alert('Error al consultar recomendación: ' + err.message);
+    alert('{% trans "Error querying recommendation:" %} ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-robot"></i> Recomendar';
+    btn.innerHTML = '<i class="fas fa-robot"></i> {% trans "Recommend" %}';
   }
 });
 </script>

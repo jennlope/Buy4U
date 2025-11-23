@@ -5,15 +5,15 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
-      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← {% trans "Back" %}</a>
     </div>
     <div>
-      <h1 class="h4 mb-1">Estadísticas de valoraciones</h1>
-      <p class="text-muted mb-0">Promedio, desviación y número de reseñas por producto.</p>
+      <h1 class="h4 mb-1">{% trans "Rating statistics" %}</h1>
+      <p class="text-muted mb-0">{% trans "Average, deviation and number of reviews per product." %}</p>
     </div>
     
     <div class="d-flex align-items-center gap-3">
-      <label for="topSelect" class="me-2 text-muted small mb-0">Mostrar</label>
+      <label for="topSelect" class="me-2 text-muted small mb-0">{% trans "Show" %}</label>
       <select id="topSelect" class="form-select form-select-sm rounded-pill shadow-sm" style="width:120px;">
         <option value="5">Top 5</option>
         <option value="10" selected>Top 10</option>
@@ -25,8 +25,8 @@
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-header bg-gradient" style="background: linear-gradient(135deg,#0ea5a4,#34d399);">
       <div class="d-flex justify-content-between align-items-center text-white">
-        <div class="fw-semibold">Resumen de valoraciones</div>
-        <small id="lastUpdated" class="opacity-75">Última actualización: —</small>
+        <div class="fw-semibold">{% trans "Rating summary" %}</div>
+        <small id="lastUpdated" class="opacity-75">{% trans "Last updated:" %} —</small>
       </div>
     </div>
 
@@ -36,19 +36,19 @@
           <thead>
             <tr class="text-muted small">
               <th style="width:6rem">#</th>
-              <th>Producto</th>
-              <th style="width:9rem">Reseñas</th>
-              <th style="width:11rem">Calificación media</th>
-              <th style="width:11rem">Desviación</th>
+              <th>{% trans "Product" %}</th>
+              <th style="width:9rem">{% trans "Reviews" %}</th>
+              <th style="width:11rem">{% trans "Average rating" %}</th>
+              <th style="width:11rem">{% trans "Deviation" %}</th>
             </tr>
           </thead>
           <tbody id="ratingTable">
-            <tr><td colspan="5">Cargando...</td></tr>
+            <tr><td colspan="5">{% trans "Loading..." %}</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div id="errorMsg" class="text-danger small mt-2 d-none">No se pudieron cargar los datos.</div>
+      <div id="errorMsg" class="text-danger small mt-2 d-none">{% trans "Could not load data." %}</div>
     </div>
   </div>
 </div>
@@ -101,14 +101,14 @@
 
     try{
       const res = await fetch(`/admin/reports/ratings/data/?top=${encodeURIComponent(top)}`);
-      if(!res.ok) throw new Error('Error en la petición');
+      if(!res.ok) throw new Error('Request error');
       const data = await res.json();
 
       tbody.innerHTML = '';
 
       if(!Array.isArray(data.rating_stats) || data.rating_stats.length === 0){
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="5">No hay datos para mostrar.</td>`;
+        tr.innerHTML = `<td colspan="5">{% trans "No data to display." %}</td>`;
         tbody.appendChild(tr);
       } else {
         data.rating_stats.forEach((item, i) => {
@@ -124,11 +124,11 @@
         });
       }
 
-      lastUpdated.textContent = 'Última actualización: ' + new Date().toLocaleString();
+      lastUpdated.textContent = '{% trans "Last updated:" %} ' + new Date().toLocaleString();
     }catch(err){
       console.error(err);
       errorMsg.classList.remove('d-none');
-      tbody.innerHTML = `<tr><td colspan="5">Se produjo un error al cargar los datos.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5">{% trans "An error occurred while loading data." %}</td></tr>`;
     }
   }
 

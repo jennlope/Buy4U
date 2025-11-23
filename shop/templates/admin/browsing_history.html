@@ -5,10 +5,10 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="h3 mb-1">Historial de búsqueda (UI)</h1>
+      <h1 class="h3 mb-1">{% trans "Search History (UI)" %}</h1>
     </div>
     <div>
-      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary btn-sm">← {% trans "Back" %}</a>
     </div>
   </div>
 
@@ -18,40 +18,40 @@
         <div class="col-sm-4 col-md-3">
           <div class="input-group input-group-sm">
             <span class="input-group-text bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"></circle><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line></svg></span>
-            <input type="text" name="bh_query" id="bh_query" placeholder="Buscar usuario, producto o texto" class="form-control" autocomplete="off">
+            <input type="text" name="bh_query" id="bh_query" placeholder="{% trans 'Search user, product or text' %}" class="form-control" autocomplete="off">
           </div>
         </div>
 
         <div class="col-auto">
           <select id="bh_user" name="bh_user" class="form-select form-select-sm">
-            <option value="">Todos los usuarios</option>
+            <option value="">{% trans "All users" %}</option>
           </select>
         </div>
 
         <div class="col-auto">
           <select id="bh_action" name="bh_action" class="form-select form-select-sm">
-            <option value="">Todas las acciones</option>
-            <option value="search">Búsqueda</option>
-            <option value="product_view">Ver producto</option>
+            <option value="">{% trans "All actions" %}</option>
+            <option value="search">{% trans "Search" %}</option>
+            <option value="product_view">{% trans "View product" %}</option>
           </select>
         </div>
 
         <div class="col-auto">
-          <input type="date" id="bh_start" name="bh_start" class="form-control form-control-sm" title="Fecha inicio">
+          <input type="date" id="bh_start" name="bh_start" class="form-control form-control-sm" title="{% trans 'Start date' %}">
         </div>
         <div class="col-auto">
-          <input type="date" id="bh_end" name="bh_end" class="form-control form-control-sm" title="Fecha fin">
+          <input type="date" id="bh_end" name="bh_end" class="form-control form-control-sm" title="{% trans 'End date' %}">
         </div>
 
         <div class="col-auto">
-          <button id="applyFilters" class="btn btn-success btn-sm">Filtrar</button>
+          <button id="applyFilters" class="btn btn-success btn-sm">{% trans "Filter" %}</button>
         </div>
 
         <div class="col-auto">
-          <button id="downloadCsvBtn" class="btn btn-outline-secondary btn-sm">Descargar CSV</button>
+          <button id="downloadCsvBtn" class="btn btn-outline-secondary btn-sm">{% trans "Download CSV" %}</button>
         </div>
 
-        <div class="col ms-auto text-end small text-muted">Registros: <span id="rowsCount">—</span></div>
+        <div class="col ms-auto text-end small text-muted">{% trans "Records:" %} <span id="rowsCount">—</span></div>
       </form>
     </div>
   </div>
@@ -62,15 +62,15 @@
         <thead class="table-light small text-muted">
           <tr>
             <th style="width:4rem">#</th>
-            <th>Usuario</th>
-            <th>Acción</th>
-            <th>Producto</th>
-            <th>Path</th>
-            <th>Fecha</th>
+            <th>{% trans "User" %}</th>
+            <th>{% trans "Action" %}</th>
+            <th>{% trans "Product" %}</th>
+            <th>{% trans "Path" %}</th>
+            <th>{% trans "Date" %}</th>
           </tr>
         </thead>
         <tbody id="bhTbody">
-          <tr><td colspan="6" class="text-center text-muted py-4">Cargando...</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4">{% trans "Loading..." %}</td></tr>
         </tbody>
       </table>
     </div>
@@ -201,7 +201,7 @@
 function renderRows(objs){
   tbody.innerHTML = '';
   if(!objs || objs.length === 0){
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No hay registros</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">{% trans "No records" %}</td></tr>';
     rowsCount.textContent = '0';
     return;
   }
@@ -216,9 +216,9 @@ function renderRows(objs){
 
     const tr = document.createElement('tr');
     const actionTag = action === 'search'
-      ? `<span class="tag-action tag-search">Búsqueda</span>`
+      ? `<span class="tag-action tag-search">{% trans "Search" %}</span>`
       : (action === 'product_view'
-          ? `<span class="tag-action tag-view">Ver producto</span>`
+          ? `<span class="tag-action tag-view">{% trans "View product" %}</span>`
           : escapeHtml(action || ''));
 
     tr.innerHTML = `
@@ -236,20 +236,20 @@ function renderRows(objs){
 
   // carga inicial: descarga CSV, parsea, genera objetos y cache
   async function initialLoad(){
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Cargando...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">{% trans "Loading..." %}</td></tr>';
     try{
       const resp = await fetch(baseCsvUrl, {credentials: 'same-origin'});
       if(!resp.ok) throw new Error('HTTP ' + resp.status);
       const txt = await resp.text();
       const rows = parseCSVrows(txt);
-      if(!rows || rows.length === 0){ throw new Error('CSV vacío'); }
+      if(!rows || rows.length === 0){ throw new Error('{% trans "Empty CSV" %}'); }
       const objs = rowsToObjects(rows);
       allRows = objs;
       buildUserList(allRows);
       const filtered = applyFiltersToCache();
       renderRows(filtered);
     }catch(err){
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Error cargando datos: ${escapeHtml(err.message || String(err))}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">{% trans "Error loading data:" %} ${escapeHtml(err.message || String(err))}</td></tr>`;
       rowsCount.textContent = '0';
       console.error(err);
     }
@@ -260,8 +260,8 @@ function renderRows(objs){
     try{
       const rows = Array.from(document.querySelectorAll('#bhTbody tr')).map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim()).join('\t')).join('\n');
       await navigator.clipboard.writeText(rows);
-      copyBtn.textContent = 'Copiado';
-      setTimeout(()=> copyBtn.textContent = 'Copiar tabla', 1500);
+      copyBtn.textContent = '{% trans "Copied" %}';
+      setTimeout(()=> copyBtn.textContent = '{% trans "Copy table" %}', 1500);
     }catch(e){ console.warn(e); }
   });
 
